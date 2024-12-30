@@ -1,76 +1,70 @@
 import time
 import pyperclip
 
-def split_string(string, number):
-    parts = string.split()
+# small bug: when starting, you need to copy something before it works ingame
+
+def split_string(string, number, symbol):
+    parts = string.split(symbol)
     if len(parts) > number:
         return parts[number]
     else:
         return None
 
-def split_coords(string):
-    parts = string.split(".")
-    if len(parts) > 0:
-        return parts[0]
-    else:
-        return None
-
-def split_dimension(string):
-    parts = string.split(":")
-    if len(parts) > 1:
-        return parts[1]
-    else:
-        return None
-
 def convert_coords(x, y, z, dimension):
+    x = float(x)
+    y = float(y)
+    z = float(z)
     if dimension == "overworld":
-        x = x * 8
-        z = z * 8
-        print(f"{x}, {y}, {z}")
+        x_temp = x / 8
+        z_temp = z / 8
+        y_temp = y
+        x = split_string(str(x_temp), 0, ".")
+        y = split_string(str(y_temp), 0, ".")
+        z = split_string(str(z_temp), 0, ".")
+        print(f"New Coords: {x}, {y}, {z}")
     elif dimension == "nether":
-        x = x / 8
-        z = z / 8
-        print(f"{x}, {y}, {z}")
-
-def get_last_element_from_clipboard():
-    clipboard_content = pyperclip.paste()
-    elements = clipboard_content.split()
-    if elements:
-        return elements[-1]
+        x_temp = x * 8
+        z_temp = z * 8
+        y_temp = y
+        x = split_string(str(x_temp), 0, ".")
+        y = split_string(str(y_temp), 0, ".")
+        z = split_string(str(z_temp), 0, ".")
+        print(f"New Coords: {x}, {y}, {z}")
     else:
-        return None
+        print("No dimension found")
 
-def copy(command):
-    if command.startswith("/execute in minecraft:overworld run tp @s"):
-        x1 = split_string(command, 6)
-        y1 = split_string(command, 7)
-        z1 = split_string(command, 8)
-        x = split_coords(x1)
-        y = split_coords(y1)
-        z = split_coords(z1)
-        return x, y, z
-    else:
-        return None
+def extract_coords(string):
+    x_temp = split_string(string, 6, " ")
+    y_temp = split_string(string, 7, " ")
+    z_temp = split_string(string, 8, " ")
+    x = split_string(x_temp, 0, ".")
+    y = split_string(y_temp, 0, ".")
+    z = split_string(z_temp, 0, ".")
+    print(f"Coords: {x}, {y}, {z}")
+    return  x, y, z
+
+def extract_dimension(string):
+    dimension_temp = split_string(string, 2, " ")
+    dimension = split_string(dimension_temp, 1, ":")
+    print(f"Dimension: {dimension}")
+    return dimension
 
 def on_clipboard_change(new_content):
-    dimensiontemp = split_string(new_content, 3)
-    dimension = split_dimension(dimensiontemp)
-    coords = copy(new_content)
-    if coords:
-        x, y, z = coords
-        x = int(x)
-        y = int(y)
-        z = int(z)
+    print(f"New content: {new_content}")
+    if new_content.startswith("/execute in minecraft:overworld run tp @s"):
+        x, y, z = extract_coords(new_content)
+        dimension = extract_dimension(new_content)
         convert_coords(x, y, z, dimension)
 
+
 def monitor_clipboard(callback):
-    previous_content = None
+    last_content = pyperclip.paste()
     while True:
+        time.sleep(0.5)  # Check every 0.5 seconds
         current_content = pyperclip.paste()
-        if current_content != previous_content:
-            previous_content = current_content
+        if current_content != last_content:
             callback(current_content)
-        time.sleep(1)
+            last_content = current_content
 
 # Start monitoring the clipboard
 monitor_clipboard(on_clipboard_change)
