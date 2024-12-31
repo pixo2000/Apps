@@ -3,12 +3,14 @@ import pyperclip
 
 # small bug: when starting, you need to copy something before it works ingame
 
+
 def split_string(string, number, symbol):
     parts = string.split(symbol)
     if len(parts) > number:
         return parts[number]
     else:
         return None
+
 
 def convert_coords(x, y, z, dimension):
     x = float(x)
@@ -33,6 +35,7 @@ def convert_coords(x, y, z, dimension):
     else:
         print("No dimension found")
 
+
 def extract_coords(string):  # negative coords?
     x_temp = split_string(string, 6, " ")
     y_temp = split_string(string, 7, " ")
@@ -41,13 +44,15 @@ def extract_coords(string):  # negative coords?
     y = split_string(y_temp, 0, ".")
     z = split_string(z_temp, 0, ".")
     print(f"Coords: {x}, {y}, {z}")
-    return  x, y, z
+    return x, y, z
+
 
 def extract_dimension(string):
     dimension_temp = split_string(string, 2, " ")
     dimension = split_string(dimension_temp, 1, ":")
     print(f"Dimension: {dimension}")
     return dimension
+
 
 def on_clipboard_change(new_content):
     print(f"New content: {new_content}")
@@ -66,7 +71,6 @@ def monitor_clipboard(callback):
             callback(current_content)
             last_content = current_content
 
-# Start monitoring the clipboard
-monitor_clipboard(on_clipboard_change)
 
-
+if __name__ == '__main__':
+    monitor_clipboard(on_clipboard_change())
