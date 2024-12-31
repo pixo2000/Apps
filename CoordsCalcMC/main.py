@@ -33,7 +33,7 @@ def convert_coords(x, y, z, dimension):
     else:
         print("No dimension found")
 
-def extract_coords(string):
+def extract_coords(string):  # negative coords?
     x_temp = split_string(string, 6, " ")
     y_temp = split_string(string, 7, " ")
     z_temp = split_string(string, 8, " ")
@@ -51,7 +51,7 @@ def extract_dimension(string):
 
 def on_clipboard_change(new_content):
     print(f"New content: {new_content}")
-    if new_content.startswith("/execute in minecraft:overworld run tp @s"):
+    if new_content.startswith("/execute in minecraft:overworld run tp @s"):  # only world with nether
         x, y, z = extract_coords(new_content)
         dimension = extract_dimension(new_content)
         convert_coords(x, y, z, dimension)
