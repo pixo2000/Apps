@@ -4,6 +4,11 @@ from listener import monitor_clipboard
 
 
 # fix closing gui not stopping other threads
+# self msg, copy to clipboard, copy to clipboard with comma, copy to clipboard with space
+# on entry change, add functions to read and change entrys
+
+# on hover tutorial
+# global varialbe for clipboard
 
 
 if __name__ == '__main__':
