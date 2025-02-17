@@ -1,1 +1,3 @@
-Bug mit GUI -> crash
+NBT to players
+
+test ability
