@@ -15,3 +15,20 @@ def init(playground_instance):
     playground_instance = playground.write(playground_instance, 5, 5, "V") # Player 4
 
     return  playground_instance
+
+
+# Testing with classes for NBT attributes
+class Player:
+    def __init__(self, name, team, position):
+        self.name = name
+        self.team = team
+        self.position = position
+
+    def place_on_playground(self, playground_instance):
+        playground_instance = playground.write(playground_instance, self.team, self.position, self.name)
+        return playground_instance
+
+class NPC(Player):
+    def __init__(self, name, team, position, difficulty):
+        super().__init__(name, team, position)
+        self.difficulty = difficulty
