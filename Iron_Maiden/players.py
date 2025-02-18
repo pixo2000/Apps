@@ -1,23 +1,5 @@
 import playground
 
-def init(playground_instance):
-    # Team 1
-    playground_instance = playground.write(playground_instance, 1, 1, "E") # Player 5
-    playground_instance = playground.write(playground_instance, 1, 2, "C") # Player 3
-    playground_instance = playground.write(playground_instance, 1, 3, "A") # Player 1
-    playground_instance = playground.write(playground_instance, 1, 4, "B") # Player 2
-    playground_instance = playground.write(playground_instance, 1, 5, "D") # Player 4
-    # Team 2
-    playground_instance = playground.write(playground_instance, 5, 1, "W") # Player 5
-    playground_instance = playground.write(playground_instance, 5, 2, "X") # Player 3
-    playground_instance = playground.write(playground_instance, 5, 3, "Z") # Player 1
-    playground_instance = playground.write(playground_instance, 5, 4, "Y") # Player 2
-    playground_instance = playground.write(playground_instance, 5, 5, "V") # Player 4
-
-    return  playground_instance
-
-
-# Testing with classes for NBT attributes
 class Player:
     def __init__(self, name, team, position):
         self.name = name
@@ -25,10 +7,19 @@ class Player:
         self.position = position
 
     def place_on_playground(self, playground_instance):
-        playground_instance = playground.write(playground_instance, self.team, self.position, self.name)
+        playground_instance = playground.write(playground_instance, self.position[0], self.position[1], self.name)
         return playground_instance
 
 class NPC(Player):
     def __init__(self, name, team, position, difficulty):
         super().__init__(name, team, position)
         self.difficulty = difficulty
+
+def init(playground_instance):
+    team_1 = [Player("E", 1, (1, 1)), Player("C", 1, (1, 2)), Player("A", 1, (1, 3)), Player("B", 1, (1, 4)), Player("D", 1, (1, 5))]
+    team_2 = [NPC("W", 2, (5, 1), "hard"), NPC("X", 2, (5, 2), "medium"), NPC("Z", 2, (5, 3), "easy"), NPC("Y", 2, (5, 4), "medium"), NPC("V", 2, (5, 5), "hard")]
+
+    for player in team_1 + team_2:
+        playground_instance = player.place_on_playground(playground_instance)
+
+    return playground_instance
