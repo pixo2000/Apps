@@ -18,3 +18,19 @@ code everything myself
 
 as start make it in table form with commands - no "spielfeld". 
 table should update live but not from start
+
+
+
+immer coord system pro dimension
+coords: 2d, negativ und positiv
+dimensionen immer z.B. D13 oder A4, B09 -> bei nem jump kommt man immer bei 0 0 raus
+
+add command to scan system/himmelskörper
+
+sonnensystem fertig machen und noch n system
+wenn man auf coords von planeten etc is kann man landen / bei sternen in der nähe tanken und drauf explorieren man kann auch bei planeten mit belt abbauen
+
+find solution for too many moons
+
+
+write docs
