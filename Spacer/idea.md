@@ -11,3 +11,10 @@ when you press G the player is centerd. there are some stations generated random
 
 erstmal als tabelle
 gibt auch carrier etc
+
+
+code everything myself
+
+
+as start make it in table form with commands - no "spielfeld". 
+table should update live but not from start
