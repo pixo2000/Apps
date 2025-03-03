@@ -16,7 +16,7 @@ def temp_start():
 
 # main loop
 def main():
-    name = temp_start()
+    name = temp_start() # replace later
     me = player.Player(name)
     running = True
     
