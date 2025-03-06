@@ -58,21 +58,7 @@
                     "Ganymed",
                     "Callisto"
                 ]
-            },
-            "Saturn": {
-                "type": "Planet",
-                "Coordinates": {
-                    "x": "100",
-                    "y": "200"
-                },
-                "Moons": [
-                    "Mimas",
-                    "Enceladus",
-                    "Tethys",
-                    "Dione",
-                    "Rhea",
-                    "Titan",
-                    
+            }
         }
     }
 }

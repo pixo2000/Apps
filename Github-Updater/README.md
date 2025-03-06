@@ -1,0 +1,1 @@
+Just a basic script that checks the local app version and downloads the newest from github releases

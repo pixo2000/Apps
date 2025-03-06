@@ -1,5 +1,5 @@
 import player
-
+from dimension import Dimension
 
 def handle_input(name):
     command = input(f"{name.name}, what do you want to do? ")
@@ -17,7 +17,16 @@ def handle_input(name):
             print("Invalid move command.")
             return "positive"
     elif command == "whereami":
-        name.position
+        name.position()
+        return "positive"
+    elif command.startswith("jump "): # jump A01
+        dimension_name = command.split(" ")[1]
+        name.jump(dimension_name)
+        return "positive"
+    elif command == "dimensions":
+        print("Available dimensions:")
+        for dim in Dimension.get_available_dimensions():
+            print(f"- {dim}")
         return "positive"
     elif command in ["quit", "exit"]:
         print("Goodbye Captain!")
