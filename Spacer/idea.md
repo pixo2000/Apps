@@ -37,3 +37,17 @@ write docs
 
 
 den kram aus threema chat
+
+
+
+scans:
+man kann system scan machen:
+gibt alle bodies und auch namen falls in nem 100er radius -> grobe cords
+planet scan nur in nem 10er radius und gibt name etc-> genaue coords
+
+maybe nav-bojen?
+
+
+
+planet bzw sonnen interaction is wenn man drauf is,landen, monde sind 2 neben planet
+auf sonne = tot
