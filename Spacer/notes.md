@@ -6,3 +6,9 @@ clear
 planet scan
 
 saving and server
+
+
+maybe ne map?
+
+
+change animation, fix visual bugs
