@@ -4,9 +4,11 @@ import player_input as pinput
 
 # import modules
 import time
+import os
 
 # load stuff
 def temp_start():
+    os.system("clear")
     print("\n" + "=" * 50)
     print("  SPACER - INTERSTELLAR EXPLORATION SIMULATOR")
     print("=" * 50 + "\n")

@@ -45,7 +45,7 @@ man kann system scan machen:
 gibt alle bodies und auch namen falls in nem 100er radius -> grobe cords
 planet scan nur in nem 10er radius und gibt name etc-> genaue coords, moonds und städte
 
-maybe nav-bojen?
+maybe nav-bojen? -> ja neben stern so bei 3, 5 oda so
 
 
 
