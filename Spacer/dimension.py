@@ -1,4 +1,5 @@
 import json
+import os
 
 class Dimension:
     def __init__(self, name):
@@ -6,7 +7,9 @@ class Dimension:
         self.load_dimension()
     
     def load_dimension(self):
-        with open('dimensions.json', 'r') as f: # fix this stupid ass error
+        base_path = os.path.dirname(__file__)
+        file_path = os.path.join(base_path, 'dimensions.json')
+        with open(file_path, 'r') as f:
             dimensions = json.load(f)
             if self.name in dimensions:
                 dimension_data = dimensions[self.name]
