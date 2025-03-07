@@ -43,7 +43,7 @@ den kram aus threema chat
 scans:
 man kann system scan machen:
 gibt alle bodies und auch namen falls in nem 100er radius -> grobe cords
-planet scan nur in nem 10er radius und gibt name etc-> genaue coords
+planet scan nur in nem 10er radius und gibt name etc-> genaue coords, moonds und städte
 
 maybe nav-bojen?
 
