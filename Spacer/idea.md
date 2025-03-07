@@ -1,6 +1,6 @@
+# Spacer
+
 Game idee: 3d sternsystem man kann in nem schiff rumfliegen zu stationen, so wie galaxy in elite. so 3d space aus 0 und 1, 1 feld braucht 1 sprungreichweite und 5s?
-
-
 
 init prompt:
 create a game in python. remember to split files into main, visual, player etc.
@@ -12,14 +12,10 @@ when you press G the player is centerd. there are some stations generated random
 erstmal als tabelle
 gibt auch carrier etc
 
-
 code everything myself
 
-
-as start make it in table form with commands - no "spielfeld". 
+as start make it in table form with commands - no "spielfeld".
 table should update live but not from start
-
-
 
 immer coord system pro dimension
 coords: 2d, negativ und positiv
@@ -32,13 +28,9 @@ wenn man auf coords von planeten etc is kann man landen / bei sternen in der nä
 
 find solution for too many moons
 
-
 write docs
 
-
 den kram aus threema chat
-
-
 
 scans:
 man kann system scan machen:
@@ -46,8 +38,6 @@ gibt alle bodies und auch namen falls in nem 100er radius -> grobe cords
 planet scan nur in nem 10er radius und gibt name etc-> genaue coords, moonds und städte
 
 maybe nav-bojen? -> ja neben stern so bei 3, 5 oda so
-
-
 
 planet bzw sonnen interaction is wenn man drauf is,landen, monde sind 2 neben planet
 auf sonne = tot
