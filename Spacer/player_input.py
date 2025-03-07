@@ -1,4 +1,5 @@
 import player
+from dimension import Dimension
 
 def handle_input(name):
     command = input(f"{name.name}, what do you want to do? ")
