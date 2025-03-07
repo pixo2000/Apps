@@ -1,5 +1,6 @@
 import time
 from dimension import Dimension
+from tqdm import tqdm
 
 class Player:
     def __init__(self, name):
@@ -33,7 +34,11 @@ class Player:
         try:
             new_dimension = Dimension(dimension_name)
             print(f"Jumping to {new_dimension.title}...")
-            time.sleep(2)
+            
+            # Ladeleiste anzeigen
+            for _ in tqdm(range(20), desc="Jumping", ncols=100): # change loading bar style
+                time.sleep(0.1)
+
             self.dimension = new_dimension
             self.x = 10
             self.y = 10
