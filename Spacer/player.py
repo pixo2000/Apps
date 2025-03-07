@@ -22,17 +22,20 @@ class Player:
         # Show countdown and wait for each field
         for remaining in range(distance, 0, -1):
             progress = distance - remaining
-            bar_length = 20
-            progress_bar = "█" * int((progress/distance) * bar_length) + "▒" * (bar_length - int((progress/distance) * bar_length))
+            bar_length = 30
+            
+            # Create a dynamic spaceship movement animation
+            ship_position = int((progress/distance) * (bar_length-3))
+            spacebar = "·" * ship_position + "🚀" + "·" * (bar_length - ship_position - 3)
             percent = int((progress/distance) * 100)
             
-            # Display movement animation
+            # Display improved movement animation with spaceship
             if remaining > 1:
-                print(f"\r[{bar_length}] Moving... {remaining} fields remaining [{percent}%] {bar_length}", end="", flush=True)
-                time.sleep(1)
+                print(f"\r[{spacebar}] Moving... {remaining} seconds remaining [{percent}%]", end="", flush=True)
+                time.sleep(0.8)
             else:
-                print(f"\r[{bar_length}] Moving... Final approach [{percent}%] {bar_length}", end="", flush=True)
-                time.sleep(1)
+                print(f"\r[{spacebar}] Moving... Final approach [{percent}%]", end="", flush=True)
+                time.sleep(0.8)
                 
         # Update position
         self.x = x
