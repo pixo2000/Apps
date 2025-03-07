@@ -70,7 +70,13 @@ def display_scan_results(scan_results):
     print("\n=== SCAN RESULTS ===")
     print(f"Found {len(scan_results)} celestial bodies:")
     
+    # Header for table format
+    print(f"{'Type':<15} {'Name':<20} {'Coordinates':<20} {'Distance':<10}")
+    print("-" * 65)
+    
     for body in scan_results:
-        print(f"Type: {body['type']}, Name: {body['name']}, Coordinates: {body['coords']}")
+        # Format distance to show only 2 decimal places
+        distance_formatted = f"{body['distance']:.2f}"
+        print(f"{body['type']:<15} {body['name']:<20} {str(body['coords']):<20} {distance_formatted:<10}")
     
     print("===================\n")
