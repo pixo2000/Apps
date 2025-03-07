@@ -3,12 +3,30 @@ import player
 import player_input as pinput
 
 # import modules
-
+import time
 
 # load stuff
 def temp_start():
+    print("\n" + "=" * 50)
+    print("  SPACER - INTERSTELLAR EXPLORATION SIMULATOR")
+    print("=" * 50 + "\n")
+    
+    # Animation für die Initialisierung
+    loading_messages = ["Initializing systems", "Calibrating navigation", "Loading universe"]
+    for message in loading_messages:
+        print(f"\r{message}...", end="", flush=True)
+        time.sleep(0.8)
+    print("\r" + " " * 30, end="")  # Lösche die Zeile
+    
+    print("\nSystem initialized. Ready for commands.\n")
+    
     name = input("Who are you, Captain? ")
-    print(f"Welcome, {name}!")
+    print("\n" + "*" * 50)
+    print(f"Welcome aboard, Captain {name}!")
+    print("Your journey through the cosmos begins now.")
+    print("*" * 50 + "\n")
+    time.sleep(1)
+    
     return name
 
 # global values
