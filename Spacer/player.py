@@ -33,12 +33,14 @@ class Player:
     def jump(self, dimension_name):
         try:
             new_dimension = Dimension(dimension_name)
-            print(f"Jumping to {new_dimension.title}...")
+            print(f"Preparing and loading engine to jump...")
             
             # Ladeleiste anzeigen
-            for _ in tqdm(range(20), desc="Jumping", ncols=100): # change loading bar style
+            for _ in tqdm(range(100), desc="Charging", ncols=100, ascii='░▒█', bar_format='{l_bar}[{bar}]'): # change loading bar style
                 time.sleep(0.1)
 
+            print(f"Jumping to {new_dimension.title}...")
+            time.sleep(2)
             self.dimension = new_dimension
             self.x = 10
             self.y = 10
