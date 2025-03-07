@@ -24,6 +24,8 @@ class Dimension:
 
     @staticmethod # why statismethod
     def get_available_dimensions():
-        with open('dimensions.json', 'r') as f:
+        base_path = os.path.dirname(__file__)
+        file_path = os.path.join(base_path, 'dimensions.json')
+        with open(file_path, 'r') as f:
             dimensions = json.load(f)
             return list(dimensions.keys())
