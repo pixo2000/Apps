@@ -29,6 +29,3 @@ class Dimension:
         with open(file_path, 'r') as f:
             dimensions = json.load(f)
             return list(dimensions.keys())
-        
-def scan():
-    pass
