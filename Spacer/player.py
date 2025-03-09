@@ -1,13 +1,22 @@
 import time
 from dimension import Dimension
 from tqdm import tqdm
+import uuid
 
 class Player:
     def __init__(self, name):
         self.name = name
+        self.uuid = str(uuid.uuid4())  # Generate unique UUID for new player
         self.x = 10
         self.y = 10
         self.dimension = Dimension('A01')
+        self.is_dead = False  # Player's alive status
+        
+        # Discovery tracking
+        self.known_dimensions = ['A01']  # Start with home dimension
+        self.known_bodies = {
+            'A01': []  # Will store names of known bodies by dimension
+        }
     
     def move(self, x, y):
         # Calculate the distance (maximum of x or y difference for diagonal movement)
@@ -47,6 +56,19 @@ class Player:
         self.x = x
         self.y = y
         print(f"\n\n✓ Arrived at coordinates [{x}, {y}]\n")
+    
+    def discover_body(self, body_name):
+        """Mark a celestial body as discovered"""
+        dimension = self.dimension.name
+        
+        if dimension not in self.known_bodies:
+            self.known_bodies[dimension] = []
+            
+        if body_name not in self.known_bodies[dimension]:
+            self.known_bodies[dimension].append(body_name)
+            return True  # Newly discovered
+        
+        return False  # Already known
 
     def position(self, variable):
         if variable == "x":
@@ -55,6 +77,12 @@ class Player:
             return self.y
         elif variable == "dimension":
             return self.dimension.name
+        
+    def change_name(self, new_name):
+        """Change the player's name"""
+        old_name = self.name
+        self.name = new_name
+        return old_name
 
     def jump(self, dimension_name):
         try:
@@ -81,6 +109,12 @@ class Player:
             self.x = 10
             self.y = 10
             
+            # Mark dimension as discovered if it's new
+            if dimension_name not in self.known_dimensions:
+                self.known_dimensions.append(dimension_name)
+                self.known_bodies[dimension_name] = []
+                print(f"\n✓ NEW DIMENSION DISCOVERED: {new_dimension.title}")
+            
             print(f"\n\n✓ JUMP COMPLETE")
             print(f"\n== Welcome to {new_dimension.title} ==")
             print(f"» {new_dimension.description}")
@@ -88,3 +122,44 @@ class Player:
             
         except ValueError as e:
             print(f"\n✗ JUMP FAILED: {str(e)}\n")
+
+    def load_save_data(self, save_data):
+        """Load player state from save data"""
+        if not save_data:
+            return False
+        
+        try:
+            # Set position
+            self.x = save_data["position"]["x"]
+            self.y = save_data["position"]["y"]
+            
+            # Set current dimension
+            dimension_name = save_data["position"]["dimension"]
+            self.dimension = Dimension(dimension_name)
+            
+            # Load discoveries
+            self.known_dimensions = save_data["discoveries"]["known_dimensions"]
+            self.known_bodies = save_data["discoveries"]["known_bodies"]
+            
+            # Load dead status if available
+            if "is_dead" in save_data:
+                self.is_dead = save_data["is_dead"]
+            
+            # Load UUID if available, otherwise generate one
+            if "uuid" in save_data:
+                self.uuid = save_data["uuid"]
+            else:
+                # Generate a new UUID for older save files
+                self.uuid = str(uuid.uuid4())
+                
+            return True
+        except Exception as e:
+            print(f"Error loading save data: {e}")
+            return False
+
+    def kill(self):
+        """Set player as dead"""
+        self.is_dead = True
+        print("\n☠ ☠ ☠ YOU HAVE DIED ☠ ☠ ☠")
+        print("Your journey ends here.")
+        return "negative"  # Signal to end the game

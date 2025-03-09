@@ -17,3 +17,7 @@ distance in seconds when scan
 fix bug after jump(visual)
 
 n paar notes sind uf meinem handy als voice gespeichert
+
+solution for too many moons
+
+# fix name change and uppercase name
