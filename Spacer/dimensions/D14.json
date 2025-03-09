@@ -1,0 +1,64 @@
+{
+    "D14": {
+        "name": "D14",
+        "title": "Sirius",
+        "description": "The Home of the Sirians",
+        "bodies": {
+            "Sirius": {
+                "type": "Star",
+                "Coordinates": {
+                    "x": "0",
+                    "y": "0"
+                }
+            },
+            "Sirius Prime": {
+                "type": "Planet",
+                "Coordinates": {
+                    "x": "80",
+                    "y": "100"
+                }
+            },
+            "Sirius Secundus": {
+                "type": "Planet",
+                "Coordinates": {
+                    "x": "150",
+                    "y": "-120"
+                }
+            },
+            "Sirius Tertius": {
+                "type": "Planet",
+                "Coordinates": {
+                    "x": "-190",
+                    "y": "230"
+                },
+                "Moons": [
+                    "Sirius Moon"
+                ]
+            },
+            "Sirius Quartus": {
+                "type": "Planet",
+                "Coordinates": {
+                    "x": "200",
+                    "y": "-150"
+                },
+                "Moons": [
+                    "Sirius Phobos",
+                    "Sirius Deimos"
+                ]
+            },
+            "Sirius Quintus": {
+                "type": "Planet",
+                "Coordinates": {
+                    "x": "-200",
+                    "y": "-200"
+                },
+                "Moons": [
+                    "Sirius Io",
+                    "Sirius Europa",
+                    "Sirius Ganymed",
+                    "Sirius Callisto"
+                ]
+            }
+        }
+    }
+}

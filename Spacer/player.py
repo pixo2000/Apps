@@ -20,21 +20,27 @@ class Player:
         print(f"\n➤ Setting course to coordinates [{x}, {y}]")
         
         # Show countdown and wait for each field
-        for remaining in range(distance, 0, -1):
-            progress = distance - remaining
+        for i in range(distance + 1):  # +1 to ensure we reach 100%
+            progress = i
             bar_length = 30
             
             # Create a dynamic spaceship movement animation
-            ship_position = int((progress/distance) * (bar_length-3))
+            ship_position = int((progress/distance) * (bar_length-3)) if distance > 0 else bar_length-3
             spacebar = "·" * ship_position + "🚀" + "·" * (bar_length - ship_position - 3)
-            percent = int((progress/distance) * 100)
+            percent = int((progress/distance) * 100) if distance > 0 else 100
             
             # Display improved movement animation with spaceship
-            if remaining > 1:
-                print(f"\r[{spacebar}] Moving... {remaining} seconds remaining [{percent}%]", end="", flush=True)
-                time.sleep(0.8)
+            if i < distance:
+                remaining = distance - i
+                line_content = f"[{spacebar}] Moving... {remaining} second{'s' if remaining > 1 else ' '} remaining [{percent}%]"
             else:
-                print(f"\r[{spacebar}] Moving... Final approach [{percent}%]", end="", flush=True)
+                # Final frame shows 100%
+                line_content = f"[{spacebar}] Moving... Arrival imminent [100%]"
+                
+            # Ensure the line is properly cleared with padding
+            print(f"\r{line_content}{' ' * 10}", end="", flush=True)
+            
+            if i < distance:  # Don't sleep after the last frame
                 time.sleep(0.8)
                 
         # Update position

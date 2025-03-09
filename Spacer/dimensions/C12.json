@@ -1,0 +1,71 @@
+{
+    "C12": {
+        "name": "C12",
+        "title": "Alpha Centauri",
+        "description": "The Home of the Centaurians",
+        "bodies": {
+            "Alpha Centauri": {
+                "type": "Star",
+                "Coordinates": {
+                    "x": "0",
+                    "y": "0"
+                }
+            },
+            "Proxima Centauri": {
+                "type": "Star",
+                "Coordinates": {
+                    "x": "100",
+                    "y": "100"
+                }
+            },
+            "Centauri Prime": {
+                "type": "Planet",
+                "Coordinates": {
+                    "x": "80",
+                    "y": "100"
+                }
+            },
+            "Centauri Secundus": {
+                "type": "Planet",
+                "Coordinates": {
+                    "x": "150",
+                    "y": "-120"
+                }
+            },
+            "Centauri Tertius": {
+                "type": "Planet",
+                "Coordinates": {
+                    "x": "-190",
+                    "y": "230"
+                },
+                "Moons": [
+                    "Centauri Moon"
+                ]
+            },
+            "Centauri Quartus": {
+                "type": "Planet",
+                "Coordinates": {
+                    "x": "200",
+                    "y": "-150"
+                },
+                "Moons": [
+                    "Centauri Phobos",
+                    "Centauri Deimos"
+                ]
+            },
+            "Centauri Quintus": {
+                "type": "Planet",
+                "Coordinates": {
+                    "x": "-200",
+                    "y": "-200"
+                },
+                "Moons": [
+                    "Centauri Io",
+                    "Centauri Europa",
+                    "Centauri Ganymed",
+                    "Centauri Callisto"
+                ]
+            }
+        }
+    }
+}
