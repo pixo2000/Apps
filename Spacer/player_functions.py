@@ -43,7 +43,7 @@ def scan_system(player):
 
     # Enhanced loading screen animation
     print("\nInitiating System Scan...\n")
-    animation_chars = ["◓ ", "◑ ", "◒ ", "◐ "]  # Füge Leerzeichen nach jedem Symbol hinzu
+    animation_chars = ["◓ ", "◑ ", "◒ ", "◐ "]
     scan_stages = [
         "Calibrating sensors   ",
         "Scanning for radiation",
@@ -52,12 +52,15 @@ def scan_system(player):
         "Processing data       "
     ]
     
+    line_length = 50  # Ensure this is long enough to overwrite previous lines
+    
     for stage in scan_stages:
         for i in range(20):
             char = animation_chars[i % len(animation_chars)]
-            progress = int((i+1)/20 * 10)  # +1 um 100% zu erreichen
+            progress = int((i+1)/20 * 10)
             bar = "█" * progress + "▒" * (10 - progress)
-            print(f"\r{char}{stage} [{bar}] {min((i+1)*5, 100)}%", end="", flush=True)
+            status = f"{char}{stage} [{bar}] {min((i+1)*5, 100)}%"
+            print(f"\r{status}{' ' * (line_length - len(status))}", end="", flush=True)
             time.sleep(0.1)
         print()  # Move to next line after stage completes
     

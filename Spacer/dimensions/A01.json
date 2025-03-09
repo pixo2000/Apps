@@ -1,0 +1,64 @@
+{
+    "A01": {
+        "name": "A01",
+        "title": "SOL",
+        "description": "The Home of Humans",
+        "bodies": {
+            "SOL": {
+                "type": "Star",
+                "Coordinates": {
+                    "x": "0",
+                    "y": "0"
+                }
+            },
+            "Mercury": {
+                "type": "Planet",
+                "Coordinates": {
+                    "x": "80",
+                    "y": "100"
+                } 
+            },
+            "Venus": {
+                "type": "Planet",
+                "Coordinates": {
+                    "x": "150",
+                    "y": "-120"
+                }
+            },
+            "Earth": {
+                "type": "Planet",
+                "Coordinates": {
+                    "x": "-190",
+                    "y": "230"
+                },
+                "Moons": [
+                    "Moon"
+                ]
+            },
+            "Mars": {
+                "type": "Planet",
+                "Coordinates": {
+                    "x": "200",
+                    "y": "-150"
+                },
+                "Moons": [
+                    "Phobos",
+                    "Deimos"
+                ]
+            },
+            "Jupiter": {
+                "type": "Planet",
+                "Coordinates": {
+                    "x": "-200",
+                    "y": "-200"
+                },
+                "Moons": [
+                    "Io",
+                    "Europa",
+                    "Ganymed",
+                    "Callisto"
+                ]
+            }
+        }
+    }
+}

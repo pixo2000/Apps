@@ -15,10 +15,12 @@ def temp_start():
     
     # Animation für die Initialisierung
     loading_messages = ["Initializing systems", "Calibrating navigation", "Loading universe"]
+    max_length = max(len(message) for message in loading_messages) + 4  # +4 for the "..." and some padding
+    
     for message in loading_messages:
-        print(f"\r{message}...", end="", flush=True)
+        print(f"\r{message}...{' ' * (max_length - len(message) - 3)}", end="", flush=True)
         time.sleep(0.8)
-    print("\r" + " " * 30, end="")  # Lösche die Zeile
+    print("\r" + " " * max_length)  # Properly clear the line after all messages
     
     print("\nSystem initialized. Ready for commands.\n")
     
