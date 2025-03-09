@@ -7,9 +7,14 @@ def scan_system(player):
     player_x = player.position("x")
     player_y = player.position("y")
     current_dimension = player.dimension
+    dimension_name = current_dimension.name
     
     # Initialize list to store results
     scan_results = []
+    
+    # Check if this dimension is in known bodies dictionary
+    if dimension_name not in player.known_bodies:
+        player.known_bodies[dimension_name] = []
     
     # Scan all properties in the dimension
     for body_name, body_data in current_dimension.properties.items():
@@ -20,22 +25,39 @@ def scan_system(player):
         # Calculate distance to player
         distance = math.sqrt((player_x - body_x) ** 2 + (player_y - body_y) ** 2)
         
-        if distance <= 250:
-            # Full information for nearby bodies
+        # Determine if body should be identified
+        if distance <= 250 or body_name in player.known_bodies[dimension_name]:
+            # Body is close enough to identify or already known
             body_type = body_data["type"]
-            scan_results.append({
+            
+            # Mark as discovered
+            if body_name not in player.known_bodies[dimension_name]:
+                player.known_bodies[dimension_name].append(body_name)
+                is_new_discovery = True
+            else:
+                is_new_discovery = False
+                
+            result = {
                 "name": body_name,
                 "type": body_type,
                 "coords": (body_x, body_y),
-                "distance": distance
-            })
+                "distance": distance,
+                "new_discovery": is_new_discovery
+            }
+            
+            # Add moons info if available
+            if "Moons" in body_data:
+                result["moons"] = body_data["Moons"]
+                
+            scan_results.append(result)
         else:
             # Limited information for distant bodies
             scan_results.append({
                 "name": "Unknown",
                 "type": "Unknown",
                 "coords": (body_x, body_y),
-                "distance": distance
+                "distance": distance,
+                "new_discovery": False
             })
     
     # Sort by distance to player
@@ -74,12 +96,21 @@ def display_scan_results(scan_results):
     print(f"Found {len(scan_results)} celestial bodies:")
     
     # Header for table format
-    print(f"{'Type':<15} {'Name':<20} {'Coordinates':<20} {'Distance':<10}")
-    print("-" * 65)
+    print(f"{'Type':<15} {'Name':<20} {'Coordinates':<20} {'Distance':<10} {'Status':<10}")
+    print("-" * 75)
     
     for body in scan_results:
         # Format distance to show only 2 decimal places
         distance_formatted = f"{body['distance']:.2f}"
-        print(f"{body['type']:<15} {body['name']:<20} {str(body['coords']):<20} {distance_formatted:<10}")
+        
+        # Show discovery status
+        status = "NEW!" if body.get("new_discovery", False) else ""
+        
+        print(f"{body['type']:<15} {body['name']:<20} {str(body['coords']):<20} {distance_formatted:<10} {status:<10}")
+        
+        # Show moons if present and body is known
+        if body['name'] != "Unknown" and "moons" in body:
+            moon_list = ", ".join(body["moons"])
+            print(f"   └─ Moons: {moon_list}")
     
     print("===================\n")
