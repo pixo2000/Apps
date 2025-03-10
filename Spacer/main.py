@@ -43,7 +43,7 @@ def temp_start():
             # Case-insensitive player name check
             for saved_name in saved_players:
                 if saved_name.lower() == choice.lower():
-                    return saved_name, True  # Return exact name from save and load_save flag
+                    return saved_name, True, False  # Return exact name, load_save flag, show_tutorial flag
             
             print("Captain not found. Please try again.")
     else:
@@ -85,8 +85,13 @@ def main():
     while True:
         try:
             # Get player name and flags
-            name, load_save = temp_start()
-            show_help = not load_save  # Show help for new players
+            result = temp_start()
+            if len(result) == 3:  # Updated to handle 3 values
+                name, load_save, show_help = result
+            else:
+                name, load_save = result
+                show_help = not load_save  # Show help for new players
+                
             me = player.Player(name)
             
             # Load saved game if requested
