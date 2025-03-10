@@ -12,11 +12,15 @@ def handle_input(name):
         print("\n☠ You are deceased. Game over.")
         return "negative"
         
-    command = input(f"\n[{name.position('dimension')}:{name.position('x')},{name.position('y')}] {name.name} > ").lower()
+    # Get the raw user input (without converting to lowercase)
+    user_input = input(f"\n[{name.position('dimension')}:{name.position('x')},{name.position('y')}] {name.name} > ")
+    
+    # Create a lowercase version for command detection only
+    command_lower = user_input.lower()
     result = "positive"
     
-    if command.startswith("move "): # move 7 3
-        parts = command.split(" ")
+    if command_lower.startswith("move "):
+        parts = user_input.split(" ")
         if len(parts) != 3:
             print("\n✗ Invalid move command. Format: move X Y\n")
             return "positive"
@@ -29,7 +33,7 @@ def handle_input(name):
             print("\n✗ Invalid coordinates. Please enter numbers.\n")
             return "positive"
             
-    elif command == "whereami":
+    elif command_lower == "whereami":
         dimension = name.position('dimension')
         x_pos = name.position('x')
         y_pos = name.position('y')
@@ -45,12 +49,12 @@ def handle_input(name):
         print("=======================\n")
         return "positive"
         
-    elif command.startswith("jump "): # jump A01
-        dimension_name = command.split(" ")[1].upper()
+    elif command_lower.startswith("jump "): 
+        dimension_name = user_input.split(" ")[1].upper()
         name.jump(dimension_name)
         return "positive"
         
-    elif command == "dimensions":
+    elif command_lower == "dimensions":
         available = Dimension.get_available_dimensions()
         
         print("\n=== AVAILABLE DIMENSIONS ===")
@@ -69,12 +73,12 @@ def handle_input(name):
         print("===========================\n")
         return "positive"
         
-    elif command == "scan":
+    elif command_lower == "scan":
         scan_results = scan_system(name)
         display_scan_results(scan_results)
         return "positive"
         
-    elif command in ["quit", "exit"]:
+    elif command_lower in ["quit", "exit"]:
         # Save before quitting
         save_mgr.save_game(name)
         print("\n=== SYSTEM SHUTDOWN ===")
@@ -83,22 +87,22 @@ def handle_input(name):
         print("\nGoodbye Captain! Safe travels.\n")
         return "negative"
         
-    elif command == "help":
+    elif command_lower == "help":
         display_help()
         return "positive"
         
-    elif command == "discoveries":
+    elif command_lower == "discoveries":
         display_discoveries(name)
         return "positive"
         
-    elif command.startswith("changename "):
-        # Extract the new name from command
-        parts = command.split(" ", 1)
+    elif command_lower.startswith("changename "):
+        # Extract the new name from command, preserving original case
+        parts = user_input.split(" ", 1)
         if len(parts) != 2:
             print("\n✗ Invalid command format. Use: changename YourNewName")
             return "positive"
             
-        new_name = parts[1]
+        new_name = parts[1]  # This now preserves the original capitalization
         
         # Attempt to change the player's name
         success, message = save_mgr.change_player_name(name, new_name)
@@ -108,10 +112,17 @@ def handle_input(name):
             print(f"✓ Your unique player ID remains: {name.uuid}")
         else:
             print(f"\n✗ Failed to change name: {message}")
+            # Add more detailed error message if name format is invalid
+            if "Invalid name format" in message:
+                print("  Names must be 3-15 characters long and can contain:")
+                print("  - Uppercase letters (A-Z)")
+                print("  - Lowercase letters (a-z)")
+                print("  - Numbers (0-9)")
+                print("  - Underscores (_)")
             
         return "positive"
         
-    elif command == "playerinfo":
+    elif command_lower == "playerinfo":
         print("\n=== PLAYER INFORMATION ===")
         print(f"» Name: {name.name}")
         print(f"» UUID: {name.uuid}")
@@ -126,7 +137,7 @@ def handle_input(name):
         print("=========================\n")
         return "positive"
         
-    elif command == "self-destruct":
+    elif command_lower == "self-destruct":
         print("\n⚠ WARNING: Self-destruct sequence initiated!")
         print("⚠ This will permanently kill your character")
         confirm = input("Type 'CONFIRM' to proceed: ")
@@ -137,7 +148,7 @@ def handle_input(name):
         else:
             print("Self-destruct sequence aborted.")
         
-    elif command == "logout":
+    elif command_lower == "logout":
         print("\n=== LOGGING OUT ===")
         print("Saving current session...")
         save_mgr.save_game(name)
@@ -149,7 +160,7 @@ def handle_input(name):
         print("\n✗ Unknown command. Type 'help' for available commands.\n")
     
     # Save after every command (only if not already returning "negative" or "logout")
-    if result != "negative" and command != "logout":
+    if result != "negative" and command_lower != "logout":
         save_mgr.save_game(name)
     return result
 

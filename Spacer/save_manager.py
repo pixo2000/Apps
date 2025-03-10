@@ -9,11 +9,18 @@ class SaveManager:
         # Ensure the saves directory exists
         self.save_directory.mkdir(exist_ok=True)
         
-        # Valid player name pattern: 3-15 chars, alphanumeric and underscore
+        # Valid player name pattern: 3-15 chars, alphanumeric (both upper and lowercase) and underscore
         self.name_pattern = re.compile(r'^[a-zA-Z0-9_]{3,15}$')
     
     def is_valid_player_name(self, name):
-        """Check if player name meets requirements"""
+        """
+        Check if player name meets requirements:
+        - 3-15 characters long
+        - Can contain uppercase letters (A-Z)
+        - Can contain lowercase letters (a-z)
+        - Can contain numbers (0-9)
+        - Can contain underscores (_)
+        """
         return bool(self.name_pattern.match(name))
         
     def save_game(self, player):
