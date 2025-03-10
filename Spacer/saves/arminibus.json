@@ -1,18 +1,24 @@
 {
-    "name": "pixo2000",
+    "name": "Arminibus",
     "uuid": "95cb169a-6f29-4d2a-85e7-4a7fac0fa965",
     "position": {
-        "x": -50,
-        "y": -50,
-        "dimension": "C12"
+        "x": 10,
+        "y": 10,
+        "dimension": "D14"
     },
     "discoveries": {
         "known_dimensions": [
             "A01",
-            "C12"
+            "C12",
+            "D14"
         ],
         "known_bodies": {
-            "A01": [],
+            "A01": [
+                "SOL",
+                "Mercury",
+                "Venus",
+                "Mars"
+            ],
             "C12": [
                 "Alpha Centauri",
                 "Proxima Centauri",
@@ -20,6 +26,12 @@
                 "Centauri Secundus",
                 "Centauri Quartus",
                 "Centauri Quintus"
+            ],
+            "D14": [
+                "Sirius",
+                "Sirius Prime",
+                "Sirius Secundus",
+                "Sirius Quartus"
             ]
         }
     },

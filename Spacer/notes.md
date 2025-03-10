@@ -23,3 +23,11 @@ solution for too many moons
 ## fix name change and uppercase name
 
 check jump animation
+
+change all save names to uuid
+
+command to calc uuid
+
+exit on login <-- better login system
+
+also rework jump loading bar to ramove tqdm dependency
