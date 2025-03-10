@@ -2,16 +2,25 @@
     "name": "pixo2000",
     "uuid": "95cb169a-6f29-4d2a-85e7-4a7fac0fa965",
     "position": {
-        "x": 10,
-        "y": 10,
-        "dimension": "A01"
+        "x": -50,
+        "y": -50,
+        "dimension": "C12"
     },
     "discoveries": {
         "known_dimensions": [
-            "A01"
+            "A01",
+            "C12"
         ],
         "known_bodies": {
-            "A01": []
+            "A01": [],
+            "C12": [
+                "Alpha Centauri",
+                "Proxima Centauri",
+                "Centauri Prime",
+                "Centauri Secundus",
+                "Centauri Quartus",
+                "Centauri Quintus"
+            ]
         }
     },
     "is_dead": false
