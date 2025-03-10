@@ -20,4 +20,6 @@ n paar notes sind uf meinem handy als voice gespeichert
 
 solution for too many moons
 
-# fix name change and uppercase name
+## fix name change and uppercase name
+
+check jump animation
