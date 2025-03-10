@@ -56,8 +56,11 @@ def create_new_captain(save_mgr):
         
         # Check length and allowed characters
         if not save_mgr.is_valid_player_name(name):
-            print("\n⚠ Invalid name. Names must be 3-15 characters long and contain")
-            print("  only letters, numbers, and underscores.")
+            print("\n⚠ Invalid name. Names must be 3-15 characters long and can contain:")
+            print("  - Uppercase letters (A-Z)")
+            print("  - Lowercase letters (a-z)")
+            print("  - Numbers (0-9)")
+            print("  - Underscores (_)")
             continue
             
         # Check if name already exists (case insensitive)
