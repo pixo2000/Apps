@@ -10,6 +10,10 @@
                 "Coordinates": {
                     "x": "0",
                     "y": "0"
+                },
+                "size": {
+                    "width": "5",
+                    "height": "5"
                 }
             },
             "Sirius Prime": {
@@ -17,6 +21,10 @@
                 "Coordinates": {
                     "x": "80",
                     "y": "100"
+                },
+                "size": {
+                    "width": "3",
+                    "height": "3"
                 }
             },
             "Sirius Secundus": {
@@ -24,6 +32,10 @@
                 "Coordinates": {
                     "x": "150",
                     "y": "-120"
+                },
+                "size": {
+                    "width": "3",
+                    "height": "3"
                 }
             },
             "Sirius Tertius": {
@@ -32,9 +44,34 @@
                     "x": "-190",
                     "y": "230"
                 },
-                "Moons": [
-                    "Sirius Moon"
-                ]
+                "size": {
+                    "width": "3",
+                    "height": "3"
+                },
+                "Moons": {
+                    "Sirius Moon": {
+                        "type": "Moon",
+                        "Coordinates": {
+                            "x": "-185",
+                            "y": "230"
+                        },
+                        "size": {
+                            "width": "1",
+                            "height": "1"
+                        }
+                    },
+                    "Canis I": {
+                        "type": "Moon",
+                        "Coordinates": {
+                            "x": "-185",
+                            "y": "230"
+                        },
+                        "size": {
+                            "width": "1",
+                            "height": "1"
+                        }
+                    }
+                }
             },
             "Sirius Quartus": {
                 "type": "Planet",
@@ -42,10 +79,34 @@
                     "x": "200",
                     "y": "-150"
                 },
-                "Moons": [
-                    "Sirius Phobos",
-                    "Sirius Deimos"
-                ]
+                "size": {
+                    "width": "3",
+                    "height": "3"
+                },
+                "Moons": {
+                    "Majoris I": {
+                        "type": "Moon",
+                        "Coordinates": {
+                            "x": "205",
+                            "y": "-150"
+                        },
+                        "size": {
+                            "width": "1",
+                            "height": "1"
+                        }
+                    },
+                    "Majoris II": {
+                        "type": "Moon",
+                        "Coordinates": {
+                            "x": "200",
+                            "y": "-155"
+                        },
+                        "size": {
+                            "width": "1",
+                            "height": "1"
+                        }
+                    }
+                }
             },
             "Sirius Quintus": {
                 "type": "Planet",
@@ -53,12 +114,56 @@
                     "x": "-200",
                     "y": "-200"
                 },
-                "Moons": [
-                    "Sirius Io",
-                    "Sirius Europa",
-                    "Sirius Ganymed",
-                    "Sirius Callisto"
-                ]
+                "size": {
+                    "width": "3",
+                    "height": "3"
+                },
+                "Moons": {
+                    "Dogstar I": {
+                        "type": "Moon",
+                        "Coordinates": {
+                            "x": "-195",
+                            "y": "-200"
+                        },
+                        "size": {
+                            "width": "1",
+                            "height": "1"
+                        }
+                    },
+                    "Dogstar II": {
+                        "type": "Moon",
+                        "Coordinates": {
+                            "x": "-200",
+                            "y": "-195"
+                        },
+                        "size": {
+                            "width": "1",
+                            "height": "1"
+                        }
+                    },
+                    "Aschere I": {
+                        "type": "Moon",
+                        "Coordinates": {
+                            "x": "-205",
+                            "y": "-200"
+                        },
+                        "size": {
+                            "width": "1",
+                            "height": "1"
+                        }
+                    },
+                    "Aschere II": {
+                        "type": "Moon",
+                        "Coordinates": {
+                            "x": "-200",
+                            "y": "-205"
+                        },
+                        "size": {
+                            "width": "1",
+                            "height": "1"
+                        }
+                    }
+                }
             }
         }
     }
