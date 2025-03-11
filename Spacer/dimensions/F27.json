@@ -1,0 +1,16 @@
+{
+    "F27": {
+        "name": "F27",
+        "title": "The Great Void",
+        "description": "A place of nothingness",
+        "bodies": {
+            "Void": {
+                "type": "Black Hole",
+                "Coordinates": {
+                    "x": "0",
+                    "y": "0"
+                }
+            }
+        }
+    }
+}

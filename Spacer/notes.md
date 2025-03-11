@@ -22,10 +22,10 @@ solution for too many moons
 
 check jump animation
 
-change all save names to uuid
-
-command to calc uuid
-
-exit on login <-- better login system
-
 also rework jump loading bar to ramove tqdm dependency
+
+remove global scan showing moons. only show then if the player has done a detailed scan.
+
+rework moon system <-- A01
+
+refactor and docs

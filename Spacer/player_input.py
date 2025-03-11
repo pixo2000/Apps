@@ -2,6 +2,7 @@ import player
 from dimension import Dimension
 from player_functions import scan_system, display_scan_results
 from save_manager import SaveManager
+import json  # Neuer Import für JSON-Verarbeitung
 
 # Create save manager instance
 save_mgr = SaveManager()
@@ -122,19 +123,27 @@ def handle_input(name):
             
         return "positive"
         
-    elif command_lower == "playerinfo":
-        print("\n=== PLAYER INFORMATION ===")
-        print(f"» Name: {name.name}")
-        print(f"» UUID: {name.uuid}")
-        print(f"» Status: {'Alive' if not name.is_dead else 'Deceased'}")
-        print(f"» Current Dimension: {name.dimension.name} ({name.dimension.title})")
-        print(f"» Position: [{name.x}, {name.y}]")
-        print(f"» Dimensions visited: {len(name.known_dimensions)}")
+    elif command_lower.startswith("playerinfo"):
+        parts = user_input.split(None, 1)  # Split by whitespace, max 1 split
         
-        # Count total discovered bodies
-        total_bodies = sum(len(bodies) for bodies in name.known_bodies.values())
-        print(f"» Celestial bodies discovered: {total_bodies}")
-        print("=========================\n")
+        if len(parts) > 1:
+            # Check another player by name
+            other_player_name = parts[1]
+            display_other_player_info(other_player_name)
+        else:
+            # Show current player info
+            print("\n=== PLAYER INFORMATION ===")
+            print(f"» Name: {name.name}")
+            print(f"» UUID: {name.uuid}")
+            print(f"» Status: {'Alive' if not name.is_dead else 'Deceased'}")
+            print(f"» Current Dimension: {name.dimension.name} ({name.dimension.title})")
+            print(f"» Position: [{name.x}, {name.y}]")
+            print(f"» Dimensions visited: {len(name.known_dimensions)}")
+            
+            # Count total discovered bodies
+            total_bodies = sum(len(bodies) for bodies in name.known_bodies.values())
+            print(f"» Celestial bodies discovered: {total_bodies}")
+            print("=========================\n")
         return "positive"
         
     elif command_lower == "self-destruct":
@@ -180,7 +189,7 @@ def display_help(first_time=False):
         ("scan", "Scan current system for celestial bodies"),
         ("discoveries", "Display all your discoveries"),
         ("changename NAME", "Change your captain's name"),
-        ("playerinfo", "Display your player information and UUID"),
+        ("playerinfo [NAME]", "Display player info (yours or another captain)"),
         ("logout", "Save and log out to switch captains"),
         ("self-destruct", "End your journey permanently"),
         ("quit/exit", "Exit the game"),
@@ -217,3 +226,53 @@ def display_discoveries(player):
             print(f"» {dim_name}: [Data corrupted]")
     
     print("\n" + "=" * 50)
+
+def display_other_player_info(player_name):
+    """Display information about another player by name"""
+    print("\n=== PLAYER INFORMATION ===")
+    
+    # Get player data from save files
+    player_data = None
+    for save_file in save_mgr.save_directory.glob('*.json'):
+        try:
+            with open(save_file, 'r') as f:
+                data = json.load(f)
+                if data.get("name", "").lower() == player_name.lower():
+                    player_data = data
+                    break
+        except:
+            continue
+    
+    if not player_data:
+        print(f"» Captain '{player_name}' not found in records.")
+        print("=========================\n")
+        return
+        
+    print(f"» Name: {player_data['name']}")
+    
+    # Show UUID
+    if "uuid" in player_data:
+        print(f"» UUID: {player_data['uuid']}")
+    
+    # Show status (alive/deceased)
+    status = "Alive" if not player_data.get("is_dead", False) else "Deceased"
+    print(f"» Status: {status}")
+    
+    # Only show discovery stats if player is not dead
+    if not player_data.get("is_dead", False):
+        # Show discoveries stats
+        try:
+            dims_visited = len(player_data["discoveries"]["known_dimensions"])
+            print(f"» Dimensions visited: {dims_visited}")
+        except:
+            print("» Dimensions visited: Unknown")
+        
+        # Count total bodies
+        try:
+            known_bodies = player_data["discoveries"]["known_bodies"]
+            total_bodies = sum(len(bodies) for bodies in known_bodies.values())
+            print(f"» Celestial bodies discovered: {total_bodies}")
+        except:
+            print("» Celestial bodies discovered: Unknown")
+    
+    print("=========================\n")

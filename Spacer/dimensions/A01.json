@@ -1,5 +1,6 @@
 {
     "A01": {
+        "author": "Spacer",
         "name": "A01",
         "title": "SOL",
         "description": "The Home of Humans",
@@ -31,9 +32,26 @@
                     "x": "-190",
                     "y": "230"
                 },
-                "Moons": [
-                    "Moon"
-                ]
+                "Stations": {
+                    "Wiesbaden": {
+                        "type": "Top",
+                        "description": "Headquaters on Earth"
+                    }
+                },
+                "Moons": {
+                    "Luna": {
+                        "type": "Moon",
+                        "Coordinates": {
+                            "x": "-191",
+                            "y": "230"
+                        },
+                        "Stations": {
+                            "LunaBase": {
+                                "type": "Top",
+                                "description": "The first human base on a celestial body"
+                            }
+                    }
+                }
             },
             "Mars": {
                 "type": "Planet",
@@ -41,10 +59,22 @@
                     "x": "200",
                     "y": "-150"
                 },
-                "Moons": [
-                    "Phobos",
-                    "Deimos"
-                ]
+                "Moons": {
+                    "Phobos": {
+                        "type": "Moon",
+                        "Coordinates": {
+                            "x": "201",
+                            "y": "-150"
+                        }
+                    },
+                    "Deimos": {
+                        "type": "Moon",
+                        "Coordinates": {
+                            "x": "201",
+                            "y": "-151"
+                        }
+                    }
+                }
             },
             "Jupiter": {
                 "type": "Planet",
@@ -52,13 +82,37 @@
                     "x": "-200",
                     "y": "-200"
                 },
-                "Moons": [
-                    "Io",
-                    "Europa",
-                    "Ganymed",
-                    "Callisto"
-                ]
+                "Moons": {
+                    "Io": {
+                        "type": "Moon",
+                        "Coordinates": {
+                            "x": "-201",
+                            "y": "-200"
+                        }
+                    },
+                    "Europa": {
+                        "type": "Moon",
+                        "Coordinates": {
+                            "x": "-201",
+                            "y": "-201"
+                        }
+                    },
+                    "Ganymede": {
+                        "type": "Moon",
+                        "Coordinates": {
+                            "x": "-201",
+                            "y": "-202"
+                        }
+                    },
+                    "Callisto": {
+                        "type": "Moon",
+                        "Coordinates": {
+                            "x": "-201",
+                            "y": "-203"
+                        }
+                    }
+                }
             }
         }
     }
-}
+}}

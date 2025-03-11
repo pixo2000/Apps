@@ -9,7 +9,7 @@ import os
 
 # load stuff
 def temp_start():
-    os.system("clear")
+    os.system("clear") # clear console, works on codespace but not on windows
     print("\n" + "=" * 50)
     print("  SPACER - INTERSTELLAR EXPLORATION SIMULATOR")
     print("=" * 50 + "\n")
@@ -35,10 +35,13 @@ def temp_start():
             print(f"{i}. {saved_name}")
         
         while True:
-            choice = input("\nEnter captain name to continue, or 'new' for new game: ")
+            choice = input("\nEnter captain name to continue, 'new' for new game, or 'exit' to quit: ")
             
             if choice.lower() == 'new':
                 return create_new_captain(save_mgr)
+            elif choice.lower() == 'exit':
+                print("\nExiting game. Goodbye!")
+                exit(0)  # Exit the program immediately
             
             # Case-insensitive player name check
             for saved_name in saved_players:
@@ -52,8 +55,12 @@ def temp_start():
 def create_new_captain(save_mgr):
     """Handle creation of a new captain with name validation"""
     while True:
-        name = input("Who are you, Captain? ")
+        name = input("Who are you, Captain? (or 'exit' to quit): ")
         
+        if name.lower() == 'exit':
+            print("\nExiting game. Goodbye!")
+            exit(0)  # Exit the program immediately
+            
         # Check length and allowed characters
         if not save_mgr.is_valid_player_name(name):
             print("\n⚠ Invalid name. Names must be 3-15 characters long and can contain:")
@@ -61,6 +68,11 @@ def create_new_captain(save_mgr):
             print("  - Lowercase letters (a-z)")
             print("  - Numbers (0-9)")
             print("  - Underscores (_)")
+            
+            # Check specifically for reserved names
+            if name.lower() in save_mgr.reserved_names:
+                print("\n⚠ Additionally, this name is reserved as a system command and cannot be used.")
+            
             continue
             
         # Check if name already exists (case insensitive)

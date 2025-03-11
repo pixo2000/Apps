@@ -1,0 +1,24 @@
+{
+    "N09": {
+        "author": "Lord_Flakx",
+        "name": "N09",
+        "title": "Caliban Stands",
+        "description": "For the Lion!",
+        "bodies": {
+            "Sigma Sun": {
+                "type": "Star",
+                "Coordinates": {
+                    "x": "0",
+                    "y": "0"
+                }
+            },
+            "Caliban": {
+                "type": "Planet",
+                "Coordinates": {
+                    "x": "80",
+                    "y": "100"
+                }
+            }
+        }
+    }
+}
