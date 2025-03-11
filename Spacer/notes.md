@@ -27,3 +27,7 @@ remove global scan showing moons. only show then if the player has done a detail
 rework moon system <-- A01
 
 refactor and docs
+
+log playtime
+
+stop command, comands while moving, renew pathing, dead when on sun

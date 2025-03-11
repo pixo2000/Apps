@@ -10,31 +10,65 @@
                 "Coordinates": {
                     "x": "0",
                     "y": "0"
+                },
+                "size": {
+                    "width": "5",
+                    "height": "5"
+                },
+                "Stations": {
+                    "SolarStation": {
+                        "type": "Station",
+                        "Coordinates": {
+                            "x": "8",
+                            "y": "2"
+                        },
+                        "description": "Central solar observation station"
+                    },
+                    "NavBeacon": {
+                        "type": "Beacon",
+                        "Coordinates": {
+                            "x": "8",
+                            "y": "-2"
+                        },
+                        "description": "Primary navigation beacon for the Sol system"
+                    }
                 }
             },
             "Mercury": {
                 "type": "Planet",
                 "Coordinates": {
-                    "x": "80",
-                    "y": "100"
-                } 
+                    "x": "30",
+                    "y": "30"
+                },
+                "size": {
+                    "width": "3",
+                    "height": "3"
+                }
             },
             "Venus": {
                 "type": "Planet",
                 "Coordinates": {
-                    "x": "150",
-                    "y": "-120"
+                    "x": "-45",
+                    "y": "45"
+                },
+                "size": {
+                    "width": "3",
+                    "height": "3"
                 }
             },
             "Earth": {
                 "type": "Planet",
                 "Coordinates": {
-                    "x": "-190",
-                    "y": "230"
+                    "x": "60",
+                    "y": "-60"
+                },
+                "size": {
+                    "width": "3",
+                    "height": "3"
                 },
                 "Stations": {
                     "Wiesbaden": {
-                        "type": "Top",
+                        "type": "City",
                         "description": "Headquaters on Earth"
                     }
                 },
@@ -42,36 +76,53 @@
                     "Luna": {
                         "type": "Moon",
                         "Coordinates": {
-                            "x": "-191",
-                            "y": "230"
+                            "x": "65",
+                            "y": "-60"
+                        },
+                        "size": {
+                            "width": "1",
+                            "height": "1"
                         },
                         "Stations": {
                             "LunaBase": {
-                                "type": "Top",
+                                "type": "City",
                                 "description": "The first human base on a celestial body"
                             }
+                        }
                     }
                 }
             },
             "Mars": {
                 "type": "Planet",
                 "Coordinates": {
-                    "x": "200",
-                    "y": "-150"
+                    "x": "-80",
+                    "y": "-80"
+                },
+                "size": {
+                    "width": "3",
+                    "height": "3"
                 },
                 "Moons": {
                     "Phobos": {
                         "type": "Moon",
                         "Coordinates": {
-                            "x": "201",
-                            "y": "-150"
+                            "x": "-85",
+                            "y": "-80"
+                        },
+                        "size": {
+                            "width": "1",
+                            "height": "1"
                         }
                     },
                     "Deimos": {
                         "type": "Moon",
                         "Coordinates": {
-                            "x": "201",
-                            "y": "-151"
+                            "x": "-80",
+                            "y": "-85"
+                        },
+                        "size": {
+                            "width": "1",
+                            "height": "1"
                         }
                     }
                 }
@@ -79,40 +130,319 @@
             "Jupiter": {
                 "type": "Planet",
                 "Coordinates": {
-                    "x": "-200",
-                    "y": "-200"
+                    "x": "120",
+                    "y": "120"
+                },
+                "size": {
+                    "width": "3",
+                    "height": "3"
                 },
                 "Moons": {
                     "Io": {
                         "type": "Moon",
                         "Coordinates": {
-                            "x": "-201",
-                            "y": "-200"
+                            "x": "125",
+                            "y": "120"
+                        },
+                        "size": {
+                            "width": "1",
+                            "height": "1"
                         }
                     },
                     "Europa": {
                         "type": "Moon",
                         "Coordinates": {
-                            "x": "-201",
-                            "y": "-201"
+                            "x": "120",
+                            "y": "125"
+                        },
+                        "size": {
+                            "width": "1",
+                            "height": "1"
                         }
                     },
                     "Ganymede": {
                         "type": "Moon",
                         "Coordinates": {
-                            "x": "-201",
-                            "y": "-202"
+                            "x": "115",
+                            "y": "120"
+                        },
+                        "size": {
+                            "width": "1",
+                            "height": "1"
                         }
                     },
                     "Callisto": {
                         "type": "Moon",
                         "Coordinates": {
-                            "x": "-201",
-                            "y": "-203"
+                            "x": "120",
+                            "y": "115"
+                        },
+                        "size": {
+                            "width": "1",
+                            "height": "1"
                         }
                     }
+                }
+            },
+            "Saturn": {
+                "type": "Planet",
+                "Coordinates": {
+                    "x": "-150",
+                    "y": "-150"
+                },
+                "size": {
+                    "width": "3",
+                    "height": "3"
+                },
+                "Moons": {
+                    "Mimas": {
+                        "type": "Moon",
+                        "Coordinates": {
+                            "x": "-155",
+                            "y": "-150"
+                        },
+                        "size": {
+                            "width": "1",
+                            "height": "1"
+                        }
+                    },
+                    "Enceladus": {
+                        "type": "Moon",
+                        "Coordinates": {
+                            "x": "-150",
+                            "y": "-155"
+                        },
+                        "size": {
+                            "width": "1",
+                            "height": "1"
+                        }
+                    },
+                    "Tethys": {
+                        "type": "Moon",
+                        "Coordinates": {
+                            "x": "-145",
+                            "y": "-150"
+                        },
+                        "size": {
+                            "width": "1",
+                            "height": "1"
+                        }
+                    },
+                    "Dione": {
+                        "type": "Moon",
+                        "Coordinates": {
+                            "x": "-150",
+                            "y": "-145"
+                        },
+                        "size": {
+                            "width": "1",
+                            "height": "1"
+                        }
+                    },
+                    "Rhea": {
+                        "type": "Moon",
+                        "Coordinates": {
+                            "x": "-156",
+                            "y": "-156"
+                        },
+                        "size": {
+                            "width": "1",
+                            "height": "1"
+                        }
+                    },
+                    "Titan": {
+                        "type": "Moon",
+                        "Coordinates": {
+                            "x": "-144",
+                            "y": "-156"
+                        },
+                        "size": {
+                            "width": "1",
+                            "height": "1"
+                        }
+                    },
+                    "Iapetus": {
+                        "type": "Moon",
+                        "Coordinates": {
+                            "x": "-144",
+                            "y": "-144"
+                        },
+                        "size": {
+                            "width": "1",
+                            "height": "1"
+                        }
+                    }
+                }
+            },
+            "Uranus": {
+                "type": "Planet",
+                "Coordinates": {
+                    "x": "200",
+                    "y": "200"
+                },
+                "size": {
+                    "width": "3",
+                    "height": "3"
+                },
+                "Moons": {
+                    "Miranda": {
+                        "type": "Moon",
+                        "Coordinates": {
+                            "x": "205",
+                            "y": "200"
+                        },
+                        "size": {
+                            "width": "1",
+                            "height": "1"
+                        }
+                    },
+                    "Ariel": {
+                        "type": "Moon",
+                        "Coordinates": {
+                            "x": "200",
+                            "y": "205"
+                        },
+                        "size": {
+                            "width": "1",
+                            "height": "1"
+                        }
+                    },
+                    "Umbriel": {
+                        "type": "Moon",
+                        "Coordinates": {
+                            "x": "195",
+                            "y": "200"
+                        },
+                        "size": {
+                            "width": "1",
+                            "height": "1"
+                        }
+                    },
+                    "Titania": {
+                        "type": "Moon",
+                        "Coordinates": {
+                            "x": "200",
+                            "y": "195"
+                        },
+                        "size": {
+                            "width": "1",
+                            "height": "1"
+                        }
+                    },
+                    "Oberon": {
+                        "type": "Moon",
+                        "Coordinates": {
+                            "x": "206",
+                            "y": "206"
+                        },
+                        "size": {
+                            "width": "1",
+                            "height": "1"
+                        }
+                    }
+                }
+            },
+            "Neptune": {
+                "type": "Planet",
+                "Coordinates": {
+                    "x": "-240",
+                    "y": "-240"
+                },
+                "size": {
+                    "width": "3",
+                    "height": "3"
+                },
+                "Moons": {
+                    "Triton": {
+                        "type": "Moon",
+                        "Coordinates": {
+                            "x": "-245",
+                            "y": "-240"
+                        },
+                        "size": {
+                            "width": "1",
+                            "height": "1"
+                        }
+                    },
+                    "Nereid": {
+                        "type": "Moon",
+                        "Coordinates": {
+                            "x": "-240",
+                            "y": "-245"
+                        },
+                        "size": {
+                            "width": "1",
+                            "height": "1"
+                        }
+                    }
+                }
+            },
+            "Pluto": {
+                "type": "Dwarf Planet",
+                "Coordinates": {
+                    "x": "280",
+                    "y": "280"
+                },
+                "size": {
+                    "width": "2",
+                    "height": "2"
+                }
+            },
+            "Eris": {
+                "type": "Dwarf Planet",
+                "Coordinates": {
+                    "x": "-320",
+                    "y": "-320"
+                },
+                "size": {
+                    "width": "2",
+                    "height": "2"
+                }
+            },
+            "Ceres": {
+                "type": "Asteroid",
+                "Coordinates": {
+                    "x": "90",
+                    "y": "0"
+                },
+                "size": {
+                    "width": "1",
+                    "height": "1"
+                }
+            },
+            "Vesta": {
+                "type": "Asteroid",
+                "Coordinates": {
+                    "x": "0",
+                    "y": "90"
+                },
+                "size": {
+                    "width": "1",
+                    "height": "1"
+                }
+            },
+            "Pallas": {
+                "type": "Asteroid",
+                "Coordinates": {
+                    "x": "-90",
+                    "y": "0"
+                },
+                "size": {
+                    "width": "1",
+                    "height": "1"
+                }
+            },
+            "Juno": {
+                "type": "Asteroid",
+                "Coordinates": {
+                    "x": "0",
+                    "y": "-90"
+                },
+                "size": {
+                    "width": "1",
+                    "height": "1"
                 }
             }
         }
     }
-}}
+}
