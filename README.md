@@ -1,1 +1,1 @@
-# Man gebe mir ne simple aufgabe und ich mach ne windows app draus
+# Man gebe mir ne simple Aufgabe und ich mach ne windows app draus
