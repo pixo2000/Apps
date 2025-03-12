@@ -28,6 +28,7 @@ def temp_start():
     # Check for existing save files
     save_mgr = SaveManager()
     saved_players = save_mgr.get_all_players()
+    all_players = save_mgr.get_all_players_including_dead()
     
     if saved_players:
         print("Saved captains found:")
@@ -43,11 +44,20 @@ def temp_start():
                 print("\nExiting game. Goodbye!")
                 exit(0)  # Exit the program immediately
             
-            # Case-insensitive player name check
+            # First check if the player name exists but is dead
+            if any(name.lower() == choice.lower() for name in all_players):
+                # Player exists (might be dead), check status
+                if save_mgr.is_player_dead(choice):
+                    print(f"\n☠ Captain {choice} is deceased. Their journey has ended.")
+                    print("  Choose another captain or start a new game.")
+                    continue
+                
+            # Case-insensitive player name check for living captains
             for saved_name in saved_players:
                 if saved_name.lower() == choice.lower():
                     return saved_name, True, False  # Return exact name, load_save flag, show_tutorial flag
             
+            # If we reach here, the player wasn't found at all
             print("Captain not found. Please try again.")
     else:
         return create_new_captain(save_mgr)

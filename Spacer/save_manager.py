@@ -127,6 +127,20 @@ class SaveManager:
                 # Skip files that can't be read properly
                 continue
         return players
+        
+    def get_all_players_including_dead(self):
+        """Return a list of all saved players including dead ones"""
+        players = []
+        for save_file in self.save_directory.glob('*.json'):
+            try:
+                with open(save_file, 'r') as f:
+                    data = json.load(f)
+                    # Include all players regardless of dead status
+                    players.append(data["name"])
+            except:
+                # Skip files that can't be read properly
+                continue
+        return players
 
     def change_player_name(self, player, new_name):
         """Change a player's name and update the save file"""
