@@ -47,7 +47,11 @@ def scan_system(player):
             
             # Add moons info if available
             if "Moons" in body_data:
-                result["moons"] = body_data["Moons"]
+                # Check if Moons is a dictionary (new format) or a list (old format)
+                if isinstance(body_data["Moons"], dict):
+                    result["moons"] = list(body_data["Moons"].keys())
+                else:
+                    result["moons"] = body_data["Moons"]
                 
             scan_results.append(result)
         else:

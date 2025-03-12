@@ -14,13 +14,23 @@
                 "size": {
                     "width": "5",
                     "height": "5"
+                },
+                "Stations": {
+                    "NavBeacon": {
+                        "type": "Beacon",
+                        "Coordinates": {
+                            "x": "8",
+                            "y": "-2"
+                        },
+                        "description": "Primary navigation beacon for the Alpha Cantauri system"
+                    }
                 }
             },
             "Centauri Prime": {
                 "type": "Planet",
                 "Coordinates": {
-                    "x": "80",
-                    "y": "100"
+                    "x": "30",
+                    "y": "30"
                 },
                 "size": {
                     "width": "3",
@@ -30,8 +40,8 @@
             "Centauri Secundus": {
                 "type": "Planet",
                 "Coordinates": {
-                    "x": "150",
-                    "y": "-120"
+                    "x": "-45",
+                    "y": "45"
                 },
                 "size": {
                     "width": "3",
@@ -41,8 +51,8 @@
             "Centauri Tertius": {
                 "type": "Planet",
                 "Coordinates": {
-                    "x": "-190",
-                    "y": "230"
+                    "x": "60",
+                    "y": "-60"
                 },
                 "size": {
                     "width": "3",
@@ -52,8 +62,8 @@
                     "Proxima I": {
                         "type": "Moon",
                         "Coordinates": {
-                            "x": "-185",
-                            "y": "230"
+                            "x": "64",
+                            "y": "-60"
                         },
                         "size": {
                             "width": "1",
@@ -65,8 +75,8 @@
             "Centauri Quartus": {
                 "type": "Planet",
                 "Coordinates": {
-                    "x": "200",
-                    "y": "-150"
+                    "x": "-80",
+                    "y": "-80"
                 },
                 "size": {
                     "width": "3",
@@ -76,8 +86,8 @@
                     "Alpha I": {
                         "type": "Moon",
                         "Coordinates": {
-                            "x": "205",
-                            "y": "-150"
+                            "x": "-84",
+                            "y": "-80"
                         },
                         "size": {
                             "width": "1",
@@ -87,8 +97,8 @@
                     "Alpha II": {
                         "type": "Moon",
                         "Coordinates": {
-                            "x": "200",
-                            "y": "-155"
+                            "x": "-80",
+                            "y": "-84"
                         },
                         "size": {
                             "width": "1",
@@ -100,8 +110,8 @@
             "Centauri Quintus": {
                 "type": "Planet",
                 "Coordinates": {
-                    "x": "-200",
-                    "y": "-200"
+                    "x": "120",
+                    "y": "120"
                 },
                 "size": {
                     "width": "3",
@@ -111,8 +121,8 @@
                     "Rigil I": {
                         "type": "Moon",
                         "Coordinates": {
-                            "x": "-195",
-                            "y": "-200"
+                            "x": "124",
+                            "y": "120"
                         },
                         "size": {
                             "width": "1",
@@ -122,8 +132,8 @@
                     "Rigil II": {
                         "type": "Moon",
                         "Coordinates": {
-                            "x": "-200",
-                            "y": "-195"
+                            "x": "120",
+                            "y": "124"
                         },
                         "size": {
                             "width": "1",
@@ -133,8 +143,8 @@
                     "Toliman I": {
                         "type": "Moon",
                         "Coordinates": {
-                            "x": "-205",
-                            "y": "-200"
+                            "x": "116",
+                            "y": "120"
                         },
                         "size": {
                             "width": "1",
@@ -144,8 +154,8 @@
                     "Toliman II": {
                         "type": "Moon",
                         "Coordinates": {
-                            "x": "-200",
-                            "y": "-205"
+                            "x": "120",
+                            "y": "116"
                         },
                         "size": {
                             "width": "1",

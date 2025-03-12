@@ -24,7 +24,7 @@ also rework jump loading bar to ramove tqdm dependency
 
 remove global scan showing moons. only show then if the player has done a detailed scan.
 
-rework moon system <-- A01
+update restliche systeme
 
 refactor and docs
 

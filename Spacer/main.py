@@ -82,6 +82,9 @@ def create_new_captain(save_mgr):
 # main loop
 def main():
     # Loop to handle logout and new login
+    current_player = None  # Track the current player to save on exit
+    save_mgr = SaveManager()  # Create save manager instance once
+    
     while True:
         try:
             # Get player name and flags
@@ -93,10 +96,10 @@ def main():
                 show_help = not load_save  # Show help for new players
                 
             me = player.Player(name)
+            current_player = me  # Set reference to current player for emergency save
             
             # Load saved game if requested
             if load_save:
-                save_mgr = SaveManager()
                 save_data = save_mgr.load_game(name)
                 if me.load_save_data(save_data):
                     print(f"\nWelcome back, Captain {name}!")
@@ -125,12 +128,30 @@ def main():
                     os.system("clear")
         
         except KeyboardInterrupt:
-            # Handle Ctrl+C gracefully
-            print("\n\nEmergency shutdown initiated. Goodbye!")
+            # Handle Ctrl+C gracefully with save
+            print("\n\nEmergency shutdown initiated!")
+            
+            # Save the current player's progress if one exists
+            if current_player and not current_player.is_dead:
+                print("Saving your progress before exit...")
+                save_mgr.save_game(current_player)
+                print(f"Progress saved for Captain {current_player.name}.")
+                
+            print("Goodbye, Captain! Safe travels.")
             break
         except Exception as e:
             # Handle unexpected errors
             print(f"\nUnexpected error: {e}")
+            
+            # Try to save current player if one exists
+            if current_player and not current_player.is_dead:
+                print("Attempting to save your progress...")
+                try:
+                    save_mgr.save_game(current_player)
+                    print(f"Progress saved for Captain {current_player.name}.")
+                except:
+                    print("Failed to save progress during error recovery.")
+                    
             print("Game will restart...")
             time.sleep(2)
 
