@@ -1,0 +1,275 @@
+{
+    "A01": {
+        "author": "Spacer",
+        "name": "A01",
+        "title": "Sol System",
+        "description": "Unser Heimatsystem - Die Wiege der Menschheit",
+        "bodies": {
+            "Sol": {
+                "type": "Star",
+                "Coordinates": {
+                    "x": "0",
+                    "y": "0"
+                },
+                "size": {
+                    "width": "8",
+                    "height": "8"
+                },
+                "Stations": {
+                    "Solar Observatory": {
+                        "type": "Research",
+                        "Coordinates": {
+                            "x": "15",
+                            "y": "0"
+                        },
+                        "description": "Sonnenforschungsstation mit hochauflösenden Teleskopen und Sensoren"
+                    },
+                    "Mercury Mining HQ": {
+                        "type": "SpacePort",
+                        "Coordinates": {
+                            "x": "-10",
+                            "y": "8"
+                        },
+                        "description": "Hauptquartier für Bergbauoperationen im inneren System"
+                    }
+                }
+            },
+            "Mercury": {
+                "type": "Planet",
+                "Coordinates": {
+                    "x": "20",
+                    "y": "20"
+                },
+                "size": {
+                    "width": "1",
+                    "height": "1"
+                },
+                "Stations": {
+                    "Mercury Mining Operations": {
+                        "type": "Colony",
+                        "Coordinates": {
+                            "x": "22",
+                            "y": "20"
+                        },
+                        "description": "Untergrundsiedlung für Bergbaupersonal"
+                    },
+                    "Polar Observatory": {
+                        "type": "Research",
+                        "Coordinates": {
+                            "x": "20",
+                            "y": "22"
+                        },
+                        "description": "Forschungsstation am Nordpol des Merkur"
+                    }
+                }
+            },
+            "Venus": {
+                "type": "Planet",
+                "Coordinates": {
+                    "x": "35",
+                    "y": "35"
+                },
+                "size": {
+                    "width": "2",
+                    "height": "2"
+                },
+                "Stations": {
+                    "Cloud City": {
+                        "type": "Colony",
+                        "Coordinates": {
+                            "x": "35",
+                            "y": "31"
+                        },
+                        "description": "Schwebende Stadt in der oberen Atmosphäre der Venus"
+                    },
+                    "Venus Gateway": {
+                        "type": "SpacePort",
+                        "Coordinates": {
+                            "x": "38",
+                            "y": "35"
+                        },
+                        "description": "Orbitaler Umschlagplatz für Waren aus der Venusatmosphäre"
+                    }
+                }
+            },
+            "Earth": {
+                "type": "Planet",
+                "Coordinates": {
+                    "x": "50",
+                    "y": "50"
+                },
+                "size": {
+                    "width": "3",
+                    "height": "3"
+                },
+                "Moons": {
+                    "Luna": {
+                        "type": "Moon",
+                        "Coordinates": {
+                            "x": "55",
+                            "y": "50"
+                        },
+                        "size": {
+                            "width": "1",
+                            "height": "1"
+                        },
+                        "Stations": {
+                            "Lunar Colony": {
+                                "type": "Colony",
+                                "Coordinates": {
+                                    "x": "56",
+                                    "y": "51"
+                                },
+                                "description": "Hauptsiedlung auf dem Mond"
+                            },
+                            "Farside Observatory": {
+                                "type": "Research",
+                                "Coordinates": {
+                                    "x": "57",
+                                    "y": "49"
+                                },
+                                "description": "Astronomisches Observatorium auf der erdabgewandten Seite"
+                            }
+                        }
+                    }
+                },
+                "Stations": {
+                    "ISS": {
+                        "type": "SpaceStation",
+                        "Coordinates": {
+                            "x": "52",
+                            "y": "52"
+                        },
+                        "description": "Internationale Raumstation - Erstes permanentes Habitat im Erdorbit"
+                    },
+                    "Orbital Gateway": {
+                        "type": "SpacePort",
+                        "Coordinates": {
+                            "x": "48",
+                            "y": "54"
+                        },
+                        "description": "Hauptraumhafen der Erde - Knotenpunkt für interplanetare Reisen"
+                    },
+                    "NavBeacon Earth": {
+                        "type": "Beacon",
+                        "Coordinates": {
+                            "x": "47",
+                            "y": "47"
+                        },
+                        "description": "Primärer Navigationspunkt für Annäherung an die Erde"
+                    }
+                }
+            },
+            "Mars": {
+                "type": "Planet",
+                "Coordinates": {
+                    "x": "75",
+                    "y": "75"
+                },
+                "size": {
+                    "width": "2",
+                    "height": "2"
+                },
+                "Moons": {
+                    "Phobos": {
+                        "type": "Moon",
+                        "Coordinates": {
+                            "x": "78",
+                            "y": "75"
+                        },
+                        "size": {
+                            "width": "0.5",
+                            "height": "0.5"
+                        },
+                        "Stations": {
+                            "Phobos Mining": {
+                                "type": "Colony",
+                                "Coordinates": {
+                                    "x": "78.5",
+                                    "y": "75.5"
+                                },
+                                "description": "Bergbauanlage im Phobos-Asteroiden"
+                            }
+                        }
+                    },
+                    "Deimos": {
+                        "type": "Moon",
+                        "Coordinates": {
+                            "x": "75",
+                            "y": "78"
+                        },
+                        "size": {
+                            "width": "0.3",
+                            "height": "0.3"
+                        },
+                        "Stations": {
+                            "Deimos Fuel Depot": {
+                                "type": "SpacePort",
+                                "Coordinates": {
+                                    "x": "75.5",
+                                    "y": "78.5"
+                                },
+                                "description": "Treibstoffdepot für den äußeren Bereich des Systems"
+                            }
+                        }
+                    }
+                },
+                "Stations": {
+                    "Mars Colony": {
+                        "type": "Colony",
+                        "Coordinates": {
+                            "x": "75",
+                            "y": "72"
+                        },
+                        "description": "Erste dauerhafte Marskolonie im Olympus Mons"
+                    },
+                    "Valles Marineris Research": {
+                        "type": "Research",
+                        "Coordinates": {
+                            "x": "72",
+                            "y": "75"
+                        },
+                        "description": "Geologische Forschungsstation im größten Canyonsystem"
+                    },
+                    "NavBeacon Mars": {
+                        "type": "Beacon",
+                        "Coordinates": {
+                            "x": "77",
+                            "y": "77"
+                        },
+                        "description": "Navigationspunkt für Mars-Orbit-Operationen"
+                    }
+                }
+            },
+            "Asteroid Belt": {
+                "type": "AsteroidField",
+                "Coordinates": {
+                    "x": "100",
+                    "y": "100"
+                },
+                "size": {
+                    "width": "10",
+                    "height": "10"
+                },
+                "Stations": {
+                    "Ceres Outpost": {
+                        "type": "Colony",
+                        "Coordinates": {
+                            "x": "105",
+                            "y": "97"
+                        },
+                        "description": "Hauptsiedlung im Asteroidengürtel auf dem Zwergplaneten Ceres"
+                    },
+                    "Deep Space Industries": {
+                        "type": "SpacePort",
+                        "Coordinates": {
+                            "x": "95",
+                            "y": "105"
+                        },
+                        "description": "Hauptumschlagplatz für Asteroiden-Bergbau"
+                    }
+                }
+            }
+        }
+    }
+}
