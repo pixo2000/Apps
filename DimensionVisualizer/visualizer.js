@@ -30,21 +30,6 @@ document.getElementById('dimension-file').addEventListener('change', function(e)
     }
 });
 
-// Event Listener für Beispieldaten
-document.getElementById('load-sample').addEventListener('click', function() {
-    fetch('/workspaces/Apps/Spacer/dimensions/C12.json')
-        .then(response => response.json())
-        .then(data => {
-            dimensionData = data;
-            resetView();
-            drawDimension();
-            updateDimensionInfo();
-        })
-        .catch(error => {
-            alert('Fehler beim Laden der Beispieldaten: ' + error.message);
-        });
-});
-
 // Zoom-Funktionen
 document.getElementById('zoom-in').addEventListener('click', function() {
     scale *= 1.2;
@@ -57,6 +42,36 @@ document.getElementById('zoom-out').addEventListener('click', function() {
 });
 
 document.getElementById('reset-view').addEventListener('click', resetView);
+
+// Event Listener für Mausrad-Zoom mit STRG-Taste
+canvas.addEventListener('wheel', function(e) {
+    // Nur zoomen, wenn STRG gedrückt ist
+    if (e.ctrlKey) {
+        e.preventDefault(); // Verhindert das Scrollen der Seite
+        
+        const mouseX = e.offsetX;
+        const mouseY = e.offsetY;
+        
+        // Position vor dem Zoom berechnen
+        const worldX = (mouseX - offsetX) / scale;
+        const worldY = (mouseY - offsetY) / scale;
+        
+        // Zoom-Faktor basierend auf Scrollrichtung
+        if (e.deltaY < 0) {
+            // Zoom in
+            scale *= 1.1;
+        } else {
+            // Zoom out
+            scale *= 0.9;
+        }
+        
+        // Neue Position berechnen, sodass der Punkt unter dem Mauszeiger bleibt
+        offsetX = mouseX - worldX * scale;
+        offsetY = mouseY - worldY * scale;
+        
+        drawDimension();
+    }
+});
 
 // Mausbewegung für Panning
 canvas.addEventListener('mousedown', function(e) {
@@ -326,10 +341,29 @@ function drawDimension() {
                 const stationX = (parseFloat(station.Coordinates.x) * scale) + offsetX;
                 const stationY = (parseFloat(station.Coordinates.y) * scale) + offsetY;
                 
-                ctx.beginPath();
-                ctx.rect(stationX - 5, stationY - 5, 10, 10);
-                ctx.fillStyle = '#ff0000';  // rot für Stationen
-                ctx.fill();
+                // Form der Station basierend auf Typ
+                let stationShape = drawStation;
+                let stationColor = '#ff0000';  // Standard: rot
+                
+                if (station.type === 'Research') {
+                    stationColor = '#9b59b6';  // lila für Forschungsstationen
+                    stationShape = drawResearchStation;
+                } else if (station.type === 'SpaceStation') {
+                    stationColor = '#3498db';  // blau für Raumstationen
+                    stationShape = drawSpaceStation;
+                } else if (station.type === 'SpacePort') {
+                    stationColor = '#f39c12';  // orange für Raumhäfen
+                    stationShape = drawSpacePort;
+                } else if (station.type === 'Colony') {
+                    stationColor = '#2ecc71';  // grün für Kolonien
+                    stationShape = drawColony;
+                } else if (station.type === 'Beacon') {
+                    stationColor = '#e74c3c';  // rot für Navigationspunkte
+                    stationShape = drawBeacon;
+                }
+                
+                // Station zeichnen
+                stationShape(stationX, stationY, stationColor);
                 
                 // Hervorhebung für ausgewähltes Objekt
                 if (selectedObject && selectedObject.type === 'station' && selectedObject.name === stationName) {
@@ -384,6 +418,78 @@ function drawDimension() {
             }
         }
     }
+}
+
+// Funktionen zum Zeichnen verschiedener Stationstypen
+function drawStation(x, y, color) {
+    ctx.beginPath();
+    ctx.rect(x - 5, y - 5, 10, 10);
+    ctx.fillStyle = color;
+    ctx.fill();
+}
+
+function drawResearchStation(x, y, color) {
+    ctx.beginPath();
+    ctx.moveTo(x, y - 7);
+    ctx.lineTo(x + 7, y + 3);
+    ctx.lineTo(x - 7, y + 3);
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+}
+
+function drawSpaceStation(x, y, color) {
+    ctx.beginPath();
+    ctx.moveTo(x - 6, y);
+    ctx.lineTo(x - 3, y - 5);
+    ctx.lineTo(x + 3, y - 5);
+    ctx.lineTo(x + 6, y);
+    ctx.lineTo(x + 3, y + 5);
+    ctx.lineTo(x - 3, y + 5);
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+}
+
+function drawSpacePort(x, y, color) {
+    ctx.beginPath();
+    ctx.arc(x, y, 6, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+    
+    ctx.beginPath();
+    ctx.moveTo(x, y - 6);
+    ctx.lineTo(x + 4, y);
+    ctx.lineTo(x, y + 6);
+    ctx.lineTo(x - 4, y);
+    ctx.closePath();
+    ctx.fillStyle = '#000';
+    ctx.fill();
+}
+
+function drawColony(x, y, color) {
+    ctx.beginPath();
+    ctx.moveTo(x, y - 6);
+    ctx.lineTo(x + 6, y);
+    ctx.lineTo(x, y + 6);
+    ctx.lineTo(x - 6, y);
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+}
+
+function drawBeacon(x, y, color) {
+    ctx.beginPath();
+    ctx.arc(x, y, 5, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+    
+    // Pulseffekt für Beacons
+    ctx.beginPath();
+    ctx.arc(x, y, 8 + Math.sin(Date.now() / 200) * 2, 0, Math.PI * 2);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1;
+    ctx.stroke();
 }
 
 // Funktion zum Zeichnen des Koordinatengitters
