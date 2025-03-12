@@ -9,7 +9,7 @@ import os
 
 # load stuff
 def temp_start():
-    os.system("clear")
+    os.system("clear") # clear console, works on codespace but not on windows
     print("\n" + "=" * 50)
     print("  SPACER - INTERSTELLAR EXPLORATION SIMULATOR")
     print("=" * 50 + "\n")
@@ -35,10 +35,13 @@ def temp_start():
             print(f"{i}. {saved_name}")
         
         while True:
-            choice = input("\nEnter captain name to continue, or 'new' for new game: ")
+            choice = input("\nEnter captain name to continue, 'new' for new game, or 'exit' to quit: ")
             
             if choice.lower() == 'new':
                 return create_new_captain(save_mgr)
+            elif choice.lower() == 'exit':
+                print("\nExiting game. Goodbye!")
+                exit(0)  # Exit the program immediately
             
             # Case-insensitive player name check
             for saved_name in saved_players:
@@ -52,12 +55,24 @@ def temp_start():
 def create_new_captain(save_mgr):
     """Handle creation of a new captain with name validation"""
     while True:
-        name = input("Who are you, Captain? ")
+        name = input("Who are you, Captain? (or 'exit' to quit): ")
         
+        if name.lower() == 'exit':
+            print("\nExiting game. Goodbye!")
+            exit(0)  # Exit the program immediately
+            
         # Check length and allowed characters
         if not save_mgr.is_valid_player_name(name):
-            print("\n⚠ Invalid name. Names must be 3-15 characters long and contain")
-            print("  only letters, numbers, and underscores.")
+            print("\n⚠ Invalid name. Names must be 3-15 characters long and can contain:")
+            print("  - Uppercase letters (A-Z)")
+            print("  - Lowercase letters (a-z)")
+            print("  - Numbers (0-9)")
+            print("  - Underscores (_)")
+            
+            # Check specifically for reserved names
+            if name.lower() in save_mgr.reserved_names:
+                print("\n⚠ Additionally, this name is reserved as a system command and cannot be used.")
+            
             continue
             
         # Check if name already exists (case insensitive)
@@ -82,9 +97,6 @@ def create_new_captain(save_mgr):
 # main loop
 def main():
     # Loop to handle logout and new login
-    current_player = None  # Track the current player to save on exit
-    save_mgr = SaveManager()  # Create save manager instance once
-    
     while True:
         try:
             # Get player name and flags
@@ -96,10 +108,10 @@ def main():
                 show_help = not load_save  # Show help for new players
                 
             me = player.Player(name)
-            current_player = me  # Set reference to current player for emergency save
             
             # Load saved game if requested
             if load_save:
+                save_mgr = SaveManager()
                 save_data = save_mgr.load_game(name)
                 if me.load_save_data(save_data):
                     print(f"\nWelcome back, Captain {name}!")
@@ -128,30 +140,12 @@ def main():
                     os.system("clear")
         
         except KeyboardInterrupt:
-            # Handle Ctrl+C gracefully with save
-            print("\n\nEmergency shutdown initiated!")
-            
-            # Save the current player's progress if one exists
-            if current_player and not current_player.is_dead:
-                print("Saving your progress before exit...")
-                save_mgr.save_game(current_player)
-                print(f"Progress saved for Captain {current_player.name}.")
-                
-            print("Goodbye, Captain! Safe travels.")
+            # Handle Ctrl+C gracefully
+            print("\n\nEmergency shutdown initiated. Goodbye!")
             break
         except Exception as e:
             # Handle unexpected errors
             print(f"\nUnexpected error: {e}")
-            
-            # Try to save current player if one exists
-            if current_player and not current_player.is_dead:
-                print("Attempting to save your progress...")
-                try:
-                    save_mgr.save_game(current_player)
-                    print(f"Progress saved for Captain {current_player.name}.")
-                except:
-                    print("Failed to save progress during error recovery.")
-                    
             print("Game will restart...")
             time.sleep(2)
 
