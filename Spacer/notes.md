@@ -31,3 +31,5 @@ refactor and docs
 log playtime
 
 stop command, comands while moving, renew pathing, dead when on sun
+
+register via code(for alpha)
