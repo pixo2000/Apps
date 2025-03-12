@@ -20,6 +20,19 @@ class Dimension:
                     # Store celestial bodies as properties
                     for body_name, body_data in dimension_data['bodies'].items():
                         self.properties[body_name] = body_data
+                        
+                        # Process moons to ensure they are correctly handled
+                        if "Moons" in body_data:
+                            # Check if Moons is a dictionary (new format) or a list (old format)
+                            if isinstance(body_data["Moons"], list):
+                                # Convert old format to new format (placeholder)
+                                self.properties[body_name]["Moons"] = {
+                                    moon_name: {
+                                        "type": "Moon",
+                                        "Coordinates": {"x": "0", "y": "0"},
+                                        "size": {"width": "1", "height": "1"}
+                                    } for moon_name in body_data["Moons"]
+                                }
                 else:
                     raise ValueError(f"Dimension {self.name} not found in file")
         except FileNotFoundError:

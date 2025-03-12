@@ -4,14 +4,28 @@
     "position": {
         "x": 10,
         "y": 10,
-        "dimension": "A01"
+        "dimension": "C12"
     },
     "discoveries": {
         "known_dimensions": [
-            "A01"
+            "A01",
+            "C12"
         ],
         "known_bodies": {
-            "A01": []
+            "A01": [
+                "SOL",
+                "Mercury",
+                "Venus",
+                "Earth",
+                "Mars",
+                "Jupiter",
+                "Saturn",
+                "Ceres",
+                "Vesta",
+                "Pallas",
+                "Juno"
+            ],
+            "C12": []
         }
     },
     "is_dead": false
