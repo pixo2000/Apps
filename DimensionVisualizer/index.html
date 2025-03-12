@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dimension Visualizer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Dimension Visualizer</h1>
+    </header>
+    <main>
+        <div class="controls">
+            <input type="file" id="dimension-file" accept=".json">
+            <button id="load-sample">Alpha Centauri (C12) laden</button>
+        </div>
+        <div class="info-panel">
+            <h2 id="dimension-title">Keine Dimension geladen</h2>
+            <p id="dimension-description"></p>
+            <div id="selected-object-info">
+                <h3>Wählen Sie ein Objekt für Details</h3>
+                <div id="object-details"></div>
+            </div>
+        </div>
+        <div class="canvas-container">
+            <canvas id="dimension-canvas" width="800" height="800"></canvas>
+            <div class="zoom-controls">
+                <button id="zoom-in">+</button>
+                <button id="zoom-out">-</button>
+                <button id="reset-view">Reset</button>
+            </div>
+        </div>
+    </main>
+    <script src="visualizer.js"></script>
+</body>
+</html>
