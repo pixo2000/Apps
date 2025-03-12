@@ -69,6 +69,10 @@
                 "Stations": {
                     "Wiesbaden": {
                         "type": "City",
+                        "Coordinates": {
+                            "x": "60",
+                            "y": "-59"
+                        },
                         "description": "Headquaters on Earth"
                     }
                 },
