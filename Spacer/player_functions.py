@@ -22,27 +22,44 @@ def scan_system(player):
         body_x = int(body_data["Coordinates"]["x"])
         body_y = int(body_data["Coordinates"]["y"])
         
-        # Calculate distance to player
+        # Calculate euclidean distance to player (for detection)
         distance = math.sqrt((player_x - body_x) ** 2 + (player_y - body_y) ** 2)
         
-        # Determine if body should be identified
-        if distance <= 250 or body_name in player.known_bodies[dimension_name]:
+        # Calculate movement distance (Chebyshev distance - max of x,y differences)
+        movement_distance = max(abs(player_x - body_x), abs(player_y - body_y))
+        
+        # Determine if body should be identified (if it's close enough or already known)
+        # Using 60 seconds as the maximum identifiable distance
+        if movement_distance <= 60 or body_name in player.known_bodies.get(dimension_name, []):
             # Body is close enough to identify or already known
             body_type = body_data["type"]
             
-            # Mark as discovered
-            if body_name not in player.known_bodies[dimension_name]:
-                player.known_bodies[dimension_name].append(body_name)
+            # Check if this is a new discovery
+            is_new_discovery = False
+            if dimension_name not in player.known_bodies or body_name not in player.known_bodies.get(dimension_name, []):
                 is_new_discovery = True
-            else:
-                is_new_discovery = False
+                
+            # Count signals (moons + stations)
+            signals_count = 0
+            
+            # Count moons
+            if "Moons" in body_data:
+                if isinstance(body_data["Moons"], dict):
+                    signals_count += len(body_data["Moons"])
+                else:
+                    signals_count += len(body_data["Moons"])
+            
+            # Count stations
+            if "Stations" in body_data:
+                signals_count += len(body_data["Stations"])
                 
             result = {
                 "name": body_name,
                 "type": body_type,
                 "coords": (body_x, body_y),
-                "distance": distance,
-                "new_discovery": is_new_discovery
+                "distance": movement_distance,
+                "new_discovery": is_new_discovery,
+                "signals_count": signals_count
             }
             
             # Add moons info if available
@@ -55,13 +72,14 @@ def scan_system(player):
                 
             scan_results.append(result)
         else:
-            # Limited information for distant bodies
+            # Limited information for distant bodies (only coordinates are known)
             scan_results.append({
                 "name": "Unknown",
                 "type": "Unknown",
                 "coords": (body_x, body_y),
-                "distance": distance,
-                "new_discovery": False
+                "distance": movement_distance,
+                "new_discovery": False,
+                "signals_count": 0  # Unbekannte Körper haben keine bekannten Signale
             })
     
     # Sort by distance to player
@@ -100,8 +118,8 @@ def display_scan_results(scan_results):
     print(f"Found {len(scan_results)} celestial bodies:")
     
     # Header for table format
-    print(f"{'Type':<15} {'Name':<20} {'Coordinates':<20} {'Distance':<10} {'Status':<10}")
-    print("-" * 75)
+    print(f"{'Type':<15} {'Name':<20} {'Coordinates':<20} {'Distance':<10} {'Signals':<10} {'Status':<10}")
+    print("-" * 85)
     
     for body in scan_results:
         # Format distance to show only 2 decimal places
@@ -110,7 +128,7 @@ def display_scan_results(scan_results):
         # Show discovery status
         status = "NEW!" if body.get("new_discovery", False) else ""
         
-        print(f"{body['type']:<15} {body['name']:<20} {str(body['coords']):<20} {distance_formatted:<10} {status:<10}")
+        print(f"{body['type']:<15} {body['name']:<20} {str(body['coords']):<20} {distance_formatted:<10} {body['signals_count']:<10} {status:<10}")
         
         # Show moons if present and body is known
         if body['name'] != "Unknown" and "moons" in body:
