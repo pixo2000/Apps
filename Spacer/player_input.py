@@ -75,8 +75,25 @@ def handle_input(name):
         return "positive"
         
     elif command_lower == "scan":
-        scan_results = scan_system(name)
-        display_scan_results(scan_results)
+        try:
+            # Scan durchführen
+            scan_results = handle_scan(name)
+            
+            # Entdeckungen dem Spieler erst nach der Anzeige hinzufügen
+            # damit der NEW!-Status korrekt angezeigt wird
+            current_dimension = name.position('dimension')
+            for obj_dict, _ in scan_results:
+                # Objekt-Name aus dem Dictionary holen
+                obj_name = obj_dict['name']
+                
+                # Nur neue Objekte mit bekanntem Namen hinzufügen
+                if obj_name != 'Unknown':
+                    if current_dimension not in name.known_bodies:
+                        name.known_bodies[current_dimension] = []
+                    if obj_name not in name.known_bodies[current_dimension]:
+                        name.known_bodies[current_dimension].append(obj_name)
+        except Exception as e:
+            print(f"\nScan error: {e}")
         return "positive"
         
     elif command_lower in ["quit", "exit"]:
@@ -172,6 +189,73 @@ def handle_input(name):
     if result != "negative" and command_lower != "logout":
         save_mgr.save_game(name)
     return result
+
+def handle_scan(player):
+    """Scan the nearby area for planets"""
+    try:
+        # Scan-System aufrufen
+        raw_results = scan_system(player)
+        
+        # Ergebnisse filtern - jetzt mit korrekter Dictionary-Verarbeitung
+        filtered_results = []
+        for item in raw_results:
+            # Die Scan-Ergebnisse sind Dictionaries, keine Tupel
+            if isinstance(item, dict) and 'name' in item and 'distance' in item:
+                # Daten aus dem Dictionary extrahieren
+                name = item['name']
+                obj_type = item.get('type', 'Unknown')
+                
+                # Monde überspringen - Prüfen anhand des Typs, nicht anhand eines is_moon-Attributs
+                if obj_type.lower() == 'moon':
+                    continue
+                
+                # Wir verwenden die bereits berechnete Bewegungsdistanz aus scan_system
+                movement_distance = item['distance']
+                
+                # Prüfe, ob das Objekt neu entdeckt wurde
+                current_dimension = player.position('dimension')
+                is_new_discovery = item.get('new_discovery', False)
+                
+                # Objekt zur gefilterten Liste hinzufügen
+                filtered_results.append((item, movement_distance))
+            else:
+                print(f"Warning: Unexpected scan result format: {item}")
+                continue
+        
+        # Anzeige der gefilterten Ergebnisse als Tabelle
+        if filtered_results:
+            print("\n=== SCAN RESULTS ===")
+            print(f"Found {len(filtered_results)} celestial bodies:")
+            print(f"{'Type':<15} {'Name':<20} {'Coordinates':<20} {'Distance':<10} {'Signals':<10} {'Status':<10}")
+            print("-" * 85)
+            
+            for obj_dict, distance in filtered_results:
+                obj_name = obj_dict['name']
+                obj_type = obj_dict.get('type', 'Unknown')
+                coords = f"({obj_dict['coords'][0]}, {obj_dict['coords'][1]})"
+                
+                # Format distance as integer (travel time in seconds)
+                distance_formatted = f"{int(distance)}s"
+                
+                # Get signals count (moons + stations)
+                signals_count = obj_dict.get('signals_count', 0)
+                
+                # Set status based on whether it's a new discovery
+                status = "NEW!" if obj_dict.get('new_discovery', False) else ""
+                
+                print(f"{obj_type:<15} {obj_name:<20} {coords:<20} {distance_formatted:<10} {signals_count:<10} {status:<10}")
+            
+            print("===================\n")
+        else:
+            print(f"\nNo objects detected in this system.")
+        
+        return filtered_results
+        
+    except Exception as e:
+        print(f"\nError during scan: {e}")
+        import traceback
+        traceback.print_exc()
+        return []  # Bei einem Fehler eine leere Liste zurückgeben
 
 def display_help(first_time=False):
     print("\n" + "=" * 50)

@@ -9,7 +9,7 @@ import os
 
 # load stuff
 def temp_start():
-    os.system("clear") # clear console, works on codespace but not on windows
+#    os.system("clear") # clear console, works on codespace but not on windows
     print("\n" + "=" * 50)
     print("  SPACER - INTERSTELLAR EXPLORATION SIMULATOR")
     print("=" * 50 + "\n")
@@ -151,7 +151,12 @@ def main():
         
         except KeyboardInterrupt:
             # Handle Ctrl+C gracefully
-            print("\n\nEmergency shutdown initiated. Goodbye!")
+            print("\n\nEmergency shutdown initiated. Saving game...")
+            save_mgr = SaveManager()
+            if save_mgr.save_game(me):
+                print("Game saved successfully. Goodbye!")
+            else:
+                print("Warning: Game could not be saved.")
             break
         except Exception as e:
             # Handle unexpected errors

@@ -25,8 +25,15 @@
                 "Pallas",
                 "Juno"
             ],
-            "C12": []
+            "C12": [
+                "Proxima Centauri",
+                "Centauri Prime",
+                "Centauri Secundus",
+                "Centauri Tertius",
+                "Centauri Quartus",
+                "Centauri Quintus"
+            ]
         }
     },
-    "is_dead": true
+    "is_dead": false
 }

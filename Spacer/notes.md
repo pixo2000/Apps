@@ -16,13 +16,9 @@ distance in seconds when scan
 
 n paar notes sind uf meinem handy als voice gespeichert
 
-solution for too many moons
-
 check jump animation
 
 also rework jump loading bar to ramove tqdm dependency
-
-remove global scan showing moons. only show then if the player has done a detailed scan.
 
 update restliche systeme
 
@@ -32,4 +28,14 @@ log playtime
 
 stop command, comands while moving, renew pathing, dead when on sun
 
+<<<<<<< HEAD
 register via code(for alpha)
+=======
+bigger scan distance and more distance in C12
+
+show nav beacon on star when scanning
+
+refactor
+remove not needed code
+remove many comments
+>>>>>>> a68c35a (reworked scan command to work with new dimension system)

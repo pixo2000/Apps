@@ -2,17 +2,15 @@
     "name": "Arminibus",
     "uuid": "6e9381c9-75b7-4d5f-aaab-303ab820a951",
     "position": {
-        "x": 10,
-        "y": 10,
+        "x": 20,
+        "y": 20,
         "dimension": "A01"
     },
     "discoveries": {
         "known_dimensions": [
             "A01"
         ],
-        "known_bodies": {
-            "A01": []
-        }
+        "known_bodies": {}
     },
     "is_dead": false
 }
