@@ -1,7 +1,7 @@
 import datetime
 import player
 from dimension import Dimension
-from player_functions import scan_system, display_scan_results
+from player_functions import scan_system
 from save_manager import SaveManager
 import json  # Neuer Import für JSON-Verarbeitung
 

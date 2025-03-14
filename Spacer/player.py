@@ -57,19 +57,6 @@ class Player:
         self.y = y
         print(f"\n\n✓ Arrived at coordinates [{x}, {y}]\n")
     
-    def discover_body(self, body_name):
-        """Mark a celestial body as discovered"""
-        dimension = self.dimension.name
-        
-        if dimension not in self.known_bodies:
-            self.known_bodies[dimension] = []
-            
-        if body_name not in self.known_bodies[dimension]:
-            self.known_bodies[dimension].append(body_name)
-            return True  # Newly discovered
-        
-        return False  # Already known
-
     def position(self, variable):
         if variable == "x":
             return self.x

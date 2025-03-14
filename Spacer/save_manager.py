@@ -251,33 +251,3 @@ class SaveManager:
             return False, "Failed to save with new name"
             
         return True, f"Name changed successfully to {new_name}"
-        
-    def find_player_by_uuid(self, uuid_to_find):
-        """Find a player by their UUID"""
-        for save_file in self.save_directory.glob('*.json'):
-            try:
-                with open(save_file, 'r') as f:
-                    data = json.load(f)
-                    if data.get("uuid") == uuid_to_find:
-                        return data
-            except:
-                continue
-        return None
-
-    def get_player_metadata(self, player_name):
-        """
-        [DEPRECATED] Get metadata for a specific player
-        
-        This method is deprecated as all player data is now stored in the UUID.json files.
-        It remains only for backward compatibility.
-        """
-        return {}  # Return empty dict as we don't use this system anymore
-
-    def save_player_metadata(self, player_name, metadata):
-        """
-        [DEPRECATED] Save or update metadata for a specific player
-        
-        This method is deprecated as all player data is now stored in the UUID.json files.
-        It remains only for backward compatibility and does nothing.
-        """
-        return True  # Pretend success but actually do nothing
