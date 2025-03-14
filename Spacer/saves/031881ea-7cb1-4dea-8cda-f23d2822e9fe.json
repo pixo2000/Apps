@@ -1,0 +1,21 @@
+{
+    "name": "pixo2000",
+    "uuid": "031881ea-7cb1-4dea-8cda-f23d2822e9fe",
+    "position": {
+        "x": 10,
+        "y": 10,
+        "dimension": "A01"
+    },
+    "discoveries": {
+        "known_dimensions": [
+            "A01"
+        ],
+        "known_bodies": {
+            "A01": []
+        }
+    },
+    "playtime": "00:00:02:06",
+    "creation_date": "14.03.25 - 13:37",
+    "last_login": "14.03.25 - 13:43",
+    "is_dead": false
+}

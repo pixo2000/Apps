@@ -6,6 +6,7 @@ from save_manager import SaveManager
 # import modules
 import time
 import os
+import datetime  # Added for date/time tracking
 
 # load stuff
 def temp_start():
@@ -102,6 +103,9 @@ def create_new_captain(save_mgr):
         print("*" * 50 + "\n")
         time.sleep(1)
         
+        # The player object will be created with a creation date
+        # No need to use metadata anymore as everything is stored in the UUID-based save file
+        
         return name, False, True  # New captain, don't load save, show tutorial
 
 # main loop
@@ -119,16 +123,39 @@ def main():
                 
             me = player.Player(name)
             
+            # Update last login time and load player data
+            save_mgr = SaveManager()
+            
             # Load saved game if requested
             if load_save:
-                save_mgr = SaveManager()
                 save_data = save_mgr.load_game(name)
                 if me.load_save_data(save_data):
                     print(f"\nWelcome back, Captain {name}!")
                     print(f"Resuming from {me.dimension.title}, coordinates [{me.x}, {me.y}]")
+                    
+                    # Parse playtime from save data
+                    if "playtime" in save_data:
+                        playtime_str = save_data["playtime"]
+                        me.playtime = save_mgr.parse_playtime(playtime_str)
+                    else:
+                        me.playtime = 0
+                    
+                    # Load creation date and last login from save if available
+                    if "creation_date" in save_data:
+                        me.creation_date = save_data["creation_date"]
                 else:
                     print("\nError loading save. Starting new game.")
                     show_help = True  # Show help if load failed
+                    me.playtime = 0  # Initialize playtime to 0 for new game
+                    me.creation_date = datetime.datetime.now().isoformat()  # Set creation date for new game
+            else:
+                # New player, initialize playtime to 0 and set creation date
+                me.playtime = 0
+                me.creation_date = datetime.datetime.now().isoformat()
+            
+            # Record session start time on both a variable and the player object
+            session_start = datetime.datetime.now()
+            me.session_start = session_start
             
             # Show help menu for new players
             if show_help:
@@ -141,10 +168,14 @@ def main():
                 if check == "negative":
                     # Exit the game entirely
                     running = False
+                    # Update playtime before exiting
+                    update_playtime(me, session_start, save_mgr)
                     return  # Exit the main function
                 elif check == "logout":
                     # Break inner loop to go back to login
                     running = False
+                    # Update playtime before logging out
+                    update_playtime(me, session_start, save_mgr)
                     print("\nReturning to login screen...\n")
                     time.sleep(1)
                     os.system("clear")
@@ -153,6 +184,8 @@ def main():
             # Handle Ctrl+C gracefully
             print("\n\nEmergency shutdown initiated. Saving game...")
             save_mgr = SaveManager()
+            # Update playtime before emergency exit
+            update_playtime(me, session_start, save_mgr)
             if save_mgr.save_game(me):
                 print("Game saved successfully. Goodbye!")
             else:
@@ -164,6 +197,23 @@ def main():
             print("Game will restart...")
             time.sleep(2)
 
+# Helper function to update player's playtime
+def update_playtime(player_obj, session_start, save_mgr):
+    """Update player's total playtime by adding the current session time"""
+    try:
+        session_end = datetime.datetime.now()
+        session_duration = (session_end - session_start).total_seconds()
+        
+        # Update playtime directly on the player object
+        if hasattr(player_obj, "playtime"):
+            player_obj.playtime += session_duration
+        else:
+            player_obj.playtime = session_duration
+            
+        # Save the updated playtime with the player data
+        save_mgr.save_game(player_obj)
+    except Exception as e:
+        print(f"Error updating playtime: {e}")
 
 # yeah if ykyk
 if __name__ == "__main__":

@@ -1,3 +1,4 @@
+import datetime
 import player
 from dimension import Dimension
 from player_functions import scan_system, display_scan_results
@@ -148,6 +149,18 @@ def handle_input(name):
             other_player_name = parts[1]
             display_other_player_info(other_player_name)
         else:
+            # Save game data first to ensure playtime is accurate
+            # Calculate current session playtime and add it to total
+            current_time = datetime.datetime.now()
+            if hasattr(name, "session_start"):
+                session_duration = (current_time - name.session_start).total_seconds()
+                name.playtime += session_duration
+                # Update session start time for future calculations
+                name.session_start = current_time
+            
+            # Save the updated data
+            save_mgr.save_game(name)
+            
             # Show current player info
             print("\n=== PLAYER INFORMATION ===")
             print(f"» Name: {name.name}")
@@ -160,6 +173,18 @@ def handle_input(name):
             # Count total discovered bodies
             total_bodies = sum(len(bodies) for bodies in name.known_bodies.values())
             print(f"» Celestial bodies discovered: {total_bodies}")
+            
+            # Display playtime from player object
+            if hasattr(name, "playtime"):
+                # Get formatted playtime from save_mgr
+                playtime = save_mgr.format_playtime(name.playtime)
+                print(f"» Total playtime: {playtime}")
+            
+            # Display creation date and last login if available
+            if hasattr(name, "creation_date"):
+                creation_date = format_datetime(name.creation_date)
+                print(f"» Created: {creation_date}")
+            
             print("=========================\n")
         return "positive"
         
@@ -358,5 +383,41 @@ def display_other_player_info(player_name):
             print(f"» Celestial bodies discovered: {total_bodies}")
         except:
             print("» Celestial bodies discovered: Unknown")
+        
+        # Show playtime if available in save file
+        if "playtime" in player_data:
+            # Display the formatted playtime string directly from the save file
+            playtime = player_data["playtime"]
+            print(f"» Total playtime: {playtime}")
+        
+        # Show creation date and last login
+        if "creation_date" in player_data:
+            creation_date = format_datetime(player_data["creation_date"])
+            print(f"» Created: {creation_date}")
+        
+        if "last_login" in player_data:
+            last_login = format_datetime(player_data["last_login"])
+            print(f"» Last login: {last_login}")
     
     print("=========================\n")
+
+def format_datetime(iso_date_str):
+    """Format ISO date string to DD.MM.YY - HH:MM format using Berlin timezone"""
+    try:
+        dt = datetime.datetime.fromisoformat(iso_date_str)
+        
+        # Convert to Berlin time if possible
+        try:
+            import pytz
+            berlin_tz = pytz.timezone('Europe/Berlin')
+            if dt.tzinfo is None:
+                # Assume UTC for naive datetime objects
+                dt = dt.replace(tzinfo=datetime.timezone.utc)
+            dt = dt.astimezone(berlin_tz)
+        except ImportError:
+            # If pytz is not available, use system local time
+            pass
+            
+        return dt.strftime("%d.%m.%y - %H:%M")
+    except:
+        return iso_date_str  # Return the original string if parsing fails
