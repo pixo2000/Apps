@@ -37,3 +37,7 @@ remove not needed code
 remove many comments
 
 add register with code(for closed beta)
+
+metadata adden wenn nicht vorhanden to ensure version
+
+playerinfo bei live game wird schwer mit playtime etc

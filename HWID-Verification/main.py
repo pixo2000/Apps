@@ -2,6 +2,8 @@ import wmi
 import win32api
 import hashlib
 
+# only supports windows
+
 def get_hardware_info():
     c = wmi.WMI()
     
