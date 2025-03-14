@@ -112,27 +112,3 @@ def scan_system(player):
     time.sleep(1)
     
     return scan_results
-
-def display_scan_results(scan_results):
-    print("\n=== SCAN RESULTS ===")
-    print(f"Found {len(scan_results)} celestial bodies:")
-    
-    # Header for table format
-    print(f"{'Type':<15} {'Name':<20} {'Coordinates':<20} {'Distance':<10} {'Signals':<10} {'Status':<10}")
-    print("-" * 85)
-    
-    for body in scan_results:
-        # Format distance to show only 2 decimal places
-        distance_formatted = f"{body['distance']:.2f}"
-        
-        # Show discovery status
-        status = "NEW!" if body.get("new_discovery", False) else ""
-        
-        print(f"{body['type']:<15} {body['name']:<20} {str(body['coords']):<20} {distance_formatted:<10} {body['signals_count']:<10} {status:<10}")
-        
-        # Show moons if present and body is known
-        if body['name'] != "Unknown" and "moons" in body:
-            moon_list = ", ".join(body["moons"])
-            print(f"   └─ Moons: {moon_list}")
-    
-    print("===================\n")

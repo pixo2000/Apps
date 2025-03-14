@@ -24,8 +24,6 @@ update restliche systeme
 
 refactor and docs
 
-log playtime
-
 stop command, comands while moving, renew pathing, dead when on sun
 
 bigger scan distance and more distance in C12
