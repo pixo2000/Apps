@@ -51,17 +51,12 @@ class SaveManager:
             else:
                 return str(date_str)  # Fallback
             
-            # Convert to Berlin time if possible
-            try:
-                import pytz
-                berlin_tz = pytz.timezone('Europe/Berlin')
-                if dt.tzinfo is None:
-                    # Assume UTC for naive datetime objects
-                    dt = dt.replace(tzinfo=datetime.timezone.utc)
-                dt = dt.astimezone(berlin_tz)
-            except ImportError:
-                # If pytz is not available, use system local time
-                pass
+            # Convert to Berlin time using standard library
+            berlin_tz = datetime.timezone(datetime.timedelta(hours=1))  # Berlin is UTC+1
+            if dt.tzinfo is None:
+                # Assume UTC for naive datetime objects
+                dt = dt.replace(tzinfo=datetime.timezone.utc)
+            dt = dt.astimezone(berlin_tz)
                 
             # Format with colon separator in time portion
             return dt.strftime("%d.%m.%y - %H:%M")
