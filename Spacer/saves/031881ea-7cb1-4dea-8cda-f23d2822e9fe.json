@@ -2,7 +2,7 @@
     "name": "pixo2000",
     "uuid": "031881ea-7cb1-4dea-8cda-f23d2822e9fe",
     "position": {
-        "x": 15,
+        "x": 10,
         "y": 10,
         "dimension": "A01"
     },
@@ -20,8 +20,8 @@
             ]
         }
     },
-    "playtime": "00:00:22:39",
+    "playtime": "00:00:23:59",
     "creation_date": "14.03.25 - 13:37",
-    "last_login": "17.03.25 - 16:16",
+    "last_login": "18.03.25 - 09:40",
     "is_dead": false
 }

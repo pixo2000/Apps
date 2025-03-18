@@ -83,7 +83,7 @@ class Player:
                 bar = '█' * i + '-' * (loading_bar_length - i)
                 print(f"\rCharging: [{bar}] {int((i/loading_bar_length) * 100)}%", end="", flush=True)
                 time.sleep(0.1)
-            print("\nCharging: [██████████████████████████████] 100%")
+            print("\rCharging: [██████████████████████████████] 100%")
 
             print(f"\n➤ Jump sequence activated! Entering hyperspace...")
             time.sleep(1)
