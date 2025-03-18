@@ -1,5 +1,4 @@
 import math
-import tqdm
 import time
 
 def scan_system(player):

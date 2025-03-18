@@ -36,6 +36,14 @@ remove many comments
 
 add register with code(for closed beta)
 
-metadata adden wenn nicht vorhanden to ensure version
+metadata adden wenn nicht vorhanden to ensure version --> save after each command/send to server
 
 playerinfo bei live game wird schwer mit playtime etc
+
+mit ki server copcept mit player können player sehen etc machen
+
+refactor concept map von ki machen lassen
+
+roadmap von ki
+
+remove tqdm and rework animations

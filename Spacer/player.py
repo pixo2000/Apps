@@ -1,6 +1,5 @@
 import time
 from dimension import Dimension
-from tqdm import tqdm
 import uuid
 
 class Player:
@@ -79,8 +78,12 @@ class Player:
             print(f"➤ Preparing and calibrating jump engines...")
             
             # Ladeleiste anzeigen
-            for _ in tqdm(range(100), desc="Charging", ncols=100, ascii='░▒█', bar_format='{l_bar}[{bar}]'): # change loading bar style
+            loading_bar_length = 30
+            for i in range(loading_bar_length + 1):
+                bar = '█' * i + '-' * (loading_bar_length - i)
+                print(f"\rCharging: [{bar}] {int((i/loading_bar_length) * 100)}%", end="", flush=True)
                 time.sleep(0.1)
+            print("\nCharging: [██████████████████████████████] 100%")
 
             print(f"\n➤ Jump sequence activated! Entering hyperspace...")
             time.sleep(1)
