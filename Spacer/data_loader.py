@@ -12,8 +12,15 @@ class DataLoader:
     @staticmethod
     def load_dimension_data(dimension_name):
         """Load data for a specific dimension"""
-        base_path = Path(os.path.dirname(os.path.dirname(__file__)))
-        file_path = base_path / DIMENSIONS_DIRECTORY / f'{dimension_name}.json'
+        # Updated path handling to look in spacer/dimensions
+        base_path = Path(os.path.dirname(__file__))  # Get the directory of the current file
+        dimensions_dir = base_path / DIMENSIONS_DIRECTORY
+        file_path = dimensions_dir / f'{dimension_name}.json'
+        
+        # Ensure the dimensions directory exists
+        if not dimensions_dir.exists():
+            os.makedirs(dimensions_dir)
+            print(f"Created dimensions directory: {dimensions_dir}")
         
         try:
             with open(file_path, 'r') as f:
@@ -21,16 +28,87 @@ class DataLoader:
                 if dimension_name in dimension_data:
                     return dimension_data[dimension_name]
                 else:
-                    raise ValueError(f"Dimension {dimension_name} not found in file")
+                    # If the dimension name doesn't exist in the file, create it with default data
+                    default_data = DataLoader.create_default_dimension(dimension_name)
+                    DataLoader.save_dimension_data(dimension_name, default_data)
+                    return default_data
         except FileNotFoundError:
-            raise ValueError(f"Dimension file for {dimension_name} not found")
+            # If the file doesn't exist, create it with default data
+            default_data = DataLoader.create_default_dimension(dimension_name)
+            DataLoader.save_dimension_data(dimension_name, default_data)
+            return default_data
         except json.JSONDecodeError:
             raise ValueError(f"Invalid JSON format in dimension file for {dimension_name}")
     
     @staticmethod
+    def create_default_dimension(dimension_name):
+        """Create a default structure for a new dimension"""
+        return {
+            "title": f"System {dimension_name}",
+            "description": f"A newly discovered star system designated {dimension_name}.",
+            "bodies": {
+                f"{dimension_name} Star": {
+                    "type": "Star",
+                    "Coordinates": {"x": "0", "y": "0"},
+                    "size": {"width": "3", "height": "3"},
+                    "description": "The central star of this system."
+                },
+                f"{dimension_name} Planet": {
+                    "type": "Planet",
+                    "Coordinates": {"x": "10", "y": "0"},
+                    "size": {"width": "2", "height": "2"},
+                    "description": "A rocky planet orbiting the star."
+                }
+            }
+        }
+    
+    @staticmethod
+    def save_dimension_data(dimension_name, dimension_data):
+        """Save dimension data to a JSON file"""
+        # Updated path handling
+        base_path = Path(os.path.dirname(__file__))
+        dimensions_dir = base_path / DIMENSIONS_DIRECTORY
+        file_path = dimensions_dir / f'{dimension_name}.json'
+        
+        # Create the file with the dimension data
+        with open(file_path, 'w') as f:
+            json.dump({dimension_name: dimension_data}, f, indent=4)
+        
+        # Update the dimensions config to include this dimension
+        DataLoader.update_dimensions_config(dimension_name)
+        
+        print(f"Created new dimension file for {dimension_name}")
+    
+    @staticmethod
+    def update_dimensions_config(dimension_name):
+        """Add a dimension to the enabled dimensions in the config"""
+        # Updated path handling
+        base_path = Path(os.path.dirname(__file__))
+        config_path = base_path / DIMENSIONS_CONFIG
+        
+        try:
+            if config_path.exists():
+                with open(config_path, 'r') as f:
+                    config = json.load(f)
+            else:
+                config = {"enabled": []}
+            
+            if "enabled" not in config:
+                config["enabled"] = []
+            
+            if dimension_name not in config["enabled"]:
+                config["enabled"].append(dimension_name)
+                
+            with open(config_path, 'w') as f:
+                json.dump(config, f, indent=4)
+        except Exception as e:
+            print(f"Error updating dimensions config: {str(e)}")
+
+    @staticmethod
     def get_available_dimensions():
         """Get a list of all available dimensions"""
-        base_path = Path(os.path.dirname(os.path.dirname(__file__)))
+        # Updated path handling
+        base_path = Path(os.path.dirname(__file__))
         file_path = base_path / DIMENSIONS_CONFIG
         
         try:

@@ -14,7 +14,7 @@ save_mgr = SaveManager()
 def display_loading_animation():
     """Display an animation for game initialization"""
     print("\n" + "=" * 50)
-    print("  SPACER - INTERSTELLAR EXPLORATION SIMULATOR")
+    print(" " * 12 + "SPACER - EXPLORE AND DIE")
     print("=" * 50 + "\n")
     
     # Animation for initialization

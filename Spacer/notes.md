@@ -47,3 +47,13 @@ refactor concept map von ki machen lassen
 roadmap von ki
 
 hidden signal für voyager 1
+
+check signal scanning voyager
+
+fix visual move and intro
+
+test everything
+
+scan coords with move range
+
+abort stuff

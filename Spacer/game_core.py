@@ -185,12 +185,17 @@ def main_game_loop():
             print("Game will restart...")
             time.sleep(2)
 
-def run_game():
-    """Entry point to start the game"""
-    print("\n" + "=" * 50)
-    print("  SPACER - INTERSTELLAR EXPLORATION SIMULATOR")
-    print("=" * 50 + "\n")
-    main_game_loop()
+def run_game(debug):
+    if debug == "true":
+        print("Not clearing console because debug is set to true")
+
+        main_game_loop()
+
+    else:
+        # Clear the screen
+        os.system('cls' if os.name == 'nt' else 'clear')
+        
+        main_game_loop()
 
 if __name__ == "__main__":
     run_game()

@@ -7,7 +7,7 @@ from config import MOVEMENT_SPEED
 
 class PlayerActions:
     @staticmethod
-    def move(player, x, y):
+    def move(player, x, y): # animation is here cuz its not static
         """Move the player to specified coordinates"""
         # Calculate the distance (maximum of x or y difference for diagonal movement)
         distance = max(abs(x - player.x), abs(y - player.y))
@@ -40,7 +40,10 @@ class PlayerActions:
             spacebar = "·" * ship_position + "🚀" + "·" * (bar_length - ship_position - 1)
             
             # Calculate percentage (fixed to avoid showing multiple percentages)
-            display_percent = int(percent)
+            if remaining == 1:
+                display_percent = 100  # Always show 100% for the final step
+            else:
+                display_percent = int(percent)
             
             # Add extra buffer space to ensure previous output is completely overwritten
             buffer_space = " " * 40
