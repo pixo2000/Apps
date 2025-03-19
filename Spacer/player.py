@@ -2,6 +2,7 @@
 Player class with core attributes and state tracking.
 """
 import uuid
+from station import STATIONS
 from dimension import Dimension
 from config import DEFAULT_START_POSITION, DEFAULT_START_DIMENSION
 
@@ -18,6 +19,8 @@ class Player:
         self.playtime = 0  # Playtime in seconds
         self.last_login = None  # Will be updated when saving
         self.is_dead = False  # Player's living status
+        self.docked_at = None  # Will hold station object when docked
+        self.landed_on = None  # Will hold celestial body name when landed
     
     def change_name(self, new_name):
         """Change the player's name"""
@@ -89,7 +92,50 @@ class Player:
             if "is_dead" in save_data:
                 self.is_dead = save_data["is_dead"]
             
+            # Load docked status if it exists
+            if "docked_at" in save_data and save_data["docked_at"]:
+                from station import STATIONS
+                station_id = save_data["docked_at"]
+                if station_id in STATIONS:
+                    self.docked_at = STATIONS[station_id]
+            
+            # Load landed status if it exists
+            if "landed_on" in save_data and save_data["landed_on"]:
+                self.landed_on = save_data["landed_on"]
+            
             return True  # Successfully loaded save data
         except Exception as e:
             print(f"Error loading save data: {e}")
             return False  # Failed to load save data
+    
+    def get_save_data(self):
+        """Get player data to save"""
+        data = {
+            "name": self.name,
+            "uuid": self.uuid,
+            "position": {
+                "x": self.x,
+                "y": self.y,
+                "dimension": self.dimension.name
+            },
+            "discoveries": {
+                "known_dimensions": self.known_dimensions,
+                "known_bodies": self.known_bodies
+            },
+            "creation_date": self.creation_date,
+            "last_login": self.last_login,
+            "is_dead": self.is_dead,
+            "landed_on": self.landed_on
+        }
+        
+        # Save docked status
+        if self.docked_at:
+            # Find station id
+            for station_id, station in STATIONS.items():
+                if station is self.docked_at:
+                    data["docked_at"] = station_id
+                    break
+        else:
+            data["docked_at"] = None
+            
+        return data

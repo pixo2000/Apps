@@ -59,3 +59,17 @@ scan coords with move range
 abort stuff
 
 landing system
+
+redeem code to get new ship on register
+
+move between systems(like only from A01 to C12)
+
+better debug(clear on first start but not restart/crash)
+
+test landing
+
+save that the player is landed
+
+fix fucking stations: get new stations, load real ones. info should have coords and type and more
+
+launch animation and rename launch command on stations to release or smth
