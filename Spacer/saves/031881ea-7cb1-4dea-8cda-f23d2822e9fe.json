@@ -4,12 +4,13 @@
     "position": {
         "x": 10,
         "y": 10,
-        "dimension": "C12"
+        "dimension": "F27"
     },
     "discoveries": {
         "known_dimensions": [
             "A01",
-            "C12"
+            "C12",
+            "F27"
         ],
         "known_bodies": {
             "A01": [
@@ -23,11 +24,14 @@
                 "Centauri Secundus",
                 "C12 Star",
                 "C12 Planet"
+            ],
+            "F27": [
+                "Void"
             ]
         }
     },
-    "playtime": "00:00:34:15",
+    "playtime": "00:00:41:18",
     "creation_date": "14.03.25 - 13:37",
-    "last_login": "19.03.25 - 14:43",
+    "last_login": "19.03.25 - 14:50",
     "is_dead": false
 }
