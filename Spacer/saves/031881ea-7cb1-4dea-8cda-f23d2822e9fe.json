@@ -20,12 +20,14 @@
             "C12": [
                 "Proxima Centauri",
                 "Centauri Prime",
-                "Centauri Secundus"
+                "Centauri Secundus",
+                "C12 Star",
+                "C12 Planet"
             ]
         }
     },
-    "playtime": "00:00:27:49",
+    "playtime": "00:00:34:15",
     "creation_date": "14.03.25 - 13:37",
-    "last_login": "19.03.25 - 09:43",
+    "last_login": "19.03.25 - 14:43",
     "is_dead": false
 }

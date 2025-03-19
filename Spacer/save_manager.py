@@ -10,7 +10,8 @@ from config import RESERVED_NAMES, NAME_PATTERN
 
 class SaveManager:
     def __init__(self):
-        self.save_directory = Path(os.path.dirname(os.path.dirname(__file__))) / 'saves'
+        # Korrektur des Pfads - nur eine Ebene nach oben statt zwei
+        self.save_directory = Path(os.path.dirname(__file__)) / 'saves'
         # Ensure the saves directory exists
         self.save_directory.mkdir(exist_ok=True)
         
