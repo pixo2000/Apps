@@ -4,7 +4,7 @@
     "position": {
         "x": 10,
         "y": 10,
-        "dimension": "A01"
+        "dimension": "C12"
     },
     "discoveries": {
         "known_dimensions": [
@@ -12,7 +12,11 @@
             "C12"
         ],
         "known_bodies": {
-            "A01": [],
+            "A01": [
+                "SOL",
+                "Mercury",
+                "Venus"
+            ],
             "C12": [
                 "Proxima Centauri",
                 "Centauri Prime",
@@ -20,8 +24,8 @@
             ]
         }
     },
-    "playtime": "00:00:23:59",
+    "playtime": "00:00:27:49",
     "creation_date": "14.03.25 - 13:37",
-    "last_login": "18.03.25 - 09:40",
+    "last_login": "19.03.25 - 09:43",
     "is_dead": false
 }

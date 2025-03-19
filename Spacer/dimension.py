@@ -1,54 +1,48 @@
+"""
+Dimension class and celestial body definitions for interstellar travel.
+"""
 import json
 import os
+from pathlib import Path
+from data_loader import DataLoader
+from config import DIMENSIONS_DIRECTORY, DIMENSIONS_CONFIG
 
 class Dimension:
+    """
+    Represents a dimension (star system) in the game universe.
+    Contains properties like celestial bodies, coordinates, and description.
+    """
     def __init__(self, name):
+        """Initialize a dimension with the given name and load its data"""
         self.name = name
+        self.properties = {}
+        self.title = ""
+        self.description = ""
         self.load_dimension()
     
     def load_dimension(self):
-        base_path = os.path.dirname(__file__)
-        file_path = os.path.join(base_path, 'dimensions', f'{self.name}.json')
+        """Load dimension data from the corresponding JSON file"""
         try:
-            with open(file_path, 'r') as f:
-                dimension_data = json.load(f)
-                if self.name in dimension_data:
-                    dimension_data = dimension_data[self.name]
-                    self.title = dimension_data['title']
-                    self.description = dimension_data['description']
-                    self.properties = {}
-                    # Store celestial bodies as properties
-                    for body_name, body_data in dimension_data['bodies'].items():
-                        self.properties[body_name] = body_data
-                        
-                        # Process moons to ensure they are correctly handled
-                        if "Moons" in body_data:
-                            # Check if Moons is a dictionary (new format) or a list (old format)
-                            if isinstance(body_data["Moons"], list):
-                                # Convert old format to new format (placeholder)
-                                self.properties[body_name]["Moons"] = {
-                                    moon_name: {
-                                        "type": "Moon",
-                                        "Coordinates": {"x": "0", "y": "0"},
-                                        "size": {"width": "1", "height": "1"}
-                                    } for moon_name in body_data["Moons"]
-                                }
-                else:
-                    raise ValueError(f"Dimension {self.name} not found in file")
-        except FileNotFoundError:
-            raise ValueError(f"Dimension file for {self.name} not found")
-        except json.JSONDecodeError:
-            raise ValueError(f"Invalid JSON format in dimension file for {self.name}")
+            # Load the dimension data using the DataLoader
+            dimension_data = DataLoader.load_dimension_data(self.name)
+            
+            # Set basic dimension properties
+            self.title = dimension_data['title']
+            self.description = dimension_data['description']
+            
+            # Store celestial bodies as properties
+            for body_name, body_data in dimension_data['bodies'].items():
+                # Normalize moon data structure if needed
+                body_data = DataLoader.normalize_moon_data(body_data)
+                # Store the body data
+                self.properties[body_name] = body_data
+                
+        except ValueError as e:
+            raise ValueError(f"Failed to load dimension {self.name}: {str(e)}")
+        except Exception as e:
+            raise ValueError(f"Error loading dimension {self.name}: {str(e)}")
 
     @staticmethod
     def get_available_dimensions():
-        base_path = os.path.dirname(__file__)
-        file_path = os.path.join(base_path, 'dimensions.json')
-        try:
-            with open(file_path, 'r') as f:
-                dimensions_config = json.load(f)
-                if 'enabled' in dimensions_config:
-                    return dimensions_config['enabled']
-                return []
-        except (FileNotFoundError, json.JSONDecodeError):
-            return []
+        """Get a list of all available dimensions"""
+        return DataLoader.get_available_dimensions()

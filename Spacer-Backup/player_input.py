@@ -97,6 +97,12 @@ def handle_input(name):
             print(f"\nScan error: {e}")
         return "positive"
         
+    elif command_lower.startswith("scan "):
+        # New command to scan a specific celestial body
+        body_name = user_input.split(" ", 1)[1]  # Get everything after "scan "
+        scan_celestial_body(name, body_name)
+        return "positive"
+        
     elif command_lower in ["quit", "exit"]:
         # Save before quitting
         save_mgr.save_game(name)
@@ -215,6 +221,83 @@ def handle_input(name):
         save_mgr.save_game(name)
     return result
 
+def scan_celestial_body(player, body_name):
+    """Scan a specific celestial body for moons and stations"""
+    try:
+        current_dimension = player.dimension
+        
+        # Check if the player knows this dimension
+        dim_name = current_dimension.name
+        if dim_name not in player.known_dimensions:
+            print(f"\n✗ Cannot scan {body_name}: This dimension is not fully mapped.")
+            return
+        
+        # Look for the body in the current dimension
+        body_data = None
+        for name, data in current_dimension.properties.items():
+            if name.lower() == body_name.lower():
+                body_data = data
+                body_name = name  # Use the correct case from the data
+                break
+        
+        if not body_data:
+            print(f"\n✗ Cannot scan {body_name}: Object not found in this system.")
+            return
+        
+        # Check if the body is in the player's known bodies list
+        if body_name not in player.known_bodies.get(dim_name, []):
+            print(f"\n✗ Cannot scan {body_name}: Object not in database. Perform a system scan first.")
+            return
+        
+        # Basic body info
+        body_type = body_data.get("type", "Unknown")
+        body_x = body_data["Coordinates"]["x"]
+        body_y = body_data["Coordinates"]["y"]
+        
+        print(f"\n=== DETAILED SCAN: {body_name} ===")
+        print(f"Type: {body_type}")
+        print(f"Coordinates: [{body_x}, {body_y}]")
+        
+        # Scan for moons
+        if "Moons" in body_data and body_data["Moons"]:
+            print(f"\n--- Moons ({len(body_data['Moons'])}) ---")
+            print(f"{'Name':<15} {'Coordinates':<15}")
+            print("-" * 30)
+            
+            for moon_name, moon_data in body_data["Moons"].items():
+                moon_x = moon_data["Coordinates"]["x"]
+                moon_y = moon_data["Coordinates"]["y"]
+                print(f"{moon_name:<15} [{moon_x}, {moon_y}]")
+        
+        # Scan for stations
+        if "Stations" in body_data and body_data["Stations"]:
+            print(f"\n--- Stations/Structures ({len(body_data['Stations'])}) ---")
+            print(f"{'Name':<15} {'Type':<10} {'Coordinates':<15} {'Description'}")
+            print("-" * 70)
+            
+            for station_name, station_data in body_data["Stations"].items():
+                station_type = station_data.get("type", "Unknown")
+                station_x = station_data["Coordinates"]["x"] if "Coordinates" in station_data else "N/A"
+                station_y = station_data["Coordinates"]["y"] if "Coordinates" in station_data else "N/A"
+                desc = station_data.get("description", "")
+                
+                # Format coordinates
+                coords = f"[{station_x}, {station_y}]" if station_x != "N/A" else "N/A"
+                
+                print(f"{station_name:<15} {station_type:<10} {coords:<15} {desc}")
+        
+        # If no moons or stations were found
+        if ("Moons" not in body_data or not body_data["Moons"]) and \
+           ("Stations" not in body_data or not body_data["Stations"]):
+            print("\nNo satellites or structures detected.")
+        
+        print("==========================\n")
+        
+    except Exception as e:
+        print(f"\nScan error: {e}")
+        import traceback
+        traceback.print_exc()
+
 def handle_scan(player):
     """Scan the nearby area for planets"""
     try:
@@ -296,6 +379,7 @@ def display_help(first_time=False):
         ("jump DIM", "Jump to dimension DIM (e.g. A01, C12)"),
         ("dimensions", "List all available dimensions"),
         ("scan", "Scan current system for celestial bodies"),
+        ("scan NAME", "Scan a specific celestial body for details"),
         ("discoveries", "Display all your discoveries"),
         ("changename NAME", "Change your captain's name"),
         ("playerinfo [NAME]", "Display player info (yours or another captain)"),
