@@ -28,37 +28,49 @@ def display_loading_animation():
 
 def display_help(first_time=False):
     """Display the help menu with available commands"""
-    print("\n" + "=" * 50)
-    print("             COMMAND REFERENCE")
-    print("=" * 50)
+    if first_time:
+        print("\n" + "=" * 60)
+        print("     WELCOME TO SPACER - INTERSTELLAR EXPLORATION SYSTEM")
+        print("=" * 60)
+        print("\nYou are the captain of a spacecraft exploring the cosmos.")
+        print("Your journey begins in the SOL system, our own solar system.")
+        print("\nHere are the basic commands to get you started:\n")
+    else:
+        print("\n" + "=" * 40)
+        print("      SPACER - AVAILABLE COMMANDS")
+        print("=" * 40)
+    
+    print("\n== NAVIGATION ==")
+    print("  move X Y       - Move to coordinates X,Y")
+    print("  jump SYSTEM    - Jump to another star system (e.g., jump A01)")
+    print("  dimensions     - List all known and unknown star systems")
+    print("  whereami       - Display current position information")
+    
+    print("\n== INTERACTION ==")
+    print("  scan           - Scan the surrounding area for celestial bodies")
+    print("  scan NAME      - Scan a specific celestial body in detail")
+    print("  dock           - Dock at a station (when at station coordinates)")
+    print("  land           - Land on a planet or moon (when at celestial body coordinates)")
+    print("  land NAME      - Land on a specific planet or moon (must be at its coordinates)")
+    
+    print("\n== CHARACTER ==")
+    print("  playerinfo     - Display information about your character")
+    print("  changename NAME - Change your captain's name")
+    print("  discoveries    - List all your discovered celestial bodies")
+    
+    print("\n== SYSTEM ==")
+    print("  help           - Show this help message")
+    print("  logout         - Save game and return to login screen")
+    print("  exit/quit      - Save game and exit")
+    
+    print("\n== CONTEXT SPECIFIC COMMANDS ==")
+    print("  When docked at a station or landed on a planet,")
+    print("  different commands will be available. Type 'help' in")
+    print("  these contexts to see the available options.")
     
     if first_time:
-        print("\n👋 Welcome, new Captain! Here are the commands to get you started:\n")
-    
-    commands = [
-        ("move X Y", "Navigate to coordinates X, Y"),
-        ("whereami", "Display current location information"),
-        ("jump DIM", "Jump to dimension DIM (e.g. A01, C12)"),
-        ("dimensions", "List all available dimensions"),
-        ("scan", "Scan current system for celestial bodies"),
-        ("scan NAME", "Scan a specific celestial body for details"),
-        ("discoveries", "Display all your discoveries"),
-        ("changename NAME", "Change your captain's name"),
-        ("playerinfo [NAME]", "Display player info (yours or another captain)"),
-        ("logout", "Save and log out to switch captains"),
-        ("self-destruct", "End your journey permanently"),
-        ("quit/exit", "Exit the game"),
-        ("help", "Display this help message")
-    ]
-    
-    for cmd, desc in commands:
-        print(f"» {cmd.ljust(15)} - {desc}")
-    
-    if first_time:
-        print("\n💡 TIP: Start by typing 'scan' to discover nearby celestial bodies")
-        print("   or 'dimensions' to see what star systems you can visit!")
-    
-    print("=" * 50 + "\n")
+        print("\nStart by exploring your surrounding area with the 'scan' command.")
+        print("Good luck, Captain!\n")
 
 def display_discoveries(player):
     """Display all discoveries made by the player"""
