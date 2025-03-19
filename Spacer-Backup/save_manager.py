@@ -1,24 +1,20 @@
-"""
-Game state saving and loading, player registration and validation.
-"""
 import json
 import os
 import re
 from pathlib import Path
 import datetime
-from config import RESERVED_NAMES, NAME_PATTERN
 
 class SaveManager:
     def __init__(self):
-        self.save_directory = Path(os.path.dirname(os.path.dirname(__file__))) / 'saves'
+        self.save_directory = Path(os.path.dirname(__file__)) / 'saves'
         # Ensure the saves directory exists
         self.save_directory.mkdir(exist_ok=True)
         
-        # Valid player name pattern
-        self.name_pattern = re.compile(NAME_PATTERN)
+        # Valid player name pattern: 3-15 chars, alphanumeric (both upper and lowercase) and underscore
+        self.name_pattern = re.compile(r'^[a-zA-Z0-9_]{3,15}$')
         
         # List of reserved names that cannot be used for players
-        self.reserved_names = RESERVED_NAMES
+        self.reserved_names = ["new", "exit", "quit", "logout", "help"]
     
     def is_valid_player_name(self, name):
         """
@@ -122,7 +118,7 @@ class SaveManager:
         
         save_data = {
             "name": player.name,
-            "uuid": player.uuid,
+            "uuid": player.uuid,  # Store the player's UUID
             "position": {
                 "x": player.x,
                 "y": player.y,
@@ -132,9 +128,9 @@ class SaveManager:
                 "known_dimensions": player.known_dimensions,
                 "known_bodies": player.known_bodies
             },
-            "playtime": formatted_playtime,
-            "creation_date": formatted_creation,
-            "last_login": current_time,
+            "playtime": formatted_playtime,  # Store formatted playtime string
+            "creation_date": formatted_creation,  # Format the creation date
+            "last_login": current_time,  # Store formatted last login date
             "is_dead": player.is_dead
         }
         
@@ -186,6 +182,7 @@ class SaveManager:
     
     def is_player_dead(self, player_name):
         """Check if a player is dead"""
+        # We need to search through all save files to find the player by name
         for save_file in self.save_directory.glob('*.json'):
             try:
                 with open(save_file, 'r') as f:
@@ -193,6 +190,7 @@ class SaveManager:
                     if data.get("name", "").lower() == player_name.lower():
                         return data.get("is_dead", False)
             except:
+                # Skip files that can't be read properly
                 continue
         
         return False
@@ -208,6 +206,7 @@ class SaveManager:
                         # Use the name stored in the file
                         players.append(data["name"])
             except:
+                # Skip files that can't be read properly
                 continue
         return players
         
@@ -221,6 +220,7 @@ class SaveManager:
                     # Include all players regardless of dead status
                     players.append(data["name"])
             except:
+                # Skip files that can't be read properly
                 continue
         return players
 

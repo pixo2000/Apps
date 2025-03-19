@@ -45,3 +45,5 @@ mit ki server copcept mit player können player sehen etc machen
 refactor concept map von ki machen lassen
 
 roadmap von ki
+
+hidden signal für voyager 1
