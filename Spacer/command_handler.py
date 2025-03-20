@@ -304,7 +304,7 @@ def handle_planet_input(player):
     
     display_location = body_name
     if moon_name:
-        display_location = f"{moon_name} (moon of {body_name})"
+        display_location = f"{moon_name} (Moon of {body_name})"
     
     # Display options only once when first landing
     if not hasattr(player, "_city_options_shown") or player._city_options_shown != city_name:
@@ -585,7 +585,7 @@ def handle_land_command(player, body_name=None):
     
     landing_location = f"{city.name}"
     if parent_moon:
-        landing_location = f"{city.name} on {parent_moon} (moon of {parent_body})"
+        landing_location = f"{city.name} on {parent_moon} (Moon of {parent_body})"
     else:
         landing_location = f"{city.name} on {parent_body}"
     

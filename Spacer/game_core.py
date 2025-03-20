@@ -140,7 +140,7 @@ def main_game_loop():
                     elif player.landed_on:
                         location = player.landed_on
                         if player.landed_on_moon:
-                            print(f"You are currently on the surface of {location} on {player.landed_on_moon}, moon of {player.landed_on_body}.")
+                            print(f"You are currently on the surface of {location} on {player.landed_on_moon}, Moon of {player.landed_on_body}.")
                         else:
                             print(f"You are currently on the surface of {location} on {player.landed_on_body}.")
                     else:
