@@ -46,3 +46,5 @@ better debug(clear on first start but not restart/crash)
 station info should have coords and type and more
 
 version management+release system
+
+keybinds via task to build and run main, fix dc 

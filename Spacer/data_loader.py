@@ -3,6 +3,7 @@ Dimension loading and universe data management functions.
 """
 import json
 import os
+import sys
 from pathlib import Path
 from config import DIMENSIONS_DIRECTORY, DIMENSIONS_CONFIG
 
@@ -10,10 +11,21 @@ class DataLoader:
     """Handles loading of game data like dimensions and celestial bodies"""
     
     @staticmethod
+    def _get_base_path():
+        """Get the base path for resources, works for dev and PyInstaller"""
+        try:
+            # PyInstaller creates a temp folder and stores path in _MEIPASS
+            base_path = Path(sys._MEIPASS)
+        except Exception:
+            # We are not running as a bundled executable
+            base_path = Path(os.path.dirname(__file__))
+        return base_path
+    
+    @staticmethod
     def load_dimension_data(dimension_name):
         """Load data for a specific dimension"""
-        # Updated path handling to look in spacer/dimensions
-        base_path = Path(os.path.dirname(__file__))  # Get the directory of the current file
+        # Get base path that works with PyInstaller
+        base_path = DataLoader._get_base_path()
         dimensions_dir = base_path / DIMENSIONS_DIRECTORY
         file_path = dimensions_dir / f'{dimension_name}.json'
         
@@ -65,8 +77,8 @@ class DataLoader:
     @staticmethod
     def save_dimension_data(dimension_name, dimension_data):
         """Save dimension data to a JSON file"""
-        # Updated path handling
-        base_path = Path(os.path.dirname(__file__))
+        # Updated path handling for PyInstaller compatibility
+        base_path = DataLoader._get_base_path()
         dimensions_dir = base_path / DIMENSIONS_DIRECTORY
         file_path = dimensions_dir / f'{dimension_name}.json'
         
@@ -82,8 +94,8 @@ class DataLoader:
     @staticmethod
     def update_dimensions_config(dimension_name):
         """Add a dimension to the enabled dimensions in the config"""
-        # Updated path handling
-        base_path = Path(os.path.dirname(__file__))
+        # Updated path handling for PyInstaller compatibility
+        base_path = DataLoader._get_base_path() 
         config_path = base_path / DIMENSIONS_CONFIG
         
         try:
@@ -107,8 +119,8 @@ class DataLoader:
     @staticmethod
     def get_available_dimensions():
         """Get a list of all available dimensions"""
-        # Updated path handling
-        base_path = Path(os.path.dirname(__file__))
+        # Updated path handling for PyInstaller compatibility
+        base_path = DataLoader._get_base_path()
         file_path = base_path / DIMENSIONS_CONFIG
         
         try:
