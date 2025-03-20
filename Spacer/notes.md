@@ -48,3 +48,5 @@ station info should have coords and type and more
 version management+release system
 
 keybinds via task to build and run main, fix dc 
+
+test build -> symbole fixen
