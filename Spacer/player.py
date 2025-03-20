@@ -96,10 +96,13 @@ class Player:
             
             # Load docked status if it exists
             if "docked_at" in save_data and save_data["docked_at"]:
-                from station import STATIONS
+                from station import STATIONS, get_station_by_id
                 station_id = save_data["docked_at"]
-                if station_id in STATIONS:
-                    self.docked_at = STATIONS[station_id]
+                station = get_station_by_id(station_id)
+                if station:
+                    self.docked_at = station
+                else:
+                    print(f"Warning: Could not find station with ID {station_id}")
             
             # Load landed status if it exists
             if "landed_on" in save_data and save_data["landed_on"]:
@@ -143,11 +146,21 @@ class Player:
         # Save docked status
         if self.docked_at:
             # Find station id
-            for station_id, station in STATIONS.items():
+            station_id = None
+            for sid, station in STATIONS.items():
                 if station is self.docked_at:
-                    data["docked_at"] = station_id
+                    station_id = sid
                     break
+                    
+            # Make sure we found a station ID
+            if station_id:
+                data["docked_at"] = station_id
+            else:
+                # Fallback: create a temporary ID based on station properties
+                temp_id = f"{self.dimension.name}_{self.docked_at.name}".lower().replace(' ', '_')
+                data["docked_at"] = temp_id
+                print(f"Warning: Station ID not found, using generated ID: {temp_id}")
         else:
             data["docked_at"] = None
-            
+                
         return data

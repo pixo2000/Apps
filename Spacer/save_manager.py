@@ -109,45 +109,42 @@ class SaveManager:
             return 0  # Default to 0 if parsing fails
 
     def save_game(self, player):
-        """Save the player's game state to a JSON file"""
-        # Get current time for last_login update
-        current_time = self.format_date(datetime.datetime.now())
-        
-        # Format creation date if it exists, otherwise use current time
-        creation_date = getattr(player, "creation_date", None)
-        formatted_creation = self.format_date(creation_date) if creation_date else current_time
-        
-        # Format playtime for storage
-        raw_playtime = getattr(player, "playtime", 0)
-        formatted_playtime = self.format_playtime(raw_playtime)
-        
-        save_data = {
-            "name": player.name,
-            "uuid": player.uuid,
-            "position": {
-                "x": player.x,
-                "y": player.y,
-                "dimension": player.dimension.name
-            },
-            "discoveries": {
-                "known_dimensions": player.known_dimensions,
-                "known_bodies": player.known_bodies
-            },
-            "playtime": formatted_playtime,
-            "creation_date": formatted_creation,
-            "last_login": current_time,
-            "is_dead": player.is_dead
-        }
-        
-        # Use the UUID for the filename instead of the player name
-        save_path = self.save_directory / f"{player.uuid}.json"
-        
+        """Save the game data to a JSON file"""
         try:
-            with open(save_path, 'w') as save_file:
-                json.dump(save_data, save_file, indent=4)
+            # Get save data from player
+            save_data = player.get_save_data()
+            
+            # Ensure required fields for station/landing state are present
+            if not "docked_at" in save_data:
+                save_data["docked_at"] = None if not player.docked_at else "unknown_station"
+                print("Warning: Missing docked_at field in save data")
+            
+            if not "landed_on" in save_data:
+                save_data["landed_on"] = player.landed_on
+                print("Warning: Missing landed_on field in save data")
+                
+            if not "landed_on_body" in save_data:
+                save_data["landed_on_body"] = getattr(player, "landed_on_body", None)
+                print("Warning: Missing landed_on_body field in save data")
+                
+            if not "landed_on_moon" in save_data:
+                save_data["landed_on_moon"] = getattr(player, "landed_on_moon", None)
+                print("Warning: Missing landed_on_moon field in save data")
+            
+            # Format the playtime
+            save_data["playtime"] = self.format_playtime(player.playtime)
+            
+            # Update last login time
+            save_data["last_login"] = datetime.datetime.now().strftime("%d.%m.%y - %H:%M")
+            
+            # Save to file using player's UUID
+            file_path = self.save_directory / f"{player.uuid}.json"
+            with open(file_path, 'w') as f:
+                json.dump(save_data, f, indent=4)
+                
             return True
         except Exception as e:
-            print(f"\n⚠ Save error: {str(e)}")
+            print(f"Error saving game: {e}")
             return False
     
     def load_game(self, player_name):

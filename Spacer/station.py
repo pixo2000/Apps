@@ -167,6 +167,37 @@ def get_city_at_coords(x, y, dimension_name):
                 return station
     return None
 
+def get_station_by_id(station_id):
+    """Find a station by its ID"""
+    if station_id in STATIONS:
+        return STATIONS[station_id]
+    
+    # Try to parse the ID to find the station by other means
+    parts = station_id.split('_')
+    if len(parts) >= 2:
+        dim_name = parts[0]
+        
+        # Try different parsing methods to find the station
+        # Method 1: Look for exact station name match
+        for sid, station in STATIONS.items():
+            if station.dimension == dim_name and sid.endswith(station_id.split('_', 1)[1]):
+                return station
+        
+        # Method 2: Look for station with matching name in the same dimension
+        station_name = station_id.split('_')[-1].replace('_', ' ')
+        for sid, station in STATIONS.items():
+            if station.dimension == dim_name and station.name.lower() == station_name.lower():
+                return station
+                
+        # Method 3: Just find any station at the coordinates in save file
+        # This requires additional code to extract coordinates from save file
+        # which we don't have direct access to here
+    
+    # Debug info to help diagnose station loading issues
+    print(f"Debug - Available stations in system: {[s for s in STATIONS.keys() if s.startswith(station_id.split('_')[0])]}")
+    
+    return None
+
 def load_all_stations():
     """Load stations from all available dimensions"""
     from dimension import Dimension
