@@ -135,7 +135,7 @@ def load_stations_from_dimension(dimension_data, dimension_name):
                         station_id = f"{dimension_name}_{body_name}_{moon_name}_{station_name}".lower().replace(' ', '_')
                         
                         # Get station description
-                        description = station_data.get('description', f"A {station_data.get('type', 'unknown')} on {moon_name}, moon of {body_name}")
+                        description = station_data.get('description', f"A {station_data.get('type', 'unknown')} on {moon_name}, Moon of {body_name}")
                         
                         # Add to STATIONS dictionary
                         STATIONS[station_id] = Station(
