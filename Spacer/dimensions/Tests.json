@@ -271,5 +271,10 @@
                 }
             }
         }
+    },
+    "add": {
+        "alpha": ("Alpha Dock", "A small trading outpost on the frontier", 10, 15, "SOL"),
+        "beta": ("Beta Station", "A scientific research facility", -20, 30, "SOL"),
+        "gamma": ("Gamma Hub", "A bustling commerce center", 50, -25, "SOL")
     }
 }

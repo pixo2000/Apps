@@ -21,6 +21,8 @@ class Player:
         self.is_dead = False  # Player's living status
         self.docked_at = None  # Will hold station object when docked
         self.landed_on = None  # Will hold celestial body name when landed
+        self.landed_on_body = None  # Will hold the parent celestial body name
+        self.landed_on_moon = None  # Will hold the moon name if landed on a moon station
     
     def change_name(self, new_name):
         """Change the player's name"""
@@ -102,6 +104,14 @@ class Player:
             # Load landed status if it exists
             if "landed_on" in save_data and save_data["landed_on"]:
                 self.landed_on = save_data["landed_on"]
+                
+            # Load parent body for landing if it exists
+            if "landed_on_body" in save_data and save_data["landed_on_body"]:
+                self.landed_on_body = save_data["landed_on_body"]
+                
+            # Load parent moon for landing if it exists
+            if "landed_on_moon" in save_data and save_data["landed_on_moon"]:
+                self.landed_on_moon = save_data["landed_on_moon"]
             
             return True  # Successfully loaded save data
         except Exception as e:
@@ -125,7 +135,9 @@ class Player:
             "creation_date": self.creation_date,
             "last_login": self.last_login,
             "is_dead": self.is_dead,
-            "landed_on": self.landed_on
+            "landed_on": self.landed_on,
+            "landed_on_body": self.landed_on_body,
+            "landed_on_moon": getattr(self, "landed_on_moon", None)
         }
         
         # Save docked status

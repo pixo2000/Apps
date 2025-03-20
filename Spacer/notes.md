@@ -56,7 +56,7 @@ test everything
 
 scan coords with move range
 
-abort stuff
+abort stuff, move when cmmand-> on top of input sticky
 
 landing system
 
@@ -68,8 +68,10 @@ better debug(clear on first start but not restart/crash)
 
 test landing
 
-save that the player is landed
+save that the player is landed or docked
 
 fix fucking stations: get new stations, load real ones. info should have coords and type and more
 
 launch animation and rename launch command on stations to release or smth
+
+fix landing

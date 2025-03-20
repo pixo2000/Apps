@@ -2,8 +2,8 @@
     "name": "pixo2000",
     "uuid": "031881ea-7cb1-4dea-8cda-f23d2822e9fe",
     "position": {
-        "x": 8,
-        "y": 2,
+        "x": 65,
+        "y": -60,
         "dimension": "A01"
     },
     "discoveries": {
@@ -16,7 +16,11 @@
             "A01": [
                 "SOL",
                 "Mercury",
-                "Venus"
+                "Venus",
+                "Earth",
+                "Ceres",
+                "Juno",
+                "Earth:Luna"
             ],
             "C12": [
                 "Proxima Centauri",
@@ -30,8 +34,8 @@
             ]
         }
     },
-    "playtime": "00:01:06:28",
+    "playtime": "00:01:29:47",
     "creation_date": "14.03.25 - 13:37",
-    "last_login": "19.03.25 - 21:47",
+    "last_login": "20.03.25 - 15:09",
     "is_dead": false
 }

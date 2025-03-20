@@ -8,7 +8,7 @@ from scanner import handle_scan, scan_celestial_body
 from ui_display import display_help, display_discoveries, display_other_player_info
 from dimension import Dimension
 from save_manager import SaveManager
-from station import get_station_at_coords, STATIONS
+from station import STATIONS, get_station_at_coords, get_city_at_coords, load_stations_from_dimension
 
 # Create save manager instance
 save_mgr = SaveManager()
@@ -71,6 +71,11 @@ def handle_input(player):
     elif command_lower.startswith("jump "): 
         dimension_name = user_input.split(" ")[1].upper()
         PlayerActions.jump(player, dimension_name)
+        
+        # Load stations from the new dimension
+        if hasattr(player, 'dimension') and player.dimension:
+            load_stations_from_dimension({'bodies': player.dimension.properties}, player.dimension.name)
+        
         return "positive"
     
     # List dimensions command        
@@ -107,7 +112,7 @@ def handle_input(player):
     
     # Dock command to dock at stations
     elif command_lower == "dock":
-        handle_dock_command(player, None)
+        handle_dock_command(player)
         return "positive"
         
     # Land command to land on planets or moons
@@ -248,7 +253,7 @@ def handle_station_input(player):
         player.docked_at.display_options()
         player._station_options_shown = player.docked_at.name
     
-    user_input = input(f"\n[ {player.docked_at.name} ]> ").strip().lower()
+    user_input = input(f"\n[{player.docked_at.name}] {player.name}> ").strip().lower()
     
     if user_input == "exit" or user_input == "quit":
         return "negative"
@@ -282,17 +287,27 @@ def handle_station_input(player):
 
 def handle_planet_input(player):
     """Handle input while landed on a planet or moon"""
-    planet_name = player.landed_on
-    print(f"\n== Surface of {planet_name} ==")
-    print("Available commands:")
-    print("  explore    - Explore the surroundings")
-    print("  launch     - Return to orbit")
-    print("  analyze    - Analyze surface composition")
-    print("  help       - Show this help message")
-    print("  logout     - Save and return to login screen")
-    print("  exit/quit  - Save and exit game")
+    city_name = player.landed_on
+    body_name = getattr(player, "landed_on_body", "Unknown Body")
+    moon_name = getattr(player, "landed_on_moon", None)
     
-    user_input = input("\nSurface> ").strip().lower()
+    display_location = body_name
+    if moon_name:
+        display_location = f"{moon_name} (moon of {body_name})"
+    
+    # Display options only once when first landing
+    if not hasattr(player, "_city_options_shown") or player._city_options_shown != city_name:
+        print(f"\n== {city_name} on {display_location} ==")
+        print("Available commands:")
+        print("  explore    - Explore the surroundings")
+        print("  launch     - Return to orbit")
+        print("  analyze    - Analyze surface composition")
+        print("  help       - Show this help message")
+        print("  logout     - Save and return to login screen")
+        print("  exit/quit  - Save and exit game")
+        player._city_options_shown = city_name
+    
+    user_input = input(f"\n[{city_name}] {player.name}> ").strip().lower()
     
     if user_input == "exit" or user_input == "quit":
         return "negative"
@@ -303,7 +318,7 @@ def handle_planet_input(player):
     if user_input == "help":
         # Show planet-specific help
         print("\n== Surface Operations Help ==")
-        print(f"You are currently on the surface of {planet_name}. Available commands:")
+        print(f"You are currently on {city_name} on the surface of {display_location}. Available commands:")
         print("  explore    - Explore the surroundings for resources and discoveries")
         print("  launch     - Return to orbit and resume space travel")
         print("  analyze    - Perform detailed analysis of surface composition")
@@ -314,9 +329,12 @@ def handle_planet_input(player):
         return True
     
     elif user_input == "launch":
-        print(f"\nLaunching from the surface of {planet_name}...")
+        print(f"\nLaunching from {city_name} on {display_location}...")
         time.sleep(1)
         player.landed_on = None
+        player.landed_on_body = None
+        if hasattr(player, "landed_on_moon"):
+            player.landed_on_moon = None
         print("You have successfully returned to orbit.")
         return True
     
@@ -338,18 +356,30 @@ def handle_planet_input(player):
         print("Analyzing surface composition...")
         time.sleep(1)
         
-        # Get planet data from player's known bodies if available
-        planet_data = None
+        # Adjust the location display based on whether it's a moon or planet
+        location_display = display_location
+        
+        # Get planet/moon data from player's known bodies if available
+        body_data = None
         for dim_name, bodies in player.known_bodies.items():
             if dim_name == player.dimension.name:
-                for body_name, data in bodies.items():
-                    if body_name.lower() == planet_name.lower():
-                        planet_data = data
-                        break
+                # If it's a moon, we need to check the moon data specifically
+                if moon_name:
+                    for b_name, data in bodies.items():
+                        if b_name == body_name and "Moons" in data:
+                            if moon_name in data["Moons"]:
+                                body_data = data["Moons"][moon_name]
+                                break
+                else:
+                    # Direct planet search
+                    for b_name, data in bodies.items():
+                        if b_name == body_name:
+                            body_data = data
+                            break
         
-        if planet_data and "composition" in planet_data:
-            print(f"Composition of {planet_name}:")
-            for element, percentage in planet_data["composition"].items():
+        if body_data and "composition" in body_data:
+            print(f"Composition of {location_display}:")
+            for element, percentage in body_data["composition"].items():
                 print(f"  {element}: {percentage}%")
         else:
             print(f"Basic composition: Silicates, metals, and various minerals.")
@@ -362,10 +392,28 @@ def handle_planet_input(player):
 
 def handle_move_command(player, direction):
     """Handle player movement and check for stations"""
-    # ...existing movement code...
+    # Get current position
+    current_x = player.x
+    current_y = player.y
+    
+    # Calculate new position based on direction
+    new_x, new_y = current_x, current_y
+    if direction == "north":
+        new_y -= 1
+    elif direction == "south":
+        new_y += 1
+    elif direction == "east":
+        new_x += 1
+    elif direction == "west":
+        new_x -= 1
+    
+    # Update player position
+    player.x = new_x
+    player.y = new_y
+    print(f"Moved to coordinates [{new_x}, {new_y}]")
     
     # After movement, check if there's a station at these coordinates
-    station = get_station_at_coords(player.x, player.y)
+    station = get_station_at_coords(player.x, player.y, player.dimension.name)
     if station:
         print(f"\nYou've discovered {station.name}!")
         dock = input("Would you like to dock? (y/n): ").strip().lower()
@@ -373,16 +421,40 @@ def handle_move_command(player, direction):
             print(f"\nDocking at {station.name}...")
             player.docked_at = station
     
-    # ...existing code...
+    # Check for planets or other points of interest
+    for body_name, body_data in player.dimension.properties.items():
+        if "Coordinates" in body_data:
+            body_x = int(body_data["Coordinates"]["x"])
+            body_y = int(body_data["Coordinates"]["y"])
+            if body_x == player.x and body_y == player.y:
+                print(f"\nYou've reached {body_name}!")
+                # Additional logic for interacting with the celestial body can be added here
+                break
 
 def handle_scan_command(player):
     """Scan surroundings for points of interest"""
-    # ...existing code...
+    print("\nScanning surrounding space...")
+    time.sleep(1)
+    
+    # Get player position
+    player_x = player.x
+    player_y = player.y
+    dim_name = player.dimension.name
+    
+    # Find nearby celestial bodies
+    nearby_bodies = []
+    for body_name, body_data in player.dimension.properties.items():
+        if "Coordinates" in body_data:
+            body_x = int(body_data["Coordinates"]["x"])
+            body_y = int(body_data["Coordinates"]["y"])
+            distance = max(abs(player_x - body_x), abs(player_y - body_y))
+            if distance <= 10:  # Detect bodies within 10 units
+                nearby_bodies.append((body_name, body_data["type"], distance))
     
     # Add nearby stations to scan results
     nearby_stations = []
     for station_id, station in STATIONS.items():
-        # Prüfen, ob die Station in der gleichen Dimension ist
+        # Check if the station is in the same dimension
         if station.dimension == player.dimension.name:
             distance = ((station.x - player.x)**2 + (station.y - player.y)**2)**0.5
             if distance <= 10:  # Stations visible within 10 units
@@ -391,11 +463,17 @@ def handle_scan_command(player):
     if nearby_stations:
         print("\nStations detected:")
         for station, distance in sorted(nearby_stations, key=lambda x: x[1]):
-            print(f"  {station.name} - Distance: {distance:.1f} units")
+            print(f"  {station.name} ({station.type}) - Distance: {distance:.1f} units")
     
-    # ...existing code...
+    # Display results
+    if nearby_bodies:
+        print("\nDetected celestial bodies:")
+        for name, body_type, dist in sorted(nearby_bodies, key=lambda x: x[2]):
+            print(f"  {name} ({body_type}) - Distance: {dist} units")
+    else:
+        print("\nNo significant celestial bodies detected nearby.")
 
-def handle_dock_command(player, args):
+def handle_dock_command(player):
     """Try to dock at a station"""
     # Check if player is already docked
     if player.docked_at:
@@ -403,8 +481,8 @@ def handle_dock_command(player, args):
         return
     
     # Check if there's a station at current coordinates
-    station = get_station_at_coords(player.x, player.y)
-    if station and station.dimension == player.dimension.name:
+    station = get_station_at_coords(player.x, player.y, player.dimension.name)
+    if station:
         print(f"\nDocking at {station.name}...")
         time.sleep(1)
         player.docked_at = station
@@ -413,9 +491,10 @@ def handle_dock_command(player, args):
         
         # Check if there are stations nearby
         nearby_stations = []
+        from station import STATIONS
         for station_id, station in STATIONS.items():
-            # Prüfen, ob die Station in der gleichen Dimension ist
-            if station.dimension == player.dimension.name:
+            # Check if the station is in the same dimension
+            if station.dimension == player.dimension.name and station.type in ["Station", "Beacon"]:
                 distance = ((station.x - player.x)**2 + (station.y - player.y)**2)**0.5
                 if distance <= 5:  # Stations within docking range
                     nearby_stations.append((station, distance))
@@ -427,128 +506,73 @@ def handle_dock_command(player, args):
             print("\nNavigate to a station's coordinates to dock.")
 
 def handle_land_command(player, body_name=None):
-    """Land on a planet or moon if at the right coordinates"""
+    """Land on a planet or moon if at the right coordinates and there's a city there"""
     # Player can't land if already landed
     if player.landed_on:
         print(f"You are already on the surface of {player.landed_on}.")
         return
     
-    # Get current dimension's celestial bodies
-    dimension_name = player.dimension.name
-    bodies_in_dimension = {}
+    # Check if there's a city at current coordinates
+    city = get_city_at_coords(player.x, player.y, player.dimension.name)
     
-    # First check known bodies from player data
-    if dimension_name in player.known_bodies:
-        bodies_in_dimension = player.known_bodies[dimension_name]
-    
-    # If no bodies known yet, try to get them from dimension data
-    if not bodies_in_dimension and hasattr(player.dimension, "properties"):
-        bodies_in_dimension = player.dimension.properties
-    
-    # If we still don't have bodies, we can't land
-    if not bodies_in_dimension:
-        print("No celestial bodies detected in this area. Try scanning first.")
+    if not city:
+        print("There is no city or landing site at your current coordinates.")
         return
     
-    # If a specific body was provided, try to land on it
-    if body_name:
-        body_name = body_name.strip()
-        target_body = None
-        
-        # Look for the requested body
-        for name, data in bodies_in_dimension.items():
-            if name.lower() == body_name.lower():
-                target_body = (name, data)
-                break
-        
-        if not target_body:
-            print(f"Unknown celestial body: '{body_name}'.")
-            return
-        
-        name, data = target_body
-        
-        # Check if player is at the body's coordinates
-        if "coordinates" in data:
-            body_x, body_y = data["coordinates"]
-            if player.x != body_x or player.y != body_y:
-                print(f"You must be at coordinates [{body_x}, {body_y}] to land on {name}.")
-                return
-            
-        # Check if it's a landable body (not a star, gas giant, etc.)
-        if "type" in data:
-            body_type = data["type"].lower()
-            if "star" in body_type or "sun" in body_type:
-                print("WARNING: Cannot land on a star! That would be suicide.")
-                return
-            elif "gas" in body_type:
-                print("Cannot land on a gas giant - there is no solid surface.")
-                return
-        
-        # All checks passed, perform landing
-        print(f"\nInitiating landing sequence on {name}...")
-        for i in range(5, 0, -1):
-            print(f"Landing in {i}...")
-            time.sleep(0.5)
-        
-        print(f"\nLanded successfully on {name}.")
-        player.landed_on = name
-        return
+    # Get the celestial body name for the city
+    parent_body = None
+    parent_moon = None
     
-    # If no body specified, check if player is at coordinates of any landable body
-    potential_landing_sites = []
-    
-    for name, data in bodies_in_dimension.items():
-        if "coordinates" in data:
-            body_x, body_y = data["coordinates"]
-            
-            # Skip stars and gas giants
-            if "type" in data:
-                body_type = data["type"].lower()
-                if "star" in body_type or "sun" in body_type or "gas" in body_type:
-                    continue
-            
-            # Check coordinates
-            if player.x == body_x and player.y == body_y:
-                potential_landing_sites.append(name)
-    
-    if not potential_landing_sites:
-        print("There are no landable celestial bodies at your current coordinates.")
-        return
-    
-    if len(potential_landing_sites) == 1:
-        # Only one option, land automatically
-        body_name = potential_landing_sites[0]
-        print(f"\nInitiating landing sequence on {body_name}...")
-        for i in range(3, 0, -1):
-            print(f"Landing in {i}...")
-            time.sleep(0.5)
-        
-        print(f"\nLanded successfully on {body_name}.")
-        player.landed_on = body_name
+    # Use the stored parent_moon and parent_body if available
+    if hasattr(city, 'parent_moon') and city.parent_moon:
+        parent_moon = city.parent_moon
+        parent_body = city.parent_body
     else:
-        # Multiple options, ask player to choose
-        print("\nMultiple landing sites detected at current coordinates:")
-        for i, name in enumerate(potential_landing_sites, 1):
-            print(f"{i}. {name}")
-        
-        choice = input("\nSelect landing site (number) or 'cancel': ")
-        
-        if choice.lower() == 'cancel':
-            print("Landing aborted.")
-            return
-        
-        try:
-            index = int(choice) - 1
-            if 0 <= index < len(potential_landing_sites):
-                body_name = potential_landing_sites[index]
-                print(f"\nInitiating landing sequence on {body_name}...")
-                for i in range(3, 0, -1):
-                    print(f"Landing in {i}...")
-                    time.sleep(0.5)
-                
-                print(f"\nLanded successfully on {body_name}.")
-                player.landed_on = body_name
-            else:
-                print("Invalid selection. Landing aborted.")
-        except ValueError:
-            print("Invalid input. Landing aborted.")
+        # Legacy fallback - search through the dimension data
+        for body_name, body_data in player.dimension.properties.items():
+            # Check stations directly on the body
+            if 'Stations' in body_data:
+                for station_name, station_data in body_data['Stations'].items():
+                    if station_name == city.name:
+                        parent_body = body_name
+                        break
+            
+            # Check if it's on a moon
+            if not parent_body and 'Moons' in body_data:
+                for moon_name, moon_data in body_data['Moons'].items():
+                    if 'Stations' in moon_data:
+                        for station_name, station_data in moon_data['Stations'].items():
+                            if station_name == city.name:
+                                parent_body = body_name  # This is the planet
+                                parent_moon = moon_name  # This is the moon
+                                break
+                    if parent_moon:
+                        break
+            
+            if parent_body:
+                break
+    
+    if not parent_body:
+        # If we couldn't determine the body name, use the city name as fallback
+        parent_body = "Unknown Body"
+    
+    # All checks passed, perform landing
+    print(f"\nInitiating landing sequence on {parent_moon or parent_body}, {city.name}...")
+    for i in range(3, 0, -1):
+        print(f"Landing in {i}...")
+        time.sleep(0.5)
+    
+    landing_location = f"{city.name}"
+    if parent_moon:
+        landing_location = f"{city.name} on {parent_moon} (moon of {parent_body})"
+    else:
+        landing_location = f"{city.name} on {parent_body}"
+    
+    print(f"\nLanded successfully at {landing_location}.")
+    
+    # Store both the city name, parent moon (if applicable) and parent body
+    player.landed_on = city.name
+    player.landed_on_body = parent_body
+    if parent_moon:
+        player.landed_on_moon = parent_moon
+    return

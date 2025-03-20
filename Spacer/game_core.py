@@ -8,6 +8,7 @@ from player import Player
 from save_manager import SaveManager
 from ui_display import display_help, display_loading_animation
 from command_handler import handle_input
+from station import load_all_stations
 
 # Global save manager instance
 save_mgr = SaveManager()
@@ -15,6 +16,10 @@ save_mgr = SaveManager()
 def initialize_game():
     """Initialize the game and show welcome screen"""
     display_loading_animation()
+    
+    # Load all stations from all dimensions
+    load_all_stations()
+    
     print("\nSystem initialized. Ready for commands.\n")
     
     # Check for existing save files

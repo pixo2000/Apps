@@ -197,76 +197,135 @@ def handle_scan(player):
         return []
 
 def scan_celestial_body(player, body_name):
-    """Scan a specific celestial body for moons and stations"""
-    try:
-        current_dimension = player.dimension
+    """Scan a specific celestial body for detailed information"""
+    # Check if player's current dimension is known
+    dim_name = player.dimension.name
+    if dim_name not in player.known_dimensions:
+        print(f"\n✗ Cannot scan {body_name}: This dimension is not fully mapped.")
+        return
+    
+    # First check if it's a main celestial body
+    body_data = None
+    is_moon = False
+    parent_planet = None
+    
+    # Look for the body as a primary celestial object
+    for name, data in player.dimension.properties.items():
+        if name.lower() == body_name.lower():
+            body_data = data
+            body_name = name  # Use the correct case from the data
+            break
+    
+    # If not found as a primary body, check if it's a moon
+    if not body_data:
+        for planet_name, planet_data in player.dimension.properties.items():
+            if 'Moons' in planet_data:
+                for moon_name, moon_data in planet_data['Moons'].items():
+                    if moon_name.lower() == body_name.lower():
+                        body_data = moon_data
+                        body_name = moon_name  # Use the correct case
+                        is_moon = True
+                        parent_planet = planet_name
+                        break
+                if is_moon:
+                    break
+    
+    if not body_data:
+        print(f"\n✗ Cannot scan {body_name}: Object not found in this system.")
+        return
+    
+    # Print detailed scan results
+    print(f"\n=== DETAILED SCAN: {body_name} ===")
+    
+    # Print body type if available
+    if 'type' in body_data:
+        print(f"Type: {body_data['type']}")
+    elif is_moon:
+        print(f"Type: Moon of {parent_planet}")
+    
+    # Print coordinates if available
+    if 'Coordinates' in body_data:
+        try:
+            x = body_data['Coordinates']['x']
+            y = body_data['Coordinates']['y']
+            print(f"Coordinates: [{x}, {y}]")
+        except KeyError:
+            pass
+    
+    # If this is a planet, list its moons
+    if not is_moon and 'Moons' in body_data and body_data['Moons']:
+        print("\n--- Moons ({}) ---".format(len(body_data['Moons'])))
+        print(f"{'Name'.ljust(15)}{'Coordinates'.ljust(15)}")
+        print("-" * 30)
         
-        # Check if the player knows this dimension
-        dim_name = current_dimension.name
-        if dim_name not in player.known_dimensions:
-            print(f"\n✗ Cannot scan {body_name}: This dimension is not fully mapped.")
-            return
+        for moon_name, moon_data in body_data['Moons'].items():
+            # Get moon coordinates
+            moon_coords = "[Unknown]"
+            if 'Coordinates' in moon_data:
+                try:
+                    moon_x = moon_data['Coordinates']['x']
+                    moon_y = moon_data['Coordinates']['y']
+                    moon_coords = f"[{moon_x}, {moon_y}]"
+                except KeyError:
+                    pass
+            
+            print(f"{moon_name.ljust(15)}{moon_coords.ljust(15)}")
+    
+    # Show stations/structures
+    stations_count = 0
+    stations_info = []
+    
+    # Get stations information
+    if 'Stations' in body_data:
+        for station_name, station_data in body_data['Stations'].items():
+            stations_count += 1
+            station_type = station_data.get('type', 'Unknown')
+            
+            # Get station coordinates
+            station_coords = "[Unknown]"
+            if 'Coordinates' in station_data:
+                station_x = station_data['Coordinates']['x']
+                station_y = station_data['Coordinates']['y']
+                station_coords = f"[{station_x}, {station_y}]"
+            
+            station_desc = station_data.get('description', 'No description available')
+            stations_info.append((station_name, station_type, station_coords, station_desc))
+    
+    # Display stations information if any found
+    if stations_count > 0:
+        print(f"\n--- Stations/Structures ({stations_count}) ---")
+        print(f"{'Name'.ljust(15)}{'Type'.ljust(10)}{'Coordinates'.ljust(15)}{'Description'}")
+        print("-" * 70)
         
-        # Look for the body in the current dimension
-        body_data = None
-        for name, data in current_dimension.properties.items():
-            if name.lower() == body_name.lower():
-                body_data = data
-                body_name = name  # Use the correct case from the data
+        for name, typ, coords, desc in stations_info:
+            print(f"{name.ljust(15)}{typ.ljust(10)}{coords.ljust(15)}{desc}")
+    
+    # Add celestial body to player's known bodies - maintaining the list format for compatibility
+    if dim_name not in player.known_bodies:
+        player.known_bodies[dim_name] = []
+        
+    # For primary bodies
+    if not is_moon:
+        # Add the body to the list if not already present
+        if body_name not in player.known_bodies[dim_name]:
+            player.known_bodies[dim_name].append(body_name)
+    # For moons, add both the parent planet and the moon to known list
+    else:
+        # Add the parent planet if not already known
+        if parent_planet not in player.known_bodies[dim_name]:
+            player.known_bodies[dim_name].append(parent_planet)
+            
+        # For moons, we'll add them with their parent name for uniqueness
+        moon_entry = f"{parent_planet}:{body_name}"
+        # Check if this moon is already in the list
+        moon_already_known = False
+        for entry in player.known_bodies[dim_name]:
+            if ':' in entry and entry == moon_entry:
+                moon_already_known = True
                 break
-        
-        if not body_data:
-            print(f"\n✗ Cannot scan {body_name}: Object not found in this system.")
-            return
-        
-        # Check if the body is in the player's known bodies list
-        if body_name not in player.known_bodies.get(dim_name, []):
-            print(f"\n✗ Cannot scan {body_name}: Object not in database. Perform a system scan first.")
-            return
-        
-        # Basic body info
-        body_type = body_data.get("type", "Unknown")
-        body_x = body_data["Coordinates"]["x"]
-        body_y = body_data["Coordinates"]["y"]
-        
-        print(f"\n=== DETAILED SCAN: {body_name} ===")
-        print(f"Type: {body_type}")
-        print(f"Coordinates: [{body_x}, {body_y}]")
-        
-        # Scan for moons
-        if "Moons" in body_data and body_data["Moons"]:
-            print(f"\n--- Moons ({len(body_data['Moons'])}) ---")
-            print(f"{'Name':<15} {'Coordinates':<15}")
-            print("-" * 30)
-            
-            for moon_name, moon_data in body_data["Moons"].items():
-                moon_x = moon_data["Coordinates"]["x"]
-                moon_y = moon_data["Coordinates"]["y"]
-                print(f"{moon_name:<15} [{moon_x}, {moon_y}]")
-        
-        # Scan for stations
-        if "Stations" in body_data and body_data["Stations"]:
-            print(f"\n--- Stations/Structures ({len(body_data['Stations'])}) ---")
-            print(f"{'Name':<15} {'Type':<10} {'Coordinates':<15} {'Description'}")
-            print("-" * 70)
-            
-            for station_name, station_data in body_data["Stations"].items():
-                station_type = station_data.get("type", "Unknown")
-                station_x = station_data["Coordinates"]["x"] if "Coordinates" in station_data else "N/A"
-                station_y = station_data["Coordinates"]["y"] if "Coordinates" in station_data else "N/A"
-                desc = station_data.get("description", "")
                 
-                # Format coordinates
-                coords = f"[{station_x}, {station_y}]" if station_x != "N/A" else "N/A"
-                
-                print(f"{station_name:<15} {station_type:<10} {coords:<15} {desc}")
-        
-        # If no moons or stations were found
-        if ("Moons" not in body_data or not body_data["Moons"]) and \
-           ("Stations" not in body_data or not body_data["Stations"]):
-            print("\nNo satellites or structures detected.")
-        
-        print("==========================\n")
-        
-    except Exception as e:
-        print(f"\nScan error: {e}")
+        # Add the moon if not already known
+        if not moon_already_known:
+            player.known_bodies[dim_name].append(moon_entry)
+    
+    print("==========================\n")
