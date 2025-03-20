@@ -121,6 +121,10 @@ def main_game_loop():
             else:
                 name, load_save = result
                 show_help = not load_save
+            
+            # Load all stations first to ensure they're available when restoring player state
+            print("\nLoading station data...")
+            load_all_stations()
                 
             player = Player(name)
             
@@ -129,7 +133,18 @@ def main_game_loop():
                 save_data = save_mgr.load_game(name)
                 if player.load_save_data(save_data):
                     print(f"\nWelcome back, Captain {name}!")
-                    print(f"Resuming from {player.dimension.title}, coordinates [{player.x}, {player.y}]")
+                    
+                    # Check if player was docked or landed and inform them
+                    if player.docked_at:
+                        print(f"You are currently docked at {player.docked_at.name}.")
+                    elif player.landed_on:
+                        location = player.landed_on
+                        if player.landed_on_moon:
+                            print(f"You are currently on the surface of {location} on {player.landed_on_moon}, moon of {player.landed_on_body}.")
+                        else:
+                            print(f"You are currently on the surface of {location} on {player.landed_on_body}.")
+                    else:
+                        print(f"Resuming from {player.dimension.title}, coordinates [{player.x}, {player.y}]")
                     
                     # Parse playtime from save data
                     if "playtime" in save_data:
@@ -172,7 +187,7 @@ def main_game_loop():
                     # Return to login screen
                     running = False
                     update_playtime(player, session_start)
-                    print("\nReturning to login screen...\n")
+                    # Don't print duplicate logout messages - they're now handled in the input handlers
                     time.sleep(1)
                     os.system("clear")
         

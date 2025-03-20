@@ -256,9 +256,20 @@ def handle_station_input(player):
     user_input = input(f"\n[{player.docked_at.name}] {player.name}> ").strip().lower()
     
     if user_input == "exit" or user_input == "quit":
+        # Save before quitting
+        save_mgr.save_game(player)
+        print("\n=== SYSTEM SHUTDOWN ===")
+        print("Saving station status... Done!")
+        print("Closing connections...")
+        print("\nGoodbye Captain! Safe travels.\n")
         return "negative"
     
     if user_input == "logout":
+        print("\n=== LOGGING OUT ===")
+        print(f"Saving current session at {player.docked_at.name}...")
+        save_mgr.save_game(player)
+        print("Station status and session data saved successfully.")
+        print("Returning to login screen...")
         return "logout"
     
     if user_input == "help":
@@ -310,9 +321,20 @@ def handle_planet_input(player):
     user_input = input(f"\n[{city_name}] {player.name}> ").strip().lower()
     
     if user_input == "exit" or user_input == "quit":
+        # Save before quitting
+        save_mgr.save_game(player)
+        print("\n=== SYSTEM SHUTDOWN ===")
+        print(f"Saving surface status on {city_name}... Done!")
+        print("Closing connections...")
+        print("\nGoodbye Captain! Safe travels.\n")
         return "negative"
     
     if user_input == "logout":
+        print("\n=== LOGGING OUT ===")
+        print(f"Saving current session on {city_name}...")
+        save_mgr.save_game(player)
+        print("Surface status and session data saved successfully.")
+        print("Returning to login screen...")
         return "logout"
     
     if user_input == "help":
@@ -428,7 +450,6 @@ def handle_move_command(player, direction):
             body_y = int(body_data["Coordinates"]["y"])
             if body_x == player.x and body_y == player.y:
                 print(f"\nYou've reached {body_name}!")
-                # Additional logic for interacting with the celestial body can be added here
                 break
 
 def handle_scan_command(player):
