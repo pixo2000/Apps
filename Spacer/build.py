@@ -49,26 +49,56 @@ def prompt_for_icon():
             title="Select Icon File",
             filetypes=[
                 ("Icon Files", "*.ico"),
+                ("Image Files", "*.png;*.jpg;*.jpeg;*.bmp;*.gif;*.webp"),
                 ("PNG Files", "*.png"),
+                ("JPEG Files", "*.jpg;*.jpeg"),
+                ("BMP Files", "*.bmp"),
+                ("GIF Files", "*.gif"),
+                ("WebP Files", "*.webp"),
                 ("All Files", "*.*")
             ],
             initialdir=os.path.dirname(os.path.abspath(__file__))
         )
         
         # If user selected a file, return its path
-        if file_path:
-            # If PNG selected, convert to ICO (needs PIL/Pillow)
-            if file_path.lower().endswith('.png'):
+        if (file_path):
+            # If not an ICO file, convert it to ICO
+            if not file_path.lower().endswith('.ico'):
                 try:
-                    from PIL import Image
+                    # Make sure PIL/Pillow is installed
+                    try:
+                        from PIL import Image
+                    except ImportError:
+                        print("Pillow not found. Installing...")
+                        subprocess.check_call([sys.executable, "-m", "pip", "install", "pillow"])
+                        from PIL import Image
+                    
+                    # Open the image and convert to ICO
+                    print(f"Converting {os.path.basename(file_path)} to ICO format...")
                     img = Image.open(file_path)
+                    
+                    # Resize if necessary (Windows icons are typically 256x256 or smaller)
+                    max_size = 256
+                    if max(img.size) > max_size:
+                        print(f"Resizing image from {img.size} to fit within {max_size}x{max_size}...")
+                        img.thumbnail((max_size, max_size), Image.LANCZOS)
+                    
+                    # If image has transparency and it's not a format that supports it
+                    if img.mode == 'RGBA' and file_path.lower().endswith(('.jpg', '.jpeg', '.bmp')):
+                        # Create a white background
+                        background = Image.new('RGBA', img.size, (255, 255, 255, 255))
+                        # Paste the image on the background
+                        background.paste(img, (0, 0), img)
+                        img = background.convert('RGB')
+                    
+                    # Save as ICO
                     ico_path = os.path.splitext(file_path)[0] + '.ico'
                     img.save(ico_path, format='ICO')
-                    print(f"Converted PNG to ICO: {ico_path}")
+                    print(f"Converted to ICO: {ico_path}")
                     return ico_path
                 except Exception as e:
-                    print(f"Failed to convert PNG to ICO: {e}")
-                    print("Using PNG file directly (may not work with all PyInstaller versions)")
+                    print(f"Failed to convert to ICO: {e}")
+                    print(f"Using original file {os.path.basename(file_path)} directly (may not work with all PyInstaller versions)")
                     return file_path
             return file_path
         
@@ -139,23 +169,72 @@ def build_executable():
             os.makedirs(dimensions_dir, exist_ok=True)
             print(f"Created empty dimensions directory at {dimensions_dir}")
         
+        # Get current directory for module imports
+        current_dir = os.path.abspath(os.getcwd())
+        print(f"Working directory: {current_dir}")
+        
+        # Check for game_core module location
+        game_core_paths = [
+            os.path.join(current_dir, "game_core"),
+            os.path.join(current_dir, "game_core.py"),
+            os.path.join(script_dir, "game_core"),
+            os.path.join(script_dir, "game_core.py")
+        ]
+        
+        found_game_core = None
+        for path in game_core_paths:
+            if os.path.exists(path):
+                found_game_core = path
+                print(f"Found game_core at: {path}")
+                break
+        
+        if not found_game_core:
+            print("Warning: game_core module not found in expected locations.")
+            print("Searching for game_core module...")
+            
+            # Try to find the module by walking the directory
+            for root, dirs, files in os.walk(current_dir):
+                if "game_core.py" in files or "game_core" in dirs:
+                    found_game_core = os.path.join(root, "game_core.py" if "game_core.py" in files else "game_core")
+                    print(f"Found game_core at: {found_game_core}")
+                    break
+        
         # Define PyInstaller command with absolute paths
         cmd = [
             "pyinstaller",
             "--onefile",  # Single executable
             "--name", OUTPUT_NAME,  # Name of the executable including version
             "--clean",  # Clean PyInstaller cache
-            "--noconsole",  # No console window (pure GUI)
+            # Use console for debugging
+            "--console",  # Show console for debugging
             "--distpath", OUTPUT_DIR,  # Set custom output directory
             "--workpath", f"{OUTPUT_DIR}/build",  # Set custom work directory
             "--specpath", f"{OUTPUT_DIR}/spec",  # Set custom spec directory
-            "--add-data", f"{dimensions_dir}{os.pathsep}dimensions",  # Include dimensions folder
+            "--hidden-import", "game_core",  # Add game_core as hidden import
+            "--hidden-import", "dimensions",  # Include dimensions module
+            "--path", current_dir,  # Add current directory to import paths
         ]
         
-        # Add icon if available
-        if icon_param:
-            cmd.append(icon_param)
-            
+        # If we found the game_core module directory, add its parent as a path
+        if found_game_core:
+            module_parent = os.path.dirname(found_game_core)
+            if module_parent and module_parent != current_dir:
+                cmd.extend(["--path", module_parent])
+        
+        # Add data folder
+        cmd.extend(["--add-data", f"{dimensions_dir}{os.pathsep}dimensions"])
+        
+        # Fix icon parameter for different platforms
+        if os.path.exists(icon_path):
+            print(f"Using icon: {icon_path}")
+            if os.name == "nt":  # Windows
+                cmd.extend(["--icon", icon_path])
+            else:  # macOS/Linux
+                cmd.extend(["--icon", icon_path])
+        else:
+            print(f"Warning: Icon file not found at {icon_path}")
+            print("Building executable without icon.")
+        
         # Add main script (with absolute path)
         cmd.append(main_script)
         
