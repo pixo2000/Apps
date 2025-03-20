@@ -37,6 +37,10 @@ class Dimension:
                 # Store the body data
                 self.properties[body_name] = body_data
                 
+            # Load stations for this dimension
+            from station import load_stations_from_dimension
+            load_stations_from_dimension({'bodies': self.properties}, self.name)
+                
         except ValueError as e:
             raise ValueError(f"Failed to load dimension {self.name}: {str(e)}")
         except Exception as e:

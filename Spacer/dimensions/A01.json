@@ -90,6 +90,10 @@
                         "Stations": {
                             "LunaBase": {
                                 "type": "City",
+                                "Coordinates": {
+                                    "x": "65",
+                                    "y": "-60"
+                                },
                                 "description": "The first human base on a celestial body"
                             }
                         }

@@ -2,14 +2,16 @@
 Station module for the Spacer game.
 Handles station functionality and interactions in console-based interface.
 """
+from dimension import Dimension
 
 class Station:
-    def __init__(self, name, description, x=0, y=0, dimension="SOL"):
+    def __init__(self, name, description, station_type, x=0, y=0, dimension="A01"):
         self.name = name
         self.description = description
+        self.type = station_type
         self.x = x
         self.y = y
-        self.dimension = dimension  # Standardmäßig im SOL-System
+        self.dimension = dimension
         self.available_options = {
             "launch": "Return to space",
             "quests": "View available missions",
@@ -62,6 +64,7 @@ class Station:
             print(f"\n== {self.name} Information ==")
             print(f"{self.description}")
             print(f"Location: [{self.x}, {self.y}] in {player.dimension.title}")
+            print(f"Type: {self.type}")
             print("\nStation Services:")
             for service in ["Trading", "Repairs", "Missions"]:
                 print(f"- {service}")
@@ -69,19 +72,115 @@ class Station:
         
         return False  # Command not handled by station
 
-# Pre-defined stations
-STATIONS = {
-    "alpha": Station("Alpha Dock", "A small trading outpost on the frontier", 10, 15, "SOL"),
-    "beta": Station("Beta Station", "A scientific research facility", -20, 30, "SOL"),
-    "gamma": Station("Gamma Hub", "A bustling commerce center", 50, -25, "SOL"),
-    # Füge die Stationen hinzu, die im SOL-System-Scan angezeigt werden
-    "solar": Station("SolarStation", "Central solar observation station", 8, 2, "A01"),
-    "navbeacon": Station("NavBeacon", "Primary navigation beacon for the Sol system", 8, -2, "A01")
-}
+# Dictionary to store stations dynamically loaded from dimensions
+STATIONS = {}
 
-def get_station_at_coords(x, y):
-    """Check if there's a station at the given coordinates"""
+def load_stations_from_dimension(dimension_data, dimension_name):
+    """Load stations from dimension data into the STATIONS dictionary"""
+    # Clear existing stations for this dimension
+    for station_id in list(STATIONS.keys()):
+        if STATIONS[station_id].dimension == dimension_name:
+            del STATIONS[station_id]
+            
+    # Process all celestial bodies to find stations
+    for body_name, body_data in dimension_data.get('bodies', {}).items():
+        # Check if this body has stations
+        if 'Stations' in body_data:
+            for station_name, station_data in body_data['Stations'].items():
+                # Get station coordinates
+                if 'Coordinates' in station_data:
+                    x = int(station_data['Coordinates']['x'])
+                    y = int(station_data['Coordinates']['y'])
+                else:
+                    # If no coordinates, use body coordinates
+                    if 'Coordinates' in body_data:
+                        x = int(body_data['Coordinates']['x'])
+                        y = int(body_data['Coordinates']['y'])
+                    else:
+                        x, y = 0, 0
+                
+                # Create a unique station ID
+                station_id = f"{dimension_name}_{body_name}_{station_name}".lower().replace(' ', '_')
+                
+                # Get station description
+                description = station_data.get('description', f"A {station_data.get('type', 'unknown')} on {body_name}")
+                
+                # Add to STATIONS dictionary
+                STATIONS[station_id] = Station(
+                    station_name, 
+                    description, 
+                    station_data.get('type', 'Station'),
+                    x, y, 
+                    dimension_name
+                )
+        
+        # Check if this body has moons with stations
+        if 'Moons' in body_data:
+            for moon_name, moon_data in body_data['Moons'].items():
+                # Process stations on moons
+                if 'Stations' in moon_data:
+                    for station_name, station_data in moon_data['Stations'].items():
+                        # Get station coordinates (use moon coordinates if station doesn't have specific ones)
+                        if 'Coordinates' in station_data:
+                            x = int(station_data['Coordinates']['x'])
+                            y = int(station_data['Coordinates']['y'])
+                        else:
+                            if 'Coordinates' in moon_data:
+                                x = int(moon_data['Coordinates']['x'])
+                                y = int(moon_data['Coordinates']['y'])
+                            else:
+                                x, y = 0, 0
+                        
+                        # Create a unique station ID for moon station
+                        station_id = f"{dimension_name}_{body_name}_{moon_name}_{station_name}".lower().replace(' ', '_')
+                        
+                        # Get station description
+                        description = station_data.get('description', f"A {station_data.get('type', 'unknown')} on {moon_name}, moon of {body_name}")
+                        
+                        # Add to STATIONS dictionary
+                        STATIONS[station_id] = Station(
+                            station_name, 
+                            description, 
+                            station_data.get('type', 'Station'),
+                            x, y, 
+                            dimension_name
+                        )
+                        # Store the parent moon and planet for reference
+                        STATIONS[station_id].parent_moon = moon_name
+                        STATIONS[station_id].parent_body = body_name
+
+def get_station_at_coords(x, y, dimension_name):
+    """Check if there's a station at the given coordinates in the specified dimension"""
     for station_id, station in STATIONS.items():
-        if station.x == x and station.y == y:
-            return station
+        if station.x == x and station.y == y and station.dimension == dimension_name:
+            # Only return if it's actually a station or beacon type, not a city
+            if station.type == "Station":
+                return station
     return None
+
+def get_city_at_coords(x, y, dimension_name):
+    """Check if there's a city at the given coordinates in the specified dimension"""
+    for station_id, station in STATIONS.items():
+        if station.x == x and station.y == y and station.dimension == dimension_name:
+            # Only return if it's a city type
+            if station.type == "City":
+                return station
+    return None
+
+def load_all_stations():
+    """Load stations from all available dimensions"""
+    from dimension import Dimension
+    
+    # Get all available dimensions
+    dimensions = Dimension.get_available_dimensions()
+    
+    # Load stations from each dimension
+    for dim_name in dimensions:
+        try:
+            dim = Dimension(dim_name)
+            load_stations_from_dimension(
+                {'bodies': dim.properties}, 
+                dim_name
+            )
+        except Exception as e:
+            print(f"Error loading stations from dimension {dim_name}: {e}")
