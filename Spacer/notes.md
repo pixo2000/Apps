@@ -42,15 +42,7 @@ playerinfo bei live game wird schwer mit playtime etc
 
 mit ki server copcept mit player können player sehen etc machen
 
-refactor concept map von ki machen lassen
-
-roadmap von ki
-
-hidden signal für voyager 1
-
 check signal scanning voyager
-
-fix visual move and intro
 
 test everything
 
@@ -58,20 +50,12 @@ scan coords with move range
 
 abort stuff, move when cmmand-> on top of input sticky
 
-landing system
-
 redeem code to get new ship on register
 
 move between systems(like only from A01 to C12)
 
 better debug(clear on first start but not restart/crash)
 
-test landing
+station info should have coords and type and more
 
-save that the player is landed or docked
-
-fix fucking stations: get new stations, load real ones. info should have coords and type and more
-
-launch animation and rename launch command on stations to release or smth
-
-fix landing
+version management+release system
