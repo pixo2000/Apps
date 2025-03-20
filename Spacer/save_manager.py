@@ -4,14 +4,24 @@ Game state saving and loading, player registration and validation.
 import json
 import os
 import re
+import sys
 from pathlib import Path
 import datetime
 from config import RESERVED_NAMES, NAME_PATTERN
 
 class SaveManager:
     def __init__(self):
-        # Korrektur des Pfads - nur eine Ebene nach oben statt zwei
-        self.save_directory = Path(os.path.dirname(__file__)) / 'saves'
+        # Get base path that works with both development and PyInstaller
+        try:
+            # PyInstaller creates a temp folder and stores path in _MEIPASS
+            base_path = Path(sys._MEIPASS)
+            # When running as executable, saves should be in the executable directory
+            self.save_directory = Path(os.path.dirname(sys.executable)) / 'saves'
+        except Exception:
+            # We're running in development mode
+            base_path = Path(os.path.dirname(__file__))
+            self.save_directory = base_path / 'saves'
+            
         # Ensure the saves directory exists
         self.save_directory.mkdir(exist_ok=True)
         
