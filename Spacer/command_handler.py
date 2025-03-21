@@ -470,12 +470,6 @@ def handle_planet_input(player):
         if moon_name:
             print(f"Parent Body: {body_name}")
         
-        # Show size if available
-        if body_data and "size" in body_data:
-            width = body_data["size"]["width"]
-            height = body_data["size"]["height"]
-            print(f"Size: {width}x{height}")
-        
         # Show composition if available
         if body_data and "composition" in body_data:
             print("\nComposition:")

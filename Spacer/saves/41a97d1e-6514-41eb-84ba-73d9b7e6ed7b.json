@@ -1,0 +1,23 @@
+{
+    "name": "Test",
+    "uuid": "41a97d1e-6514-41eb-84ba-73d9b7e6ed7b",
+    "position": {
+        "x": 60,
+        "y": -60,
+        "dimension": "A01"
+    },
+    "discoveries": {
+        "known_dimensions": [
+            "A01"
+        ],
+        "known_bodies": {}
+    },
+    "creation_date": "2025-03-21T18:21:35.618139",
+    "last_login": "21.03.25 - 18:21",
+    "is_dead": false,
+    "landed_on": null,
+    "landed_on_body": null,
+    "landed_on_moon": null,
+    "docked_at": null,
+    "playtime": "00:00:00:08"
+}
