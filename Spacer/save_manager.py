@@ -170,6 +170,16 @@ class SaveManager:
                         if data.get("is_dead", False):
                             print(f"\n☠ Captain {data['name']} is deceased. Their journey has ended.")
                             return None
+                        
+                        # Ensure known_bodies is properly formatted as a dictionary of lists
+                        if "discoveries" in data and "known_bodies" in data["discoveries"]:
+                            known_bodies = data["discoveries"]["known_bodies"]
+                            # Convert any dictionary values to lists for backward compatibility
+                            for dim_name in known_bodies:
+                                if isinstance(known_bodies[dim_name], dict):
+                                    known_bodies[dim_name] = list(known_bodies[dim_name].keys())
+                            data["discoveries"]["known_bodies"] = known_bodies
+                        
                         return data
             except:
                 # Skip files that can't be read properly
