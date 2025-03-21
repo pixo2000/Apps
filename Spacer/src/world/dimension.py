@@ -4,8 +4,8 @@ Dimension class and celestial body definitions for interstellar travel.
 import json
 import os
 from pathlib import Path
-from data_loader import DataLoader
-from config import DIMENSIONS_DIRECTORY, DIMENSIONS_CONFIG
+from src.utils.data_loader import DataLoader
+from src.config import DIMENSIONS_DIRECTORY, DIMENSIONS_CONFIG
 
 class Dimension:
     """
@@ -38,7 +38,7 @@ class Dimension:
                 self.properties[body_name] = body_data
                 
             # Load stations for this dimension
-            from station import load_stations_from_dimension
+            from src.world.station import load_stations_from_dimension
             load_stations_from_dimension({'bodies': self.properties}, self.name)
                 
         except ValueError as e:

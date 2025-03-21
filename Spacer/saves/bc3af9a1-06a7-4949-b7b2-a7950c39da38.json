@@ -2,13 +2,14 @@
     "name": "pixo2000",
     "uuid": "bc3af9a1-06a7-4949-b7b2-a7950c39da38",
     "position": {
-        "x": 65,
-        "y": -60,
-        "dimension": "A01"
+        "x": 10,
+        "y": 10,
+        "dimension": "C12"
     },
     "discoveries": {
         "known_dimensions": [
-            "A01"
+            "A01",
+            "C12"
         ],
         "known_bodies": {
             "A01": [
@@ -19,15 +20,20 @@
                 "Ceres",
                 "Juno",
                 "Earth:Luna"
+            ],
+            "C12": [
+                "Proxima Centauri",
+                "Centauri Prime",
+                "Centauri Secundus"
             ]
         }
     },
     "creation_date": "20.03.25 - 15:20",
-    "last_login": "21.03.25 - 20:35",
+    "last_login": "21.03.25 - 20:54",
     "is_dead": false,
-    "landed_on": "LunaBase",
-    "landed_on_body": "Earth",
-    "landed_on_moon": "Luna",
+    "landed_on": null,
+    "landed_on_body": null,
+    "landed_on_moon": null,
     "docked_at": null,
-    "playtime": "00:00:10:12"
+    "playtime": "00:00:11:05"
 }

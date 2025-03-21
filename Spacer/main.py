@@ -18,7 +18,7 @@ def get_resource_path(relative_path):
 
 if __name__ == "__main__":
     # Import here to use the resource path function if needed
-    from game_core import run_game
+    from src.core.game_core import run_game
     
     try:
         # Create saves directory if it doesn't exist

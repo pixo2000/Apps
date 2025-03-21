@@ -2,7 +2,7 @@
 Station module for the Spacer game.
 Handles station functionality and interactions in console-based interface.
 """
-from dimension import Dimension
+from src.world.dimension import Dimension
 
 class Station:
     def __init__(self, name, description, station_type, x=0, y=0, dimension="A01"):
@@ -211,7 +211,7 @@ def get_station_by_id(station_id):
 
 def load_all_stations():
     """Load stations from all available dimensions"""
-    from dimension import Dimension
+    from src.world.dimension import Dimension
     
     # Get all available dimensions
     dimensions = Dimension.get_available_dimensions()

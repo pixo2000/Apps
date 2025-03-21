@@ -3,7 +3,7 @@ System scanning functionality and celestial body detection.
 """
 import math
 import time
-from config import DEFAULT_SCAN_RANGE, HIDDEN_SIGNALS, ANIMATION_SPEED
+from src.config import DEFAULT_SCAN_RANGE, HIDDEN_SIGNALS, ANIMATION_SPEED
 
 def scan_system(player):
     """Scan the current star system for celestial bodies"""

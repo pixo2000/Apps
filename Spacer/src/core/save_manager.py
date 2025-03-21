@@ -7,7 +7,7 @@ import re
 import sys
 from pathlib import Path
 import datetime
-from config import RESERVED_NAMES, NAME_PATTERN
+from src.config import RESERVED_NAMES, NAME_PATTERN
 
 class SaveManager:
     def __init__(self):
@@ -19,7 +19,7 @@ class SaveManager:
             self.save_directory = Path(os.path.dirname(sys.executable)) / 'saves'
         except Exception:
             # We're running in development mode
-            base_path = Path(os.path.dirname(__file__))
+            base_path = Path(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
             self.save_directory = base_path / 'saves'
             
         # Ensure the saves directory exists

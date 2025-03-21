@@ -4,11 +4,11 @@ Core game initialization and main loop functionality.
 import time
 import os
 import datetime
-from player import Player
-from save_manager import SaveManager
-from ui_display import display_help, display_loading_animation
-from command_handler import handle_input
-from station import load_all_stations
+from src.core.player import Player
+from src.core.save_manager import SaveManager
+from src.utils.ui_display import display_help, display_loading_animation
+from src.commands.command_manager import handle_input
+from src.world.station import load_all_stations
 
 # Global save manager instance
 save_mgr = SaveManager()
@@ -208,13 +208,10 @@ def main_game_loop():
 def run_game(debug):
     if debug == "true":
         print("Not clearing console because debug is set to true")
-
         main_game_loop()
-
     else:
         # Clear the screen
         os.system('cls' if os.name == 'nt' else 'clear')
-        
         main_game_loop()
 
 if __name__ == "__main__":
