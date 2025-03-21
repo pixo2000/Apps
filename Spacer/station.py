@@ -65,6 +65,17 @@ class Station:
             print(f"{self.description}")
             print(f"Location: [{self.x}, {self.y}] in {player.dimension.title}")
             print(f"Type: {self.type}")
+            
+            # Add more detailed information
+            print(f"Dimension: {self.dimension}")
+            
+            # Check if the station is attached to a planet/moon
+            if hasattr(self, 'parent_body'):
+                attached_to = f"{self.parent_body}"
+                if hasattr(self, 'parent_moon') and self.parent_moon:
+                    attached_to = f"{self.parent_moon} (Moon of {self.parent_body})"
+                print(f"Attached to: {attached_to}")
+            
             print("\nStation Services:")
             for service in ["Trading", "Repairs", "Missions"]:
                 print(f"- {service}")
