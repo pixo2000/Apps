@@ -55,4 +55,4 @@ sun maybe always discoverd?
 
 check movement?
 
-split command manager
+renew build.py
