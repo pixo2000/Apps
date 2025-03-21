@@ -83,6 +83,10 @@ class Player:
                 # Load discovered celestial bodies
                 if "known_bodies" in discoveries:
                     self.known_bodies = discoveries["known_bodies"]
+                    # Ensure each dimension value is a list, not a dict
+                    for dim_name in self.known_bodies:
+                        if isinstance(self.known_bodies[dim_name], dict):
+                            self.known_bodies[dim_name] = list(self.known_bodies[dim_name].keys())
             
             # Load creation date
             if "creation_date" in save_data:

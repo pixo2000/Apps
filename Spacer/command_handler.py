@@ -383,23 +383,25 @@ def handle_planet_input(player):
         # Adjust the location display based on whether it's a moon or planet
         location_display = display_location
         
-        # Get planet/moon data from player's known bodies if available
+        # Get planet/moon data from the dimension properties directly
         body_data = None
-        for dim_name, bodies in player.known_bodies.items():
-            if dim_name == player.dimension.name:
-                # If it's a moon, we need to check the moon data specifically
-                if moon_name:
-                    for b_name, data in bodies.items():
-                        if b_name == body_name and "Moons" in data:
-                            if moon_name in data["Moons"]:
-                                body_data = data["Moons"][moon_name]
-                                break
-                else:
-                    # Direct planet search
-                    for b_name, data in bodies.items():
-                        if b_name == body_name:
-                            body_data = data
+        
+        if moon_name:
+            # If on a moon, look for the moon data in its parent planet
+            for b_name, data in player.dimension.properties.items():
+                if b_name == body_name and "Moons" in data:
+                    for m_name, m_data in data["Moons"].items():
+                        if m_name == moon_name:
+                            body_data = m_data
                             break
+                    if body_data:  # Break outer loop if found
+                        break
+        else:
+            # If on a planet, look for the planet data directly
+            for b_name, data in player.dimension.properties.items():
+                if b_name == body_name:
+                    body_data = data
+                    break
         
         if body_data and "composition" in body_data:
             print(f"Composition of {location_display}:")
@@ -414,39 +416,25 @@ def handle_planet_input(player):
     elif user_input == "info":
         print(f"\n== {city_name} on {display_location} Information ==")
         
-        # Get planet/moon data from player's known bodies if available
+        # Get planet/moon data directly from the dimension properties
         body_data = None
-        for dim_name, bodies in player.known_bodies.items():
-            if dim_name == player.dimension.name:
-                # If it's a moon, we need to check the moon data specifically
-                if moon_name:
-                    for b_name, data in bodies.items():
-                        if b_name == body_name and "Moons" in data:
-                            for m_name, m_data in data["Moons"].items():
-                                if m_name == moon_name:
-                                    body_data = m_data
-                                    break
-                else:
-                    # Direct planet search
-                    for b_name, data in bodies.items():
-                        if b_name == body_name:
-                            body_data = data
-                            break
         
-        # Get location data from dimension directly if not found in player's known bodies
-        if not body_data:
-            if moon_name:
-                for b_name, data in player.dimension.properties.items():
-                    if b_name == body_name and "Moons" in data:
-                        for m_name, m_data in data["Moons"].items():
-                            if m_name == moon_name:
-                                body_data = m_data
-                                break
-            else:
-                for b_name, data in player.dimension.properties.items():
-                    if b_name == body_name:
-                        body_data = data
+        if moon_name:
+            # If on a moon, look for the moon data in its parent planet
+            for b_name, data in player.dimension.properties.items():
+                if b_name == body_name and "Moons" in data:
+                    for m_name, m_data in data["Moons"].items():
+                        if m_name == moon_name:
+                            body_data = m_data
+                            break
+                    if body_data:  # Break outer loop if found
                         break
+        else:
+            # If on a planet, look for the planet data directly
+            for b_name, data in player.dimension.properties.items():
+                if b_name == body_name:
+                    body_data = data
+                    break
         
         # Display information about the location
         loc_type = "Moon" if moon_name else "Planet"
@@ -594,6 +582,10 @@ def handle_dock_command(player):
         print(f"\nDocking at {station.name}...")
         time.sleep(1)
         player.docked_at = station
+        
+        # Save the game after successful docking
+        save_mgr.save_game(player)
+        print(f"Welcome to {station.name}!")
     else:
         print("There is no station at your current location.")
         
@@ -683,4 +675,7 @@ def handle_land_command(player, body_name=None):
     player.landed_on_body = parent_body
     if parent_moon:
         player.landed_on_moon = parent_moon
+    
+    # Save the game after successful landing
+    save_mgr.save_game(player)
     return

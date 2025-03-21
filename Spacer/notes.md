@@ -53,6 +53,6 @@ test build -> symbole fixen
 
 sun maybe always discoverd?
 
-fix title and info size
-
 check movement?
+
+split command manager
