@@ -313,6 +313,7 @@ def handle_planet_input(player):
         print("  explore    - Explore the surroundings")
         print("  launch     - Return to orbit")
         print("  analyze    - Analyze surface composition")
+        print("  info       - Show detailed information about this location")
         print("  help       - Show this help message")
         print("  logout     - Save and return to login screen")
         print("  exit/quit  - Save and exit game")
@@ -344,6 +345,7 @@ def handle_planet_input(player):
         print("  explore    - Explore the surroundings for resources and discoveries")
         print("  launch     - Return to orbit and resume space travel")
         print("  analyze    - Perform detailed analysis of surface composition")
+        print("  info       - Show detailed information about this location")
         print("\nGeneral commands:")
         print("  help       - Show this help message")
         print("  logout     - Save and return to login screen")
@@ -406,6 +408,97 @@ def handle_planet_input(player):
         else:
             print(f"Basic composition: Silicates, metals, and various minerals.")
             print("Detailed analysis unavailable - upgrade sensors for more information.")
+        
+        return True
+    
+    elif user_input == "info":
+        print(f"\n== {city_name} on {display_location} Information ==")
+        
+        # Get planet/moon data from player's known bodies if available
+        body_data = None
+        for dim_name, bodies in player.known_bodies.items():
+            if dim_name == player.dimension.name:
+                # If it's a moon, we need to check the moon data specifically
+                if moon_name:
+                    for b_name, data in bodies.items():
+                        if b_name == body_name and "Moons" in data:
+                            for m_name, m_data in data["Moons"].items():
+                                if m_name == moon_name:
+                                    body_data = m_data
+                                    break
+                else:
+                    # Direct planet search
+                    for b_name, data in bodies.items():
+                        if b_name == body_name:
+                            body_data = data
+                            break
+        
+        # Get location data from dimension directly if not found in player's known bodies
+        if not body_data:
+            if moon_name:
+                for b_name, data in player.dimension.properties.items():
+                    if b_name == body_name and "Moons" in data:
+                        for m_name, m_data in data["Moons"].items():
+                            if m_name == moon_name:
+                                body_data = m_data
+                                break
+            else:
+                for b_name, data in player.dimension.properties.items():
+                    if b_name == body_name:
+                        body_data = data
+                        break
+        
+        # Display information about the location
+        loc_type = "Moon" if moon_name else "Planet"
+        if body_data and "type" in body_data:
+            loc_type = body_data["type"]
+        
+        print(f"Type: {loc_type}")
+        
+        # Show coordinates
+        coords = "Unknown"
+        if body_data and "Coordinates" in body_data:
+            x = body_data["Coordinates"]["x"]
+            y = body_data["Coordinates"]["y"]
+            coords = f"[{x}, {y}]"
+        print(f"Coordinates: {coords}")
+        
+        # Show dimension info
+        print(f"Dimension: {player.dimension.name} - {player.dimension.title}")
+        
+        # Show parent info for moons
+        if moon_name:
+            print(f"Parent Body: {body_name}")
+        
+        # Show size if available
+        if body_data and "size" in body_data:
+            width = body_data["size"]["width"]
+            height = body_data["size"]["height"]
+            print(f"Size: {width}x{height}")
+        
+        # Show composition if available
+        if body_data and "composition" in body_data:
+            print("\nComposition:")
+            for element, percentage in body_data["composition"].items():
+                print(f"  {element}: {percentage}%")
+        
+        # Show stations/cities on this body
+        if body_data and "Stations" in body_data:
+            print("\nStations/Cities:")
+            for station_name, station_data in body_data["Stations"].items():
+                s_type = station_data.get("type", "Unknown")
+                s_desc = station_data.get("description", "No description available")
+                s_coords = "Unknown"
+                if "Coordinates" in station_data:
+                    s_x = station_data["Coordinates"]["x"]
+                    s_y = station_data["Coordinates"]["y"]
+                    s_coords = f"[{s_x}, {s_y}]"
+                print(f"  {station_name} ({s_type}) - {s_coords}")
+                print(f"  Description: {s_desc}")
+        
+        # Show additional description if available
+        if body_data and "description" in body_data:
+            print(f"\nDescription: {body_data['description']}")
         
         return True
     
