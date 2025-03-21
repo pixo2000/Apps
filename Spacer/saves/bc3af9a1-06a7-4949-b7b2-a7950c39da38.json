@@ -2,7 +2,7 @@
     "name": "pixo2000",
     "uuid": "bc3af9a1-06a7-4949-b7b2-a7950c39da38",
     "position": {
-        "x": 65,
+        "x": 60,
         "y": -60,
         "dimension": "A01"
     },
@@ -23,11 +23,11 @@
         }
     },
     "creation_date": "20.03.25 - 15:20",
-    "last_login": "20.03.25 - 19:57",
+    "last_login": "21.03.25 - 16:38",
     "is_dead": false,
-    "landed_on": "LunaBase",
-    "landed_on_body": "Earth",
-    "landed_on_moon": "Luna",
+    "landed_on": null,
+    "landed_on_body": null,
+    "landed_on_moon": null,
     "docked_at": null,
-    "playtime": "00:00:06:59"
+    "playtime": "00:00:08:45"
 }

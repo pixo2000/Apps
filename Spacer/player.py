@@ -4,7 +4,7 @@ Player class with core attributes and state tracking.
 import uuid
 from station import STATIONS
 from dimension import Dimension
-from config import DEFAULT_START_POSITION, DEFAULT_START_DIMENSION
+from config import DEFAULT_START_POSITION, DEFAULT_START_DIMENSION, DEFAULT_START_LANDED, DEFAULT_START_CITY, DEFAULT_START_BODY, DEFAULT_START_MOON
 
 class Player:
     def __init__(self, name):
@@ -20,9 +20,11 @@ class Player:
         self.last_login = None  # Will be updated when saving
         self.is_dead = False  # Player's living status
         self.docked_at = None  # Will hold station object when docked
-        self.landed_on = None  # Will hold celestial body name when landed
-        self.landed_on_body = None  # Will hold the parent celestial body name
-        self.landed_on_moon = None  # Will hold the moon name if landed on a moon station
+        
+        # Set up initial landing state
+        self.landed_on = DEFAULT_START_CITY if DEFAULT_START_LANDED else None
+        self.landed_on_body = DEFAULT_START_BODY if DEFAULT_START_LANDED else None
+        self.landed_on_moon = DEFAULT_START_MOON if DEFAULT_START_LANDED else None
     
     def change_name(self, new_name):
         """Change the player's name"""

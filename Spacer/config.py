@@ -7,9 +7,13 @@ VERSION = "0.9.0"
 GAME_TITLE = "SPACER - INTERSTELLAR EXPLORATION SIMULATOR"
 
 # Player settings
-DEFAULT_START_POSITION = {"x": 10, "y": 10}
+DEFAULT_START_POSITION = {"x": 60, "y": -60}  # Coordinates of Wiesbaden on Earth
 DEFAULT_START_DIMENSION = "A01"
 DEFAULT_SCAN_RANGE = 60  # Maximum identifiable distance for scans
+DEFAULT_START_LANDED = True
+DEFAULT_START_CITY = "Wiesbaden"
+DEFAULT_START_BODY = "Earth"
+DEFAULT_START_MOON = None
 
 # File paths
 SAVE_DIRECTORY = "saves"

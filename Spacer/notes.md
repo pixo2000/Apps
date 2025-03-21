@@ -50,3 +50,9 @@ version management+release system
 keybinds via task to build and run main, fix dc
 
 test build -> symbole fixen
+
+sun maybe always discoverd?
+
+fix title and info size
+
+check movement?
