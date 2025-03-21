@@ -5,7 +5,7 @@ import json
 import os
 import sys
 from pathlib import Path
-from config import DIMENSIONS_DIRECTORY, DIMENSIONS_CONFIG
+from src.config import DIMENSIONS_DIRECTORY, DIMENSIONS_CONFIG
 
 class DataLoader:
     """Handles loading of game data like dimensions and celestial bodies"""
@@ -18,7 +18,7 @@ class DataLoader:
             base_path = Path(sys._MEIPASS)
         except Exception:
             # We are not running as a bundled executable
-            base_path = Path(os.path.dirname(__file__))
+            base_path = Path(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
         return base_path
     
     @staticmethod

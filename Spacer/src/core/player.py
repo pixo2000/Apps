@@ -2,9 +2,9 @@
 Player class with core attributes and state tracking.
 """
 import uuid
-from station import STATIONS
-from dimension import Dimension
-from config import DEFAULT_START_POSITION, DEFAULT_START_DIMENSION, DEFAULT_START_LANDED, DEFAULT_START_CITY, DEFAULT_START_BODY, DEFAULT_START_MOON
+from src.world.station import STATIONS
+from src.world.dimension import Dimension
+from src.config import DEFAULT_START_POSITION, DEFAULT_START_DIMENSION, DEFAULT_START_LANDED, DEFAULT_START_CITY, DEFAULT_START_BODY, DEFAULT_START_MOON
 
 class Player:
     def __init__(self, name):
@@ -102,7 +102,7 @@ class Player:
             
             # Load docked status if it exists
             if "docked_at" in save_data and save_data["docked_at"]:
-                from station import STATIONS, get_station_by_id
+                from src.world.station import STATIONS, get_station_by_id
                 station_id = save_data["docked_at"]
                 station = get_station_by_id(station_id)
                 if station:
