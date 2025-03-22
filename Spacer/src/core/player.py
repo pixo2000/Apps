@@ -7,12 +7,27 @@ from src.world.dimension import Dimension
 from src.config import DEFAULT_START_POSITION, DEFAULT_START_DIMENSION, DEFAULT_START_LANDED, DEFAULT_START_CITY, DEFAULT_START_BODY, DEFAULT_START_MOON
 
 class Player:
-    def __init__(self, name):
+    def __init__(self, name, set_default_position=True):
         self.name = name
-        self.x = DEFAULT_START_POSITION["x"]
-        self.y = DEFAULT_START_POSITION["y"]
-        self.dimension = Dimension(DEFAULT_START_DIMENSION)
-        self.known_dimensions = [DEFAULT_START_DIMENSION]  # Start with the first dimension as known
+        # Only set default position for new players
+        if set_default_position:
+            self.x = DEFAULT_START_POSITION["x"]
+            self.y = DEFAULT_START_POSITION["y"]
+            self.dimension = Dimension(DEFAULT_START_DIMENSION)
+            self.known_dimensions = [DEFAULT_START_DIMENSION]  # Start with the first dimension as known
+            self.landed_on = DEFAULT_START_CITY if DEFAULT_START_LANDED else None
+            self.landed_on_body = DEFAULT_START_BODY if DEFAULT_START_LANDED else None
+            self.landed_on_moon = DEFAULT_START_MOON if DEFAULT_START_LANDED else None
+        else:
+            # For existing players, these will be set by load_save_data
+            self.x = 0
+            self.y = 0
+            self.dimension = None
+            self.known_dimensions = []
+            self.landed_on = None
+            self.landed_on_body = None
+            self.landed_on_moon = None
+            
         self.known_bodies = {}  # Dictionary for discovered celestial bodies by dimension
         self.uuid = str(uuid.uuid4())  # Generate unique ID for the player
         self.creation_date = None  # Will be set during game initialization
@@ -20,11 +35,6 @@ class Player:
         self.last_login = None  # Will be updated when saving
         self.is_dead = False  # Player's living status
         self.docked_at = None  # Will hold station object when docked
-        
-        # Set up initial landing state
-        self.landed_on = DEFAULT_START_CITY if DEFAULT_START_LANDED else None
-        self.landed_on_body = DEFAULT_START_BODY if DEFAULT_START_LANDED else None
-        self.landed_on_moon = DEFAULT_START_MOON if DEFAULT_START_LANDED else None
     
     def change_name(self, new_name):
         """Change the player's name"""

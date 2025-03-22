@@ -3,11 +3,11 @@ Global configuration settings and constants for the Spacer game.
 """
 
 # Game metadata
-VERSION = "0.9.0"
-GAME_TITLE = "SPACER - INTERSTELLAR EXPLORATION SIMULATOR"
+VERSION = "0.0.2-BETA" # not used anywhere
+GAME_TITLE = "SPACER - EXPLORE AND DIE"
 
 # Player settings
-DEFAULT_START_POSITION = {"x": 60, "y": -60}  # Coordinates of Wiesbaden on Earth
+DEFAULT_START_POSITION = {"x": 60, "y": -59}  # Coordinates of Wiesbaden on Earth
 DEFAULT_START_DIMENSION = "A01"
 DEFAULT_SCAN_RANGE = 60  # Maximum identifiable distance for scans
 DEFAULT_START_LANDED = True
@@ -38,4 +38,13 @@ HIDDEN_SIGNALS = {
     "A01": {  # Dimension name
         "Voyager 1": {"x": 2345, "y": -1477}  # Special hidden signal
     }
+}
+
+# Warp paths between star systems
+# Each key is a dimension that can warp to the dimensions in its value list
+WARP_PATHS = {
+    "A01": ["C12", "D14", "N09"],  # From Sol you can warp to Alpha Centauri or Sirius
+    "C12": ["A01", "D14"],  # From Alpha Centauri you can warp to Sol or Sirius
+    "D14": ["A01", "C12"],  # From Sirius you can warp to Sol or Alpha Centauri
+    "N09": ["A01"]          # From Caliban you can only warp to Sol
 }

@@ -39,20 +39,20 @@ abort stuff, move when cmmand-> on top of input sticky
 
 redeem code to get new ship on register
 
-move between systems(like only from A01 to C12)
-
-better debug(clear on first start but not restart/crash)
-
-station info should have coords and type and more
-
 version management+release system
 
 keybinds via task to build and run main, fix dc
 
 test build -> symbole fixen
 
-sun maybe always discoverd?
-
 check movement?
 
 renew build.py
+
+delete & disable account -> on server should be backup
+
+more dimensions
+
+check in help menu is uptodate
+
+DISCORD RPC
