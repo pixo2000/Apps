@@ -10,22 +10,23 @@ save_mgr = SaveManager()
 
 def handle_player_info_command(player, other_player_name=None):
     """Handle player info command, either for current player or another player"""
+    # Always save current player data first to ensure playtime is up-to-date
+    # Calculate current session playtime and add it to total
+    current_time = datetime.datetime.now()
+    if hasattr(player, "session_start"):
+        session_duration = (current_time - player.session_start).total_seconds()
+        player.playtime += session_duration
+        # Update session start time for future calculations
+        player.session_start = current_time
+    
+    # Save the updated data
+    save_mgr.save_game(player)
+    
+    # Now handle the display for either current or other player
     if other_player_name:
         # Show info about another player
         display_other_player_info(other_player_name)
     else:
-        # Save game data first to ensure playtime is accurate
-        # Calculate current session playtime and add it to total
-        current_time = datetime.datetime.now()
-        if hasattr(player, "session_start"):
-            session_duration = (current_time - player.session_start).total_seconds()
-            player.playtime += session_duration
-            # Update session start time for future calculations
-            player.session_start = current_time
-        
-        # Save the updated data
-        save_mgr.save_game(player)
-        
         # Show current player info
         print("\n=== PLAYER INFORMATION ===")
         print(f"» Name: {player.name}")
@@ -87,3 +88,11 @@ def handle_self_destruct_command(player):
     else:
         print("Self-destruct sequence aborted.")
         return "positive"
+
+def handle_credits_command():
+    """Display game credits - available from anywhere in the game"""
+    print("\n=== SPACER CREDITS ===")
+    print("» Head-Developer: pixo2000")
+    print("» Company: Voidcube")
+    print("» Copyright 2025")
+    print("====================\n")

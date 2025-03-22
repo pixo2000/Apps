@@ -3,7 +3,7 @@ Navigation and movement command handlers.
 """
 import time
 from src.world.dimension import Dimension
-from src.config import MOVEMENT_SPEED
+from src.config import MOVEMENT_SPEED, WARP_PATHS
 from src.world.station import load_stations_from_dimension
 
 def move(player, x, y):
@@ -48,12 +48,13 @@ def move(player, x, y):
         buffer_space = " " * 40
         
         # Display improved movement animation with spaceship
-        if remaining > 1:
-            print(f"\r[{spacebar}] Moving... {remaining} seconds remaining [{display_percent}%]{buffer_space}", end="", flush=True)
-            time.sleep(MOVEMENT_SPEED)
-        else:
+        print(f"\r[{spacebar}] Moving... {remaining} second{'s' if remaining != 1 else ''} remaining [{display_percent}%]{buffer_space}", end="", flush=True)
+        time.sleep(MOVEMENT_SPEED)
+        
+        # After waiting for the regular countdown, show final approach message for the last step
+        if remaining == 1:
             print(f"\r[{spacebar}] Moving... Final approach [{display_percent}%]{buffer_space}", end="", flush=True)
-            time.sleep(MOVEMENT_SPEED)
+            time.sleep(0.2)  # Add extra wait for final approach
             
     # Update position
     player.x = x
@@ -86,6 +87,24 @@ def handle_move_command(player, x, y):
 def handle_jump_command(player, dimension_name):
     """Jump to a different dimension"""
     try:
+        current_dimension = player.dimension.name
+        
+        # Check if player is trying to jump to the current dimension
+        if dimension_name == current_dimension:
+            print(f"\n✗ JUMP FAILED: You are already in the {dimension_name} system.")
+            return
+            
+        # Check if current dimension exists in WARP_PATHS
+        if current_dimension not in WARP_PATHS:
+            print(f"\n✗ JUMP FAILED: No warp paths available from {current_dimension}.")
+            return
+        
+        # Check if target dimension is in the allowed warp paths
+        if dimension_name not in WARP_PATHS[current_dimension]:
+            print(f"\n✗ JUMP FAILED: Cannot warp directly from {current_dimension} to {dimension_name}.")
+            print(f"  Available warp destinations from {current_dimension}: {', '.join(WARP_PATHS[current_dimension])}")
+            return
+            
         new_dimension = Dimension(dimension_name)
         print(f"\n▼ DIMENSIONAL JUMP SEQUENCE INITIATED ▼")
         print(f"➤ Target: {new_dimension.title}")

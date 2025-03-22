@@ -9,6 +9,7 @@ from src.commands.station_commands import handle_dock_command, handle_station_in
 from src.commands.player_commands import handle_player_info_command, handle_discoveries_command, handle_change_name_command, handle_self_destruct_command
 from src.core.save_manager import SaveManager
 from src.utils.ui_display import display_help
+from src.config import WARP_PATHS
 
 # Create save manager instance
 save_mgr = SaveManager()
@@ -137,6 +138,14 @@ def handle_input(player):
     elif command_lower == "self-destruct":
         result = handle_self_destruct_command(player)
     
+    # Undock/launch commands (only valid when docked/landed)
+    elif command_lower == "undock":
+        print("\n✗ You are not currently docked at a station.")
+        return "positive"
+    elif command_lower == "launch":
+        print("\n✗ You are not currently on a planetary surface.")
+        return "positive"
+    
     # Logout command        
     elif command_lower == "logout":
         print("\n=== LOGGING OUT ===")
@@ -160,8 +169,29 @@ def handle_list_dimensions_command(player):
     from src.world.dimension import Dimension
     
     available = Dimension.get_available_dimensions()
+    current_dim = player.dimension.name
     
     print("\n=== AVAILABLE DIMENSIONS ===")
+    # First show dimensions that can be warped to from current location
+    if current_dim in WARP_PATHS:
+        print(f"\nWarp destinations from {current_dim}:")
+        for dim_name in WARP_PATHS[current_dim]:
+            try:
+                temp_dim = Dimension(dim_name)
+                discovered = dim_name in player.known_dimensions
+                status = "DISCOVERED" if discovered else "UNDISCOVERED"
+                
+                if discovered:
+                    print(f"» {dim_name}: {temp_dim.title} - {temp_dim.description}")
+                else:
+                    print(f"» {dim_name}: {status}")
+            except Exception as e:
+                print(f"» {dim_name}: ERROR - {str(e)}")
+    else:
+        print("\nNo warp destinations available from current location.")
+    
+    # Then show all known dimensions
+    print("\nAll known dimensions:")
     for i, dim in enumerate(available):
         try:
             temp_dim = Dimension(dim)

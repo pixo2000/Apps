@@ -126,7 +126,8 @@ def main_game_loop():
             print("\nLoading station data...")
             load_all_stations()
                 
-            player = Player(name)
+            # Create player with name but don't set position yet - will be set by load_save_data for existing players
+            player = Player(name, set_default_position=not load_save)
             
             # Load saved game if requested
             if load_save:
@@ -189,7 +190,7 @@ def main_game_loop():
                     update_playtime(player, session_start)
                     # Don't print duplicate logout messages - they're now handled in the input handlers
                     time.sleep(1)
-                    os.system("clear")
+                    # Removed the os.system("clear") command to prevent clearing the console on logout
         
         except KeyboardInterrupt:
             # Handle Ctrl+C gracefully

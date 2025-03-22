@@ -53,6 +53,7 @@ def handle_station_input(player):
     
     user_input = input(f"\n[{player.docked_at.name}] {player.name}> ").strip().lower()
     
+    # Global commands that work everywhere
     if user_input == "exit" or user_input == "quit":
         # Save before quitting
         save_mgr.save_game(player)
@@ -70,16 +71,53 @@ def handle_station_input(player):
         print("Returning to login screen...")
         return "logout"
     
+    # Import required functions to handle commands that should work everywhere
+    from src.commands.player_commands import handle_player_info_command, handle_discoveries_command, handle_change_name_command, handle_self_destruct_command
+    
+    # Handle player info commands
+    if user_input.startswith("playerinfo"):
+        parts = user_input.split(None, 1)  # Split by whitespace, max 1 split
+        other_player_name = parts[1] if len(parts) > 1 else None
+        handle_player_info_command(player, other_player_name)
+        return True
+    
+    # Handle discoveries command
+    if user_input == "discoveries":
+        handle_discoveries_command(player)
+        return True
+        
+    # Handle change name command
+    if user_input.startswith("changename "):
+        parts = user_input.split(" ", 1)
+        if len(parts) == 2:
+            handle_change_name_command(player, parts[1])
+        else:
+            print("\n✗ Invalid command format. Use: changename YourNewName")
+        return True
+    
+    # Self-destruct command should work everywhere
+    if user_input == "self-destruct":
+        result = handle_self_destruct_command(player)
+        return result
+    
     if user_input == "help":
         # Show station-specific help
         print("\n== Station Help ==")
         print("You are currently docked at a station. Available commands:")
         for cmd, desc in player.docked_at.available_options.items():
             print(f"  {cmd.ljust(10)} - {desc}")
-        print("\nGeneral commands:")
-        print("  help       - Show this help message")
-        print("  logout     - Save and return to login screen")
-        print("  exit/quit  - Save and exit game")
+        print("\nGeneral commands (available everywhere):")
+        print("  playerinfo   - Show your information")
+        print("  discoveries  - List your discoveries")
+        print("  changename   - Change your captain name")
+        print("  help         - Show this help message")
+        print("  logout       - Save and return to login screen")
+        print("  exit/quit    - Save and exit game")
+        return True
+    
+    # Navigation/scan commands that don't work while docked
+    if user_input.startswith("move ") or user_input == "scan" or user_input.startswith("scan ") or user_input == "whereami" or user_input.startswith("jump "):
+        print("\n✗ Cannot perform that action while docked. Use 'undock' to return to space first.")
         return True
     
     # Handle the options command to re-display the options
@@ -194,6 +232,7 @@ def handle_planet_input(player):
     
     user_input = input(f"\n[{city_name}] {player.name}> ").strip().lower()
     
+    # Global commands that work everywhere
     if user_input == "exit" or user_input == "quit":
         # Save before quitting
         save_mgr.save_game(player)
@@ -211,6 +250,35 @@ def handle_planet_input(player):
         print("Returning to login screen...")
         return "logout"
     
+    # Import required functions to handle commands that should work everywhere
+    from src.commands.player_commands import handle_player_info_command, handle_discoveries_command, handle_change_name_command, handle_self_destruct_command
+    
+    # Handle player info commands
+    if user_input.startswith("playerinfo"):
+        parts = user_input.split(None, 1)  # Split by whitespace, max 1 split
+        other_player_name = parts[1] if len(parts) > 1 else None
+        handle_player_info_command(player, other_player_name)
+        return True
+    
+    # Handle discoveries command
+    if user_input == "discoveries":
+        handle_discoveries_command(player)
+        return True
+        
+    # Handle change name command
+    if user_input.startswith("changename "):
+        parts = user_input.split(" ", 1)
+        if len(parts) == 2:
+            handle_change_name_command(player, parts[1])
+        else:
+            print("\n✗ Invalid command format. Use: changename YourNewName")
+        return True
+    
+    # Self-destruct command should work everywhere
+    if user_input == "self-destruct":
+        result = handle_self_destruct_command(player)
+        return result
+    
     if user_input == "help":
         # Show planet-specific help
         print("\n== Surface Operations Help ==")
@@ -219,12 +287,27 @@ def handle_planet_input(player):
         print("  launch     - Return to orbit and resume space travel")
         print("  analyze    - Perform detailed analysis of surface composition")
         print("  info       - Show detailed information about this location")
-        print("\nGeneral commands:")
-        print("  help       - Show this help message")
-        print("  logout     - Save and return to login screen")
-        print("  exit/quit  - Save and exit game")
+        print("\nGeneral commands (available everywhere):")
+        print("  playerinfo   - Show your information")
+        print("  discoveries  - List your discoveries")
+        print("  changename   - Change your captain name")
+        print("  help         - Show this help message")
+        print("  logout       - Save and return to login screen")
+        print("  exit/quit    - Save and exit game")
         return True
     
+    # Navigation/scan commands that don't work while landed
+    if user_input.startswith("move ") or user_input == "scan" or user_input.startswith("scan ") or user_input.startswith("jump "):
+        print("\n✗ Cannot perform that action while on the surface. Use 'launch' to return to orbit first.")
+        return True
+    
+    # Handle whereami as an alias for info
+    if user_input == "whereami":
+        print(f"\nYou are on {city_name} on the surface of {display_location}.")
+        print("Use 'info' for more detailed information about this location.")
+        return True
+        
+    # Launch command
     elif user_input == "launch":
         print(f"\nLaunching from {city_name} on {display_location}...")
         time.sleep(1)

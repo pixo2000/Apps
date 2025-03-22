@@ -7,20 +7,32 @@ from src.config import LOADING_BAR_LENGTH, GAME_TITLE, ANIMATION_SPEED
 
 def display_loading_animation():
     """Display an animated loading screen at game start"""
-    print("\n" + "=" * 50)
-    print(f"{GAME_TITLE:^50}")
-    print("=" * 50 + "\n")
+    # Calculate padding to center the title
+    console_width = 80  # Assumed console width
+    title_padding = (console_width - len(GAME_TITLE)) // 2
+    title_display = " " * title_padding + GAME_TITLE
+    
+    print("\n" + "=" * console_width)
+    print(title_display)
+    print("=" * console_width + "\n")
 
+    # Loading animation
     print("Initializing systems...")
-
-    # Display animated loading bar
+    time.sleep(0.5)
+    
+    # Show loading bar
     for i in range(101):
-        progress = i / 100
-        bar = "█" * int(LOADING_BAR_LENGTH * progress) + "▒" * (LOADING_BAR_LENGTH - int(LOADING_BAR_LENGTH * progress))
-        print(f"\r[{bar}] {i}%", end="", flush=True)
-        time.sleep(ANIMATION_SPEED / 3)  # Faster than normal animations
-
-    print("\n\nSystems online.")
+        bar_filled = int((i / 100) * LOADING_BAR_LENGTH)
+        bar_empty = LOADING_BAR_LENGTH - bar_filled
+        
+        # Create the loading bar with blocks
+        bar = '█' * bar_filled + '▒' * bar_empty
+        
+        # Print the loading bar with percentage
+        print(f"\rLoading: [{bar}] {i}%", end="", flush=True)
+        time.sleep(ANIMATION_SPEED * random.uniform(0.1, 0.5))
+    
+    print("\n\nAll systems online.\n")
 
 def display_help(first_time=False):
     """Display available commands and help information"""
@@ -47,7 +59,7 @@ def display_help(first_time=False):
     print("  dock       - Dock at station (must be at station coordinates)")
     print("  land       - Land on planet with city (must be at city coordinates)")
     
-    print("\n== PLAYER COMMANDS ==")
+    print("\n== PLAYER COMMANDS - AVAILABLE EVERYWHERE ==")
     print("  playerinfo       - Show your information")
     print("  playerinfo NAME  - Show info about another captain")
     print("  discoveries      - List your discoveries")
@@ -57,6 +69,10 @@ def display_help(first_time=False):
     print("  help      - Show this help")
     print("  logout    - Return to login screen")
     print("  exit/quit - Exit game")
+    
+    print("\n== CONTEXT-SPECIFIC COMMANDS ==")
+    print("  When docked: 'undock', station-specific commands")
+    print("  When landed: 'launch', 'explore', 'analyze', 'info'")
     
     print("\nExplore the cosmos, discover new dimensions, and chart your own path!")
     print("=" * 50 + "\n")
@@ -135,23 +151,21 @@ def display_other_player_info(player_name):
         status = 'Deceased' if is_dead else 'Active'
         print(f"» Status: {status}")
         
-        # Show current location if not dead
+        # Show current location if not dead - REMOVED to preserve privacy
+        # Instead, only show dimension they are in without exact coordinates
         if not is_dead:
-            # Get dimension name and position
+            # Get dimension name only
             pos = save_data.get('position', {})
             dim_name = pos.get('dimension', 'Unknown')
-            x = pos.get('x', '?')
-            y = pos.get('y', '?')
             
             # Try to get dimension title
             try:
                 from src.world.dimension import Dimension
                 dim = Dimension(dim_name)
                 dim_title = dim.title
+                print(f"» Current system: {dim_name} ({dim_title})")
             except:
-                dim_title = "Unknown System"
-                
-            print(f"» Current location: {dim_name} ({dim_title}) at [{x}, {y}]")
+                print(f"» Current system: {dim_name}")
             
             # Show docked or landed status if applicable
             if save_data.get('docked_at'):
@@ -182,6 +196,10 @@ def display_other_player_info(player_name):
             known_bodies = save_data['discoveries']['known_bodies']
             total_count = sum(len(bodies) for bodies in known_bodies.values())
             print(f"» Celestial bodies discovered: {total_count}")
+            
+        # Show playtime if available
+        if 'playtime' in save_data:
+            print(f"» Total playtime: {save_data['playtime']}")
             
         print("===========================\n")
     else:
