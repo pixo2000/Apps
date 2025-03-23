@@ -56,3 +56,5 @@ more dimensions
 check in help menu is uptodate
 
 DISCORD RPC
+
+test if save on alt+f4
