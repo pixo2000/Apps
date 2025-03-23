@@ -57,4 +57,12 @@ check in help menu is uptodate
 
 DISCORD RPC
 
-test if save on alt+f4
+test if save on alt+f4 -> does not save fix!!!!
+
+playerinfo gives uuid -> maybe also info if another player scans you
+
+credits on station, whereami -> on station
+
+undock command, start alias
+
+only scan planets you know

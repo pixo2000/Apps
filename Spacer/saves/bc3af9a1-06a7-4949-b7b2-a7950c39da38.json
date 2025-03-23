@@ -2,9 +2,9 @@
     "name": "pixo2000",
     "uuid": "bc3af9a1-06a7-4949-b7b2-a7950c39da38",
     "position": {
-        "x": 10,
-        "y": 10,
-        "dimension": "C12"
+        "x": 65,
+        "y": -60,
+        "dimension": "A01"
     },
     "discoveries": {
         "known_dimensions": [
@@ -19,7 +19,8 @@
                 "Earth",
                 "Ceres",
                 "Juno",
-                "Earth:Luna"
+                "Earth:Luna",
+                "Jupiter"
             ],
             "C12": [
                 "Proxima Centauri",
@@ -29,11 +30,11 @@
         }
     },
     "creation_date": "20.03.25 - 15:20",
-    "last_login": "22.03.25 - 16:36",
+    "last_login": "23.03.25 - 19:17",
     "is_dead": false,
-    "landed_on": null,
-    "landed_on_body": null,
-    "landed_on_moon": null,
+    "landed_on": "LunaBase",
+    "landed_on_body": "Earth",
+    "landed_on_moon": "Luna",
     "docked_at": null,
-    "playtime": "00:00:19:58"
+    "playtime": "00:00:32:36"
 }
