@@ -63,6 +63,9 @@ playerinfo gives uuid -> maybe also info if another player scans you
 
 credits on station, whereami -> on station
 
+fix that users can jump everywhere fuck my testers for not reporting
+
+
 undock command, start alias
 
 only scan planets you know
