@@ -44,7 +44,9 @@ HIDDEN_SIGNALS = {
 # Each key is a dimension that can warp to the dimensions in its value list
 WARP_PATHS = {
     "A01": ["C12", "D14", "N09"],  # From Sol you can warp to Alpha Centauri or Sirius
-    "C12": ["A01", "D14"],  # From Alpha Centauri you can warp to Sol or Sirius
-    "D14": ["A01", "C12"],  # From Sirius you can warp to Sol or Alpha Centauri
-    "N09": ["A01"]          # From Caliban you can only warp to Sol
+    "C12": ["A01", "D14", "E15"],  # From Alpha Centauri you can warp to Sol or Sirius
+    "D14": ["A01", "C12", "C21"],  # From Sirius you can warp to Sol or Alpha Centauri
+    "N09": ["A01", "E15"],         # From Caliban you can only warp to Sol
+    "C21": ["D14"],         # From Proxima Centauri you can warp to Sirius
+    "E15": ["N09", "C12"]  # From Barnard's Star you can warp to Caliban or Alpha Centauri
 }

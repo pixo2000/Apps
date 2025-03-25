@@ -70,3 +70,11 @@ undock command, start alias
 only scan planets you know
 
 jump Blub does not give the right error message
+
+movement satz des pytagoras einfach damit schräg geht für später
+
+jump nav beacon
+
+sometimes you have 1 fake jump bar stuck at 0 on top of the real one
+
+nav beacon vor dimensions
