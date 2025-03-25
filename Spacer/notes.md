@@ -65,7 +65,8 @@ credits on station, whereami -> on station
 
 fix that users can jump everywhere fuck my testers for not reporting
 
-
 undock command, start alias
 
 only scan planets you know
+
+jump Blub does not give the right error message
