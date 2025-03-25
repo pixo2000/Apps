@@ -78,3 +78,5 @@ jump nav beacon
 sometimes you have 1 fake jump bar stuck at 0 on top of the real one
 
 nav beacon vor dimensions
+
+fix dimensions command when compiled
