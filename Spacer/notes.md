@@ -96,3 +96,5 @@ tutorial
 "The Game and all assets are owned by Voidcube"
 
 scanning star returns size
+
+test sys scan on planet etc
