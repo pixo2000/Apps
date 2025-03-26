@@ -96,3 +96,7 @@ tutorial
 "The Game and all assets are owned by Voidcube"
 
 scanning star returns size
+
+remove dimensions.json file cuz its not important -> just remove the path to it
+
+test sys scan on planet etc
