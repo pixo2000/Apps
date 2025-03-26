@@ -12,12 +12,25 @@ Spacer/
     │   ├── game_core.py
     │   ├── player.py
     │   └── save_manager.py
-    ├── commands/        # Split command handler
-    │   ├── command_manager.py    # Main command router
-    │   ├── navigation.py         # Movement related commands
-    │   ├── scan_commands.py      # Scanning related commands
-    │   ├── station_commands.py   # Station interaction commands
-    │   └── player_commands.py    # Player info/management commands
+    ├── commands/        # Command system
+    │   ├── registry.py           # Command registration and routing
+    │   ├── base_command.py       # Base command class/interface
+    │   ├── config/               # Command configurations
+    │   │   ├── command_config.py # Configuration loader
+    │   │   └── commands/         # Individual command config files (YAML/JSON)
+    │   │       ├── jump.yaml
+    │   │       ├── scan.yaml
+    │   │       └── ...
+    │   └── definitions/          # Individual command files
+    │       ├── jump.py           # Jump command
+    │       ├── scan.py           # Scan command
+    │       ├── move.py           # Move command
+    │       └── ...
+    ├── functions/        # Command implementation functions
+    │   ├── navigation_functions.py
+    │   ├── scan_functions.py
+    │   ├── station_functions.py
+    │   └── player_functions.py
     ├── world/           # Game world elements
     │   ├── dimension.py
     │   ├── station.py
@@ -35,12 +48,20 @@ Spacer/
 - `player.py` → `src/core/player.py`
 - `save_manager.py` → `src/core/save_manager.py`
 
-### Command Modules (Split from command_handler.py)
-- Create new `src/commands/command_manager.py` as the main router
-- `src/commands/navigation.py` - Extract movement, jump, and coordinate commands
-- `src/commands/scan_commands.py` - Extract scanning functionality
-- `src/commands/station_commands.py` - Extract station and landing commands
-- `src/commands/player_commands.py` - Extract player information commands
+### Command System (Complete Restructure)
+- Create `src/commands/registry.py` for command registration and routing
+- Create `src/commands/base_command.py` for command interface/class definition
+- Create command configuration system:
+  - `src/commands/config/command_config.py` to load and validate configs
+  - Individual YAML/JSON files in `src/commands/config/commands/` folder
+- Individual command definition files in `src/commands/definitions/`:
+  - `jump.py`, `scan.py`, `move.py`, `dock.py`, etc.
+
+### Command Functions
+- `src/functions/navigation_functions.py` - Core functions for movement and jumps
+- `src/functions/scan_functions.py` - Core functions for scanning operations
+- `src/functions/station_functions.py` - Core functions for station interactions
+- `src/functions/player_functions.py` - Core functions for player management
 
 ### World Modules
 - `dimension.py` → `src/world/dimension.py`
@@ -50,18 +71,92 @@ Spacer/
 ### Utility Modules
 - `data_loader.py` → `src/utils/data_loader.py`
 - `ui_display.py` → `src/utils/ui_display.py` 
-- `player_actions.py` → Split between `src/commands/navigation.py` and other modules
+- `player_actions.py` → Split into appropriate function modules
 
 ### Configuration
 - `config.py` → `src/config.py`
+
+## Command System Architecture
+
+### Command Definition
+Each command is defined in its own file with:
+1. Command metadata (name, aliases, description)
+2. Argument parsing
+3. Validation rules
+4. Error message templates
+5. Execution context requirements
+6. Function references for implementation
+
+Example command definition (jump.py):
+```python
+from commands.base_command import BaseCommand
+from functions.navigation_functions import perform_jump
+
+class JumpCommand(BaseCommand):
+    def __init__(self):
+        super().__init__(
+            name="jump",
+            aliases=["j", "warp"],
+            description="Jump to another star system",
+            context_requirements=["not_docked", "not_landed", "not_moving"],
+            error_messages={
+                "not_docked": "Cannot jump while docked at a station",
+                "not_landed": "Cannot jump while landed on a planet",
+                "not_moving": "Cannot jump while in transit",
+                "invalid_coords": "Invalid jump coordinates",
+                "out_of_range": "Destination is beyond jump range"
+            }
+        )
+    
+    def execute(self, game_state, args):
+        # Parse and validate arguments
+        if not self.validate_context(game_state):
+            return False
+            
+        # Execute the jump using function from navigation_functions
+        return perform_jump(game_state, args)
+```
+
+### Command Configuration
+Commands are configured via YAML/JSON files:
+```yaml
+# jump.yaml
+name: jump
+aliases: 
+  - j
+  - warp
+description: Jump to another star system
+help_text: |
+  JUMP <x> <y> <z> - Jump to coordinates
+  JUMP <system_name> - Jump to named system
+context_requirements:
+  - not_docked
+  - not_landed
+  - not_moving
+error_messages:
+  not_docked: Cannot jump while docked at a station
+  not_landed: Cannot jump while landed on a planet
+  not_moving: Cannot jump while in transit
+  invalid_coords: Invalid jump coordinates
+  out_of_range: Destination is beyond jump range
+cooldown: 5
+```
+
+### Command Registry
+The registry loads all commands and provides:
+- Command registration
+- Command lookup by name/alias
+- Context validation
+- Help generation
+- Tab completion
 
 ## Core Game Loop
 
 1. Player initialization (new game or load save)
 2. Main game loop:
-   - Process player input through command manager
-   - Route to appropriate command handler
-   - Execute actions
+   - Process player input through command registry
+   - Validate execution context
+   - Execute appropriate command implementation
    - Update game state
    - Save progress
 3. Game termination (exit or logout)
@@ -102,6 +197,7 @@ Spacer/
 - Enhanced movement and navigation systems
 - Code redemption system for special content
 - Version management and release system
+- Plugin system for custom commands
 
 ## Technical Improvements
 
@@ -123,7 +219,6 @@ Spacer/
 
 - Remove not needed code
 - Remove excessive comments
-- Split command manager for better maintainability
 - Create proper registration system with code (for closed beta)
 
-The project follows a text-based command interface but is designed with extensibility in mind for potential GUI implementation in the future. The modular architecture supports adding new features without major refactoring.
+The project follows a text-based command interface but is designed with extensibility in mind for potential GUI implementation in the future. The modular command architecture provides flexibility and maintainability while allowing for easy addition of new commands without major refactoring.
