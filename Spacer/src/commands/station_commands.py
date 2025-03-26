@@ -183,6 +183,28 @@ def handle_land_command(player, body_name=None):
         # If we couldn't determine the body name, use the city name as fallback
         parent_body = "Unknown Body"
     
+    # Check if the parent body and moon (if applicable) are known to the player
+    dim_name = player.dimension.name
+    is_known = False
+    
+    if dim_name in player.known_bodies:
+        # Check for the body directly
+        if parent_body in player.known_bodies[dim_name]:
+            is_known = True
+        
+        # If it's on a moon, check if the specific moon is known
+        if parent_moon and not is_known:
+            moon_entry = f"{parent_body}:{parent_moon}"
+            for known_body in player.known_bodies[dim_name]:
+                if known_body == moon_entry:
+                    is_known = True
+                    break
+    
+    if not is_known:
+        print(f"\n✗ Cannot land at {city.name}: You haven't discovered this location yet.")
+        print("   Perform a system scan first to discover new celestial bodies.")
+        return
+    
     # All checks passed, perform landing
     print(f"\nInitiating landing sequence on {parent_moon or parent_body}, {city.name}...")
     for i in range(3, 0, -1):

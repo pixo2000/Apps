@@ -204,6 +204,41 @@ def scan_celestial_body(player, body_name):
         print(f"\n✗ Cannot scan {body_name}: This dimension is not fully mapped.")
         return
     
+    # Check if the celestial body is known to the player
+    is_known = False
+    is_moon = False
+    parent_planet = None
+    
+    # For stars, they are always considered known for scanning
+    for name, data in player.dimension.properties.items():
+        if name.lower() == body_name.lower() and data.get("type", "").lower() == "star":
+            is_known = True
+            break
+    
+    # If not a star, check if the body is in the player's known bodies list
+    if not is_known:
+        # First check direct planet/body knowledge
+        if dim_name in player.known_bodies:
+            for known_body in player.known_bodies[dim_name]:
+                # Check if it's a direct match (planet or asteroid)
+                if known_body.lower() == body_name.lower():
+                    is_known = True
+                    break
+                # Check if it's a moon (format: "planet:moon")
+                elif ":" in known_body:
+                    parent, moon = known_body.split(":", 1)
+                    if moon.lower() == body_name.lower():
+                        is_known = True
+                        is_moon = True
+                        parent_planet = parent
+                        break
+    
+    # If the body is not known, prevent scanning
+    if not is_known:
+        print(f"\n✗ Cannot scan {body_name}: You haven't discovered this celestial body yet.")
+        print("   Perform a system scan first to discover new bodies.")
+        return
+    
     # First check if it's a main celestial body
     body_data = None
     is_moon = False
