@@ -2,10 +2,123 @@
     "G33": {
         "author": "Spacer - pixo2000",
         "name": "G33",
-        "title": "",
-        "description": "",
+        "title": "Tau Ceti",
+        "description": "A stable G-class star similar to our Sun",
         "bodies": {
-            
+            "Tau Ceti": {
+                "type": "Star",
+                "Coordinates": {
+                    "x": "0",
+                    "y": "0"
+                },
+                "size": {
+                    "width": "5",
+                    "height": "5"
+                },
+                "Stations": {
+                    "NavBeacon": {
+                        "type": "Beacon",
+                        "Coordinates": {
+                            "x": "8",
+                            "y": "-2"
+                        },
+                        "description": "Primary navigation beacon for the Tau Ceti system"
+                    },
+                    "TauResearch": {
+                        "type": "Station",
+                        "Coordinates": {
+                            "x": "-7",
+                            "y": "6"
+                        },
+                        "description": "Scientific outpost studying stellar phenomena"
+                    }
+                }
+            },
+            "Tau Ceti b": {
+                "type": "Planet",
+                "Coordinates": {
+                    "x": "25",
+                    "y": "25"
+                },
+                "size": {
+                    "width": "2",
+                    "height": "2"
+                },
+                "description": "Hot rocky planet close to the star"
+            },
+            "Tau Ceti c": {
+                "type": "Planet",
+                "Coordinates": {
+                    "x": "-40",
+                    "y": "40"
+                },
+                "size": {
+                    "width": "3",
+                    "height": "3"
+                },
+                "description": "Super-Earth with a thick atmosphere"
+            },
+            "Tau Ceti d": {
+                "type": "Planet",
+                "Coordinates": {
+                    "x": "70",
+                    "y": "-50"
+                },
+                "size": {
+                    "width": "4",
+                    "height": "4"
+                },
+                "description": "Ocean world in the habitable zone",
+                "Moons": {
+                    "Nereus": {
+                        "type": "Moon",
+                        "Coordinates": {
+                            "x": "74",
+                            "y": "-50"
+                        },
+                        "size": {
+                            "width": "1",
+                            "height": "1"
+                        }
+                    }
+                }
+            },
+            "Tau Ceti e": {
+                "type": "Planet",
+                "Coordinates": {
+                    "x": "-100",
+                    "y": "-80"
+                },
+                "size": {
+                    "width": "3",
+                    "height": "3"
+                },
+                "description": "Cold gas giant with extensive ring system",
+                "Moons": {
+                    "Aegir": {
+                        "type": "Moon",
+                        "Coordinates": {
+                            "x": "-104",
+                            "y": "-80"
+                        },
+                        "size": {
+                            "width": "1",
+                            "height": "1"
+                        }
+                    },
+                    "Njord": {
+                        "type": "Moon",
+                        "Coordinates": {
+                            "x": "-100",
+                            "y": "-84"
+                        },
+                        "size": {
+                            "width": "1",
+                            "height": "1"
+                        }
+                    }
+                }
+            }
         }
     }
 }

@@ -1,11 +1,99 @@
 {
-    "G33": {
+    "E05": {
         "author": "Spacer - pixo2000",
         "name": "E05",
-        "title": "",
-        "description": "",
+        "title": "Pulsar PSR-E05",
+        "description": "A system dominated by a rapidly spinning neutron star",
         "bodies": {
-            
+            "PSR-E05": {
+                "type": "Pulsar",
+                "Coordinates": {
+                    "x": "0",
+                    "y": "0"
+                },
+                "size": {
+                    "width": "3",
+                    "height": "3"
+                },
+                "description": "Neutron star emitting regular radiation pulses",
+                "Stations": {
+                    "NavBeacon": {
+                        "type": "Beacon",
+                        "Coordinates": {
+                            "x": "10",
+                            "y": "-5"
+                        },
+                        "description": "Warning beacon for the dangerous PSR-E05 system"
+                    },
+                    "Observatory": {
+                        "type": "Research Station",
+                        "Coordinates": {
+                            "x": "-12",
+                            "y": "8"
+                        },
+                        "description": "Heavily shielded research facility studying the pulsar"
+                    }
+                }
+            },
+            "Lazarus": {
+                "type": "Planet",
+                "Coordinates": {
+                    "x": "30",
+                    "y": "30"
+                },
+                "size": {
+                    "width": "2",
+                    "height": "2"
+                },
+                "description": "Diamond planet formed from a crystallized stellar core"
+            },
+            "Phantom": {
+                "type": "Planet",
+                "Coordinates": {
+                    "x": "-40",
+                    "y": "40"
+                },
+                "size": {
+                    "width": "2",
+                    "height": "2"
+                },
+                "description": "A planet periodically bathed in intense radiation",
+                "Moons": {
+                    "Shadow": {
+                        "type": "Moon",
+                        "Coordinates": {
+                            "x": "-43",
+                            "y": "40"
+                        },
+                        "size": {
+                            "width": "1",
+                            "height": "1"
+                        },
+                        "description": "Moon with unusual orbit providing shelter during radiation peaks"
+                    }
+                }
+            },
+            "Nebula Remnant": {
+                "type": "Nebula",
+                "Coordinates": {
+                    "x": "0",
+                    "y": "-60"
+                },
+                "size": {
+                    "width": "20",
+                    "height": "20"
+                },
+                "description": "Remains of the supernova that created the pulsar"
+            },
+            "Radiation Belt": {
+                "type": "Hazard Zone",
+                "radius": "20",
+                "Coordinates": {
+                    "x": "0",
+                    "y": "0"
+                },
+                "description": "Dangerous zone of intense radiation surrounding the pulsar"
+            }
         }
     }
 }
