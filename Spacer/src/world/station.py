@@ -17,7 +17,8 @@ class Station:
             "quests": "View available missions",
             "trade": "Trade resources",
             "repair": "Repair your ship",
-            "info": "Station information"
+            "info": "Station information",
+            "scancoords": "Use a more powerful direct scan via the Station's systems (usage: scancoords <x> <y>)"
         }
     
     def get_description(self):
@@ -40,12 +41,13 @@ class Station:
     
     def handle_command(self, command, player):
         """Process station-specific commands"""
+        # Handle basic commands first
         if command == "launch":
             print("\nLaunching from station...")
             player.docked_at = None
             print("You have left the station and returned to space.")
             return True
-            
+        
         elif command == "quests":
             print("\n== Available Missions ==")
             print("No active missions available at this time.")
@@ -77,8 +79,16 @@ class Station:
                 print(f"Attached to: {attached_to}")
             
             print("\nStation Services:")
-            for service in ["Trading", "Repairs", "Missions"]:
+            for service in ["Trading", "Repairs", "Missions", "Long-Range Scanning"]:
                 print(f"- {service}")
+            return True
+        
+        # Check if it's a coordinate scan command - must check this AFTER the basic commands
+        elif command.startswith("scancoords "):
+            # Import here to avoid circular imports
+            from src.commands.scan_commands import handle_coordinate_scan
+            coords = command[11:]  # Get everything after "scancoords "
+            handle_coordinate_scan(player, coords)
             return True
         
         return False  # Command not handled by station
@@ -165,7 +175,7 @@ def get_station_at_coords(x, y, dimension_name):
     for station_id, station in STATIONS.items():
         if station.x == x and station.y == y and station.dimension == dimension_name:
             # Only return if it's actually a station or beacon type, not a city
-            if station.type == "Station":
+            if station.type == "Station" or station.type == "Beacon":
                 return station
     return None
 
@@ -177,6 +187,177 @@ def get_city_at_coords(x, y, dimension_name):
             if station.type == "City":
                 return station
     return None
+
+def check_coords_for_objects(x, y, dimension_name, dimension_data):
+    """Check what celestial bodies, stations or hidden signals are at the specified coordinates"""
+    # Initialize result
+    result = {
+        "found": False,
+        "objects": [],
+        "is_dangerous": False  # Flag to identify if location contains a dangerous object
+    }
+    
+    # Import dangerous body types here to avoid circular imports
+    from src.config import DANGEROUS_BODY_TYPES
+    
+    # Check for celestial bodies
+    for body_name, body_data in dimension_data.get('bodies', {}).items():
+        if 'Coordinates' in body_data:
+            # Convert coordinates to integers (they might be strings)
+            try:
+                body_x = int(body_data["Coordinates"]["x"])
+                body_y = int(body_data["Coordinates"]["y"])
+            except (ValueError, TypeError):
+                body_x = 0
+                body_y = 0
+            
+            # Check body size - default to 1 if not specified
+            try:
+                size_width = int(body_data.get("size", {}).get("width", 1))
+                size_height = int(body_data.get("size", {}).get("height", 1))
+            except (ValueError, TypeError):
+                size_width = 1
+                size_height = 1
+                
+            # Special case for stars and black holes - ensure minimum size
+            if body_data.get("type", "").lower() in [t.lower() for t in DANGEROUS_BODY_TYPES]:
+                size_width = max(size_width, 5)  # Minimum size of 5 for stars and black holes
+                size_height = max(size_height, 5)  # Minimum size of 5 for stars and black holes
+            
+            # Calculate the coordinate bounds
+            min_x = body_x - (size_width // 2)
+            max_x = body_x + (size_width // 2)
+            min_y = body_y - (size_height // 2)
+            max_y = body_y + (size_height // 2)
+            
+            # Check if coordinates are within the body's bounds
+            if min_x <= x <= max_x and min_y <= y <= max_y:
+                result["found"] = True
+                body_obj = {
+                    "name": body_name,
+                    "type": body_data.get("type", "Unknown"),
+                    "description": body_data.get("description", f"A {body_data.get('type', 'celestial body')}")
+                }
+                result["objects"].append(body_obj)
+                
+                # Check if this is a dangerous body type
+                if body_data.get("type", "").lower() in [t.lower() for t in DANGEROUS_BODY_TYPES]:
+                    # If the coordinates are anywhere within the bounds of a dangerous body, mark as dangerous
+                    result["is_dangerous"] = True
+                    result["danger_name"] = body_name
+                    result["danger_type"] = body_data.get("type", "Unknown")
+                    
+                    # Additional check for direct center hit for more detailed messages
+                    if x == body_x and y == body_y:
+                        result["direct_hit"] = True
+                    
+                    # Include body size information
+                    result["danger_size"] = {
+                        "width": size_width,
+                        "height": size_height
+                    }
+        
+        # Check for moons
+        if 'Moons' in body_data:
+            for moon_name, moon_data in body_data['Moons'].items():
+                if 'Coordinates' in moon_data:
+                    moon_x = int(moon_data["Coordinates"]["x"])
+                    moon_y = int(moon_data["Coordinates"]["y"])
+                    
+                    # Check moon size
+                    moon_width = int(moon_data.get("size", {}).get("width", 1))
+                    moon_height = int(moon_data.get("size", {}).get("height", 1))
+                    
+                    # Calculate the coordinate bounds
+                    min_x = moon_x - (moon_width // 2)
+                    max_x = moon_x + (moon_width // 2)
+                    min_y = moon_y - (moon_height // 2)
+                    max_y = moon_y + (moon_height // 2)
+                    
+                    # Check if coordinates are within the moon's bounds
+                    if (min_x <= x <= max_x and min_y <= y <= max_y):
+                        result["found"] = True
+                        result["objects"].append({
+                            "name": moon_name,
+                            "type": "Moon",
+                            "parent": body_name,
+                            "description": moon_data.get("description", f"Moon of {body_name}")
+                        })
+                        
+    # Check for all stations at these coordinates
+    for station_id, station in STATIONS.items():
+        if station.x == x and station.y == y and station.dimension == dimension_name:
+            # Include any type of station (Station, Beacon, etc.)
+            result["found"] = True
+            result["objects"].append({
+                "name": station.name,
+                "type": station.type,
+                "description": station.description
+            })
+    
+    # Check for hidden signals
+    from src.config import HIDDEN_SIGNALS
+    if dimension_name in HIDDEN_SIGNALS:
+        for signal_name, coords in HIDDEN_SIGNALS[dimension_name].items():
+            signal_x = coords["x"]
+            signal_y = coords["y"]
+            if signal_x == x and signal_y == y:
+                result["found"] = True
+                result["objects"].append({
+                    "name": signal_name,
+                    "type": "Special Signal",
+                    "description": "An unusual signal of unknown origin"
+                })
+                
+    return result
+
+def is_safe_location(x, y, dimension_name, dimension_data):
+    """Check if coordinates are safe (not on a dangerous celestial body)"""
+    result = check_coords_for_objects(x, y, dimension_name, dimension_data)
+    return not result.get("is_dangerous", False)
+
+def get_nearby_dangers(x, y, dimension_name, dimension_data, warning_distance=15):
+    """Check if there are dangerous objects near the specified coordinates"""
+    dangers = []
+    
+    from src.config import DANGEROUS_BODY_TYPES
+    
+    # Check each body in the dimension
+    for body_name, body_data in dimension_data.get('bodies', {}).items():
+        body_type = body_data.get("type", "")
+        if body_type.lower() in [t.lower() for t in DANGEROUS_BODY_TYPES]:
+            if 'Coordinates' in body_data:
+                body_x = int(body_data["Coordinates"]["x"])
+                body_y = int(body_data["Coordinates"]["y"])
+                
+                # Calculate distance to the dangerous body
+                distance = max(abs(x - body_x), abs(y - body_y))
+                
+                # Include size in the calculation - a large star may be dangerous even if further away
+                try:
+                    size = max(
+                        int(body_data.get("size", {}).get("width", 1)),
+                        int(body_data.get("size", {}).get("height", 1))
+                    )
+                except (ValueError, TypeError):
+                    size = 1
+                
+                # Adjust effective distance based on body size
+                effective_distance = distance - (size // 2)
+                effective_distance = max(0, effective_distance)  # Can't be negative
+                
+                # If within warning distance
+                if effective_distance <= warning_distance:
+                    dangers.append({
+                        "name": body_name,
+                        "type": body_type,
+                        "distance": effective_distance,
+                        "coords": (body_x, body_y)
+                    })
+    
+    # Sort by distance - closest first
+    dangers.sort(key=lambda x: x["distance"])
+    return dangers
 
 def get_station_by_id(station_id):
     """Find a station by its ID"""

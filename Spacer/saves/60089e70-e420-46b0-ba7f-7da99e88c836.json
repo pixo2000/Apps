@@ -1,0 +1,31 @@
+{
+    "name": "Test3",
+    "uuid": "60089e70-e420-46b0-ba7f-7da99e88c836",
+    "position": {
+        "x": 65,
+        "y": -60,
+        "dimension": "A01"
+    },
+    "discoveries": {
+        "known_dimensions": [
+            "A01"
+        ],
+        "known_bodies": {
+            "A01": [
+                "Earth",
+                "Ceres",
+                "SOL",
+                "Juno",
+                "Mercury"
+            ]
+        }
+    },
+    "creation_date": "2025-03-26T18:04:00.655712",
+    "last_login": "26.03.25 - 18:05",
+    "is_dead": false,
+    "landed_on": "LunaBase",
+    "landed_on_body": "Earth",
+    "landed_on_moon": "Luna",
+    "docked_at": null,
+    "playtime": "00:00:01:35"
+}

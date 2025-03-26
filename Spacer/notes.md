@@ -84,3 +84,15 @@ fix dimensions command when compiled
 scan planet to be able to land etc
 
 sicher ob ich das void so haben will?
+
+mission and economy
+
+implement restliche systems
+
+split commands into folders where each command can be configured if on station and error mesages
+
+tutorial
+
+"The Game and all assets are owned by Voidcube"
+
+scanning star returns size

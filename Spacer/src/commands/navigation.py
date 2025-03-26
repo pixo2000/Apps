@@ -3,18 +3,49 @@ Navigation and movement command handlers.
 """
 import time
 from src.world.dimension import Dimension
-from src.config import MOVEMENT_SPEED, WARP_PATHS
-from src.world.station import load_stations_from_dimension
+from src.config import MOVEMENT_SPEED, WARP_PATHS, DANGEROUS_BODY_TYPES, DANGER_WARNING_DISTANCE
+from src.world.station import load_stations_from_dimension, check_coords_for_objects, is_safe_location, get_nearby_dangers
 
 def move(player, x, y):
     """Move the player to specified coordinates"""
-    # Calculate the distance (maximum of x or y difference for diagonal movement)
-    distance = max(abs(x - player.x), abs(y - player.y))
-    
-    if distance == 0:
+    # If trying to move to current position, just return without warning
+    if x == player.x and y == player.y:
         print("\n✓ Already at the requested coordinates.\n")
         return
         
+    # Store target location danger check result for later
+    target_check = check_coords_for_objects(x, y, player.dimension.name, {'bodies': player.dimension.properties})
+    target_is_dangerous = target_check.get("is_dangerous", False)
+    
+    if target_is_dangerous:
+        danger_name = target_check.get("danger_name", "Unknown")
+        danger_type = target_check.get("danger_type", "celestial body")
+        
+        print(f"\n⚠️ CRITICAL WARNING: Navigation computer detects {danger_name} ({danger_type}) at target coordinates!")
+        print(f"⚠️ Moving to these coordinates would result in immediate ship destruction!")
+        confirm = input("\nOverride safety protocols? This will result in death! (type 'override' to confirm): ")
+        
+        if confirm.lower() == "override":
+            # Continue with the move but the ship will be destroyed on arrival
+            print(f"\n⚠️ Safety protocols overridden. Proceeding with dangerous navigation...")
+        else:
+            print("\n✓ Navigation aborted. Safety protocols maintained.")
+            return
+    
+    # Check for nearby dangerous objects and warn the player
+    dangers = get_nearby_dangers(x, y, player.dimension.name, {'bodies': player.dimension.properties}, DANGER_WARNING_DISTANCE)
+    if dangers and not target_is_dangerous:  # Only show warning if we're not heading directly to a dangerous object
+        danger = dangers[0]  # Use the first danger in the list
+        print(f"\n⚠️ WARNING: Your course will bring you within {danger['distance']} units of {danger['name']} ({danger['type']}).")
+        print(f"⚠️ Exercise caution! Moving directly onto this {danger['type']} will result in ship destruction.")
+        confirm = input("Continue with navigation? (y/n): ").strip().lower()
+        if confirm != 'y':
+            print("\n✓ Navigation aborted.")
+            return
+    
+    # Calculate the distance (maximum of x or y difference for diagonal movement)
+    distance = max(abs(x - player.x), abs(y - player.y))
+    
     print(f"\n➤ Setting course to coordinates [{x}, {y}]")
     
     # Show countdown and wait for each field
@@ -55,8 +86,30 @@ def move(player, x, y):
         if remaining == 1:
             print(f"\r[{spacebar}] Moving... Final approach [{display_percent}%]{buffer_space}", end="", flush=True)
             time.sleep(0.2)  # Add extra wait for final approach
-            
-    # Update position
+    
+    # Force a direct check for dangerous location at destination
+    final_check = check_coords_for_objects(x, y, player.dimension.name, {'bodies': player.dimension.properties})
+    target_is_dangerous = final_check.get("is_dangerous", False)
+    
+    # After movement is complete, check if target or any intermediate point was dangerous
+    if target_is_dangerous:
+        danger_name = final_check.get("danger_name", "Unknown") 
+        danger_type = final_check.get("danger_type", "celestial body")
+        
+        # Update player position before killing them (to record their death location)
+        player.x = x
+        player.y = y
+        
+        print(f"\n\n🔥 CRITICAL ERROR - SHIP DESTRUCTION 🔥")
+        print(f"Your ship has been destroyed by {danger_name} ({danger_type})!")
+        print(f"Hull breach detected! All systems failing... Life support offline...")
+        print(f"Coordinates of destruction: [{x}, {y}]")
+        
+        # Kill the player
+        player.is_dead = True
+        return
+    
+    # Update position if we didn't die
     player.x = x
     player.y = y
     print(f"\n\n✓ Arrived at coordinates [{x}, {y}]\n")
@@ -65,23 +118,49 @@ def handle_move_command(player, x, y):
     """Handle player movement and check for stations"""
     move(player, x, y)
     
+    # If the player is dead, don't process anything further
+    if player.is_dead:
+        return
+    
     # After movement, check if there's a station at these coordinates
     from src.world.station import get_station_at_coords
     station = get_station_at_coords(player.x, player.y, player.dimension.name)
     if station:
         print(f"\nYou've discovered {station.name}!")
+        # Add to known bodies if not already there
+        dim_name = player.dimension.name
+        if dim_name not in player.known_bodies:
+            player.known_bodies[dim_name] = []
+        # We'll use a special notation for stations: "STATION:stationname"
+        station_entry = f"STATION:{station.name}"
+        if station_entry not in player.known_bodies[dim_name]:
+            player.known_bodies[dim_name].append(station_entry)
+            
         dock = input("Would you like to dock? (y/n): ").strip().lower()
         if dock == "y" or dock == "yes":
             print(f"\nDocking at {station.name}...")
             player.docked_at = station
     
     # Check for planets or other points of interest
+    dim_name = player.dimension.name
     for body_name, body_data in player.dimension.properties.items():
         if "Coordinates" in body_data:
             body_x = int(body_data["Coordinates"]["x"])
             body_y = int(body_data["Coordinates"]["y"])
             if body_x == player.x and body_y == player.y:
-                print(f"\nYou've reached {body_name}!")
+                # Check if this is a new discovery
+                is_new_discovery = False
+                if dim_name not in player.known_bodies or body_name not in player.known_bodies[dim_name]:
+                    is_new_discovery = True
+                    # Add to known bodies
+                    if dim_name not in player.known_bodies:
+                        player.known_bodies[dim_name] = []
+                    player.known_bodies[dim_name].append(body_name)
+                
+                if is_new_discovery:
+                    print(f"\nYou've discovered {body_name}!")
+                else:
+                    print(f"\nYou've reached {body_name}!")
                 break
 
 def handle_jump_command(player, dimension_name):
