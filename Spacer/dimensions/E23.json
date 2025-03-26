@@ -2,10 +2,126 @@
     "E23": {
         "author": "Spacer - pixo2000",
         "name": "E23",
-        "title": "",
-        "description": "",
+        "title": "Binary Haven",
+        "description": "A binary star system with unusual orbital mechanics",
         "bodies": {
-            
+            "Castor": {
+                "type": "Star",
+                "Coordinates": {
+                    "x": "-15",
+                    "y": "0"
+                },
+                "size": {
+                    "width": "4",
+                    "height": "4"
+                },
+                "description": "The primary blue-white star in the binary system"
+            },
+            "Pollux": {
+                "type": "Star",
+                "Coordinates": {
+                    "x": "15",
+                    "y": "0"
+                },
+                "size": {
+                    "width": "3",
+                    "height": "3"
+                },
+                "description": "The secondary orange star in the binary system",
+                "Stations": {
+                    "NavBeacon": {
+                        "type": "Beacon",
+                        "Coordinates": {
+                            "x": "20",
+                            "y": "-5"
+                        },
+                        "description": "Primary navigation beacon for the Binary Haven system"
+                    }
+                }
+            },
+            "Gemini": {
+                "type": "Planet",
+                "Coordinates": {
+                    "x": "0",
+                    "y": "45"
+                },
+                "size": {
+                    "width": "3",
+                    "height": "3"
+                },
+                "description": "A planet in figure-eight orbit around both stars",
+                "Stations": {
+                    "Harmony": {
+                        "type": "City",
+                        "Coordinates": {
+                            "x": "0",
+                            "y": "44"
+                        },
+                        "description": "Major settlement at the gravitational balance point"
+                    }
+                }
+            },
+            "Dioscuri": {
+                "type": "Planet",
+                "Coordinates": {
+                    "x": "-60",
+                    "y": "20"
+                },
+                "size": {
+                    "width": "3",
+                    "height": "3"
+                },
+                "description": "Circumbinary planet with extreme seasonal variations",
+                "Moons": {
+                    "Alpha": {
+                        "type": "Moon",
+                        "Coordinates": {
+                            "x": "-64",
+                            "y": "20"
+                        },
+                        "size": {
+                            "width": "1",
+                            "height": "1"
+                        }
+                    },
+                    "Beta": {
+                        "type": "Moon",
+                        "Coordinates": {
+                            "x": "-60",
+                            "y": "24"
+                        },
+                        "size": {
+                            "width": "1",
+                            "height": "1"
+                        }
+                    }
+                }
+            },
+            "Trefoil": {
+                "type": "Planet",
+                "Coordinates": {
+                    "x": "70",
+                    "y": "-40"
+                },
+                "size": {
+                    "width": "4",
+                    "height": "4"
+                },
+                "description": "Gas giant with trilobed orbit due to binary resonance",
+                "Moons": {
+                    "Knot": {
+                        "type": "Moon",
+                        "Coordinates": {
+                            "x": "74",
+                            "y": "-40"
+                        },
+                        "size": {
+                            "width": "1",
+                            "height": "1"
+                        }
+                    }
+                }
+            }
         }
     }
 }

@@ -82,3 +82,5 @@ nav beacon vor dimensions
 fix dimensions command when compiled
 
 scan planet to be able to land etc
+
+sicher ob ich das void so haben will?
