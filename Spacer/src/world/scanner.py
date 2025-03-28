@@ -93,16 +93,15 @@ def scan_system(player):
             signal_y = coords["y"]
             movement_distance = max(abs(player_x - signal_x), abs(player_y - signal_y))
             
-            # Only include if player is very close to the hidden signal
-            if movement_distance <= 10:  # Much shorter detection range for hidden signals
-                is_new_discovery = signal_name not in player.known_bodies.get(dimension_name, [])
-                
+            # Only show unknown signals when within scan range
+            if movement_distance <= DEFAULT_SCAN_RANGE:
+                # Always show as Unknown Signal with Anomaly type
                 scan_results.append({
-                    "name": signal_name,
-                    "type": "Special Signal",
+                    "name": "Unknown",
+                    "type": "Unknown",
                     "coords": (signal_x, signal_y),
                     "distance": movement_distance,
-                    "new_discovery": is_new_discovery,
+                    "new_discovery": False,
                     "signals_count": 0
                 })
     
@@ -202,6 +201,59 @@ def scan_celestial_body(player, body_name):
     dim_name = player.dimension.name
     if dim_name not in player.known_dimensions:
         print(f"\n✗ Cannot scan {body_name}: This dimension is not fully mapped.")
+        return
+    
+    # Check if we're trying to scan an "Unknown Signal" or "Anomaly"
+    if body_name.lower() == "unknown signal" or body_name.lower() == "anomaly":
+        # Check for nearby hidden signals
+        player_x = player.position("x")
+        player_y = player.position("y")
+        signal_found = False
+        
+        if dim_name in HIDDEN_SIGNALS:
+            for signal_name, coords in HIDDEN_SIGNALS[dim_name].items():
+                signal_x = coords["x"]
+                signal_y = coords["y"]
+                distance = max(abs(player_x - signal_x), abs(player_y - signal_y))
+                
+                if distance <= DEFAULT_SCAN_RANGE:
+                    signal_found = True
+                    if distance <= 10:
+                        print(f"\n=== DETAILED SCAN: {signal_name} ===")
+                        print("Type: Special Signal")
+                        print(f"Coordinates: [{signal_x}, {signal_y}]")
+                        print("\nThis appears to be a significant discovery.")
+                        print("==========================\n")
+                        
+                        # Add to known bodies
+                        if dim_name not in player.known_bodies:
+                            player.known_bodies[dim_name] = []
+                        if signal_name not in player.known_bodies[dim_name]:
+                            player.known_bodies[dim_name].append(signal_name)
+                    else:
+                        print(f"\n=== SCANNING UNKNOWN SIGNAL ===")
+                        print("Signal detected but too weak for detailed analysis.")
+                        print(f"Coordinates: [{signal_x}, {signal_y}]")
+                        print("\nYou need to fly closer to properly analyze this signal.")
+                        print("Try again when within 10 units of the coordinates.")
+                        print("==========================\n")
+                    break
+        
+        if not signal_found:
+            print(f"\n✗ No unknown signals detected in range.")
+        return
+    
+    # Check if trying to scan a hidden signal by name
+    if dim_name in HIDDEN_SIGNALS and body_name in HIDDEN_SIGNALS[dim_name]:
+        player_x = player.position("x")
+        player_y = player.position("y")
+        signal_x = HIDDEN_SIGNALS[dim_name][body_name]["x"]
+        signal_y = HIDDEN_SIGNALS[dim_name][body_name]["y"]
+        distance = max(abs(player_x - signal_x), abs(player_y - signal_y))
+        
+        # For hidden signals, always show the error message regardless of distance
+        print(f"\n✗ Cannot scan {body_name}: Signal not strong enough.")
+        print("   You need a much more powerful direct scanning tool.")
         return
     
     # Check if the celestial body is known to the player

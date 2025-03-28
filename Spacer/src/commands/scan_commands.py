@@ -5,6 +5,7 @@ import time
 import math
 from src.world.scanner import handle_scan, scan_celestial_body
 from src.world.station import STATIONS, check_coords_for_objects
+from src.config import HIDDEN_SIGNALS
 
 def handle_scan_command(player):
     """Handle the scan command to scan the current system"""
@@ -47,6 +48,17 @@ def handle_simple_scan(player):
                 else:
                     # For unknown bodies, show only limited information
                     nearby_bodies.append(("Unknown Object", "Unknown", distance))
+    
+    # Also check for hidden signals
+    if dim_name in HIDDEN_SIGNALS:
+        for signal_name, coords in HIDDEN_SIGNALS[dim_name].items():
+            signal_x = coords["x"]
+            signal_y = coords["y"]
+            distance = max(abs(player_x - signal_x), abs(player_y - signal_y))
+            
+            # For hidden signals, only show coordinates if within range
+            if distance <= 60:  # Detect from scan range distance
+                nearby_bodies.append(("Unknown", "Unknown", distance))
     
     # Display results
     if nearby_bodies:

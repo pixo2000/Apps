@@ -44,7 +44,7 @@ DANGER_WARNING_DISTANCE = 15  # Distance at which to warn about dangerous celest
 # Special hidden coordinates
 HIDDEN_SIGNALS = {
     "A01": {  # Dimension name
-        "Voyager 1": {"x": 2345, "y": -1477}  # Special hidden signal
+        "Voyager 1": {"x": 2345, "y": -1477, "description": "Ancient Earth probe, requires close proximity for identification"}  # Special hidden signal
     }
 }
 
