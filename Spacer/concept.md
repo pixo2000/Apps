@@ -4,7 +4,7 @@
 
 The Spacer game will be restructured with a modular design pattern, separating concerns into individual directories:
 
-```
+```yaml
 Spacer/
 ├── main.py               # Entry point (stays in root)
 └── src/
@@ -44,11 +44,13 @@ Spacer/
 ## File Migrations
 
 ### Core Modules
+
 - `game_core.py` → `src/core/game_core.py`
 - `player.py` → `src/core/player.py`
 - `save_manager.py` → `src/core/save_manager.py`
 
 ### Command System (Complete Restructure)
+
 - Create `src/commands/registry.py` for command registration and routing
 - Create `src/commands/base_command.py` for command interface/class definition
 - Create command configuration system:
@@ -58,28 +60,34 @@ Spacer/
   - `jump.py`, `scan.py`, `move.py`, `dock.py`, etc.
 
 ### Command Functions
+
 - `src/functions/navigation_functions.py` - Core functions for movement and jumps
 - `src/functions/scan_functions.py` - Core functions for scanning operations
 - `src/functions/station_functions.py` - Core functions for station interactions
 - `src/functions/player_functions.py` - Core functions for player management
 
 ### World Modules
+
 - `dimension.py` → `src/world/dimension.py`
 - `station.py` → `src/world/station.py`
 - `scanner.py` → `src/world/scanner.py`
 
 ### Utility Modules
+
 - `data_loader.py` → `src/utils/data_loader.py`
-- `ui_display.py` → `src/utils/ui_display.py` 
+- `ui_display.py` → `src/utils/ui_display.py`
 - `player_actions.py` → Split into appropriate function modules
 
 ### Configuration
+
 - `config.py` → `src/config.py`
 
 ## Command System Architecture
 
 ### Command Definition
+
 Each command is defined in its own file with:
+
 1. Command metadata (name, aliases, description)
 2. Argument parsing
 3. Validation rules
@@ -88,6 +96,7 @@ Each command is defined in its own file with:
 6. Function references for implementation
 
 Example command definition (jump.py):
+
 ```python
 from commands.base_command import BaseCommand
 from functions.navigation_functions import perform_jump
@@ -118,7 +127,9 @@ class JumpCommand(BaseCommand):
 ```
 
 ### Command Configuration
+
 Commands are configured via YAML/JSON files:
+
 ```yaml
 # jump.yaml
 name: jump
@@ -143,7 +154,9 @@ cooldown: 5
 ```
 
 ### Command Registry
+
 The registry loads all commands and provides:
+
 - Command registration
 - Command lookup by name/alias
 - Context validation
@@ -164,21 +177,25 @@ The registry loads all commands and provides:
 ## Key Features
 
 ### Dimension System
+
 - Multiple star systems with unique properties
 - Dynamic loading of dimension data from JSON files
 - Dimensional travel mechanics
 
 ### Celestial Body Exploration
+
 - Planets, moons, stations, and hidden signals
 - Surface landing and exploration
 - Scanning and discovery mechanics
 
 ### Station Interactions
+
 - Docking at space stations
 - Station-specific interfaces and commands
 - City landing and exploration
 
 ### Persistence
+
 - Save/load game state
 - Player profile management
 - Progress tracking across sessions
