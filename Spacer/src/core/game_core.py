@@ -7,7 +7,7 @@ import datetime
 from src.core.player import Player
 from src.core.save_manager import SaveManager
 from src.utils.ui_display import display_help, display_loading_animation
-from src.commands.command_manager import handle_input
+from src.commands.command_manager import handle_input, initialize_commands
 from src.world.station import load_all_stations
 
 # Global save manager instance
@@ -15,6 +15,9 @@ save_mgr = SaveManager()
 
 def initialize_game():
     """Initialize the game and show welcome screen"""
+    # Initialize commands first
+    initialize_commands()
+    
     display_loading_animation()
     
     # Load all stations from all dimensions

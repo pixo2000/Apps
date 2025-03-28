@@ -1,0 +1,9 @@
+name: dimensions
+aliases:
+  - dims
+  - systems
+description: List available dimensions
+help_text: |
+  DIMENSIONS - List all known dimensions and available jump destinations
+context_requirements:
+  - not_dead

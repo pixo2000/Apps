@@ -1,0 +1,7 @@
+name: exit
+aliases:
+  - quit
+  - q
+description: Save and exit the game
+help_text: |
+  EXIT - Save your progress and exit the game

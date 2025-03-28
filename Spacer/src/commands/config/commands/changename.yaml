@@ -1,0 +1,11 @@
+name: changename
+aliases:
+  - rename
+description: Change your captain name
+help_text: |
+  CHANGENAME <new_name> - Change your captain name
+  Example: changename Captain_Kirk
+context_requirements:
+  - not_dead
+error_messages:
+  invalid_format: Invalid command format. Use: changename YourNewName

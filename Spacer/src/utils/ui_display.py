@@ -35,47 +35,95 @@ def display_loading_animation():
     print("\n\nAll systems online.\n")
 
 def display_help(first_time=False):
-    """Display available commands and help information"""
+    """Display help information for the player"""
     if first_time:
-        print("\n" + "=" * 50)
-        print("WELCOME TO SPACER - COMMAND REFERENCE".center(50))
-        print("=" * 50)
+        print("\n=== WELCOME TO SPACER ===")
+        print("An interstellar exploration game")
+        print("\nYou are a captain of a small spacecraft, free to explore the cosmos.")
+        print("Use commands to navigate between star systems and discover celestial bodies.")
     else:
-        print("\n" + "=" * 50)
-        print("COMMAND REFERENCE".center(50))
-        print("=" * 50)
-
-    print("\n== NAVIGATION ==")
+        print("\n=== SPACER HELP ===")
+    
+    # Get commands from registry if available
+    try:
+        from src.commands.registry import CommandRegistry
+        import importlib
+        registry_module = importlib.import_module("src.commands.command_manager")
+        if hasattr(registry_module, "command_registry"):
+            registry = registry_module.command_registry
+            
+            # Group commands by type
+            navigation_commands = []
+            scan_commands = []
+            interaction_commands = []
+            player_commands = []
+            system_commands = []
+            
+            for cmd_name, cmd in registry.commands.items():
+                if cmd_name in ["move", "jump", "whereami", "dimensions"]:
+                    navigation_commands.append(cmd)
+                elif cmd_name in ["scan", "scancoords"]:
+                    scan_commands.append(cmd)
+                elif cmd_name in ["dock", "land", "launch", "trade", "repair", "quests"]:
+                    interaction_commands.append(cmd)
+                elif cmd_name in ["playerinfo", "changename", "discoveries", "self-destruct"]:
+                    player_commands.append(cmd)
+                else:
+                    system_commands.append(cmd)
+            
+            # Display commands by group
+            if navigation_commands:
+                print("\nNavigation Commands:")
+                for cmd in navigation_commands:
+                    print(f"  {cmd.name.ljust(12)} - {cmd.description}")
+                
+            if scan_commands:
+                print("\nScanning Commands:")
+                for cmd in scan_commands:
+                    print(f"  {cmd.name.ljust(12)} - {cmd.description}")
+                
+            if interaction_commands:
+                print("\nInteraction Commands:")
+                for cmd in interaction_commands:
+                    print(f"  {cmd.name.ljust(12)} - {cmd.description}")
+                
+            if player_commands:
+                print("\nPlayer Commands:")
+                for cmd in player_commands:
+                    print(f"  {cmd.name.ljust(12)} - {cmd.description}")
+                
+            if system_commands:
+                print("\nSystem Commands:")
+                for cmd in system_commands:
+                    print(f"  {cmd.name.ljust(12)} - {cmd.description}")
+                    
+            print("\nFor more information on specific commands, check the command documentation.")
+            print("====================\n")
+            return
+    except (ImportError, AttributeError):
+        pass
+    
+    # Fallback to static command list if registry not available
+    print("\nBasic Commands:")
+    print("  scan        - Scan current system for celestial bodies")
     print("  move X Y    - Move to coordinates [X, Y]")
-    print("  whereami    - Display current location")
+    print("  jump DIM    - Jump to dimension DIM (e.g., 'jump A01')")
+    print("  whereami    - Show current location")
     print("  dimensions  - List available dimensions")
-    print("  jump DIM    - Jump to dimension (e.g. 'jump A01')")
+    print("  dock        - Dock at a station (when at station coordinates)")
+    print("  land        - Land on a planet (when at city coordinates)")
     
-    print("\n== SCANNING ==")
-    print("  scan              - Scan current system")
-    print("  scan [BODY NAME]  - Get detailed info about celestial body")
+    print("\nInfo Commands:")
+    print("  playerinfo  - Show your information")
+    print("  discoveries - List your discoveries")
     
-    print("\n== STATION INTERACTIONS ==")
-    print("  dock       - Dock at station (must be at station coordinates)")
-    print("  land       - Land on planet with city (must be at city coordinates)")
+    print("\nSystem Commands:")
+    print("  help        - Show this help message")
+    print("  logout      - Save and return to login screen")
+    print("  exit/quit   - Save and exit game")
     
-    print("\n== PLAYER COMMANDS - AVAILABLE EVERYWHERE ==")
-    print("  playerinfo       - Show your information")
-    print("  playerinfo NAME  - Show info about another captain")
-    print("  discoveries      - List your discoveries")
-    print("  changename NAME  - Change your captain name")
-    
-    print("\n== SYSTEM COMMANDS ==")
-    print("  help      - Show this help")
-    print("  logout    - Return to login screen")
-    print("  exit/quit - Exit game")
-    
-    print("\n== CONTEXT-SPECIFIC COMMANDS ==")
-    print("  When docked: 'undock', station-specific commands")
-    print("  When landed: 'launch', 'explore', 'analyze', 'info'")
-    
-    print("\nExplore the cosmos, discover new dimensions, and chart your own path!")
-    print("=" * 50 + "\n")
+    print("\nFor more information, visit the Spacer documentation.")
+    print("====================\n")
 
 def display_discoveries(player):
     """Display player's discoveries"""
