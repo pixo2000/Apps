@@ -1,0 +1,9 @@
+name: self-destruct
+aliases:
+  - selfdestruct
+  - sd
+description: Initiate self-destruct sequence (kills your character)
+help_text: |
+  SELF-DESTRUCT - Permanently kill your character
+context_requirements:
+  - not_dead

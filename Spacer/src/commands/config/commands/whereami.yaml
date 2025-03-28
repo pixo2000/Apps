@@ -1,0 +1,10 @@
+name: whereami
+aliases:
+  - location
+  - pos
+  - position
+description: Display your current location
+help_text: |
+  WHEREAMI - Show your current coordinates and dimension
+context_requirements:
+  - not_dead

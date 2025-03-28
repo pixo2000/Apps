@@ -1,0 +1,12 @@
+name: scancoords
+aliases:
+  - sc
+  - coordinatescan
+description: Scan specific coordinates
+help_text: |
+  SCANCOORDS <x> <y> - Scan specific coordinates for objects
+  Example: scancoords 50 -30
+  Note: Only available when docked at a station or landed on a surface
+error_messages:
+  not_docked_or_landed: This command requires station/surface equipment. Must be docked or landed.
+  invalid_format: Invalid coordinates format. Use: scancoords <x> <y>

@@ -1,0 +1,7 @@
+name: help
+aliases:
+  - h
+  - "?"
+description: Display help information
+help_text: |
+  HELP - Show available commands and how to use them

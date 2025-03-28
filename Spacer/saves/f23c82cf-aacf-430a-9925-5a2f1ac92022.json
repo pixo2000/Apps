@@ -21,11 +21,11 @@
         }
     },
     "creation_date": "2025-03-22T16:12:33.534292",
-    "last_login": "22.03.25 - 16:17",
+    "last_login": "28.03.25 - 10:58",
     "is_dead": false,
-    "landed_on": "Wiesbaden",
-    "landed_on_body": "Earth",
+    "landed_on": null,
+    "landed_on_body": null,
     "landed_on_moon": null,
     "docked_at": null,
-    "playtime": "00:00:02:22"
+    "playtime": "00:00:02:39"
 }

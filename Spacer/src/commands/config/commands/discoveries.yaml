@@ -1,0 +1,10 @@
+name: discoveries
+aliases:
+  - disc
+  - found
+  - log
+description: Display discovered celestial bodies
+help_text: |
+  DISCOVERIES - List all celestial bodies you've discovered
+context_requirements:
+  - not_dead

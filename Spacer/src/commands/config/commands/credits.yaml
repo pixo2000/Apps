@@ -1,0 +1,6 @@
+name: credits
+aliases:
+  - about
+description: Display game credits
+help_text: |
+  CREDITS - Display game credits and information

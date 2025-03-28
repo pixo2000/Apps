@@ -1,0 +1,11 @@
+name: playerinfo
+aliases:
+  - pi
+  - info
+  - stats
+description: Display player information
+help_text: |
+  PLAYERINFO - Display your player information
+  PLAYERINFO <player_name> - Display information about another player
+context_requirements:
+  - not_dead

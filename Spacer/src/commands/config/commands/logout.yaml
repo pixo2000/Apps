@@ -1,0 +1,6 @@
+name: logout
+aliases:
+  - signout
+description: Save and return to login screen
+help_text: |
+  LOGOUT - Save your progress and return to the login screen

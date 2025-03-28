@@ -1,0 +1,14 @@
+name: scan
+aliases:
+  - s
+description: Scan the current system or a specific body
+help_text: |
+  SCAN - Scan the current star system for celestial bodies
+  SCAN <body_name> - Get detailed information about a specific body
+context_requirements:
+  - not_docked
+  - not_landed
+  - not_dead
+error_messages:
+  not_docked: Cannot scan while docked at a station. Use 'launch' to undock first.
+  not_landed: Cannot scan while on planetary surface. Use 'launch' to return to orbit first.

@@ -1,0 +1,18 @@
+name: move
+aliases:
+  - goto
+  - nav
+description: Move to specific coordinates
+help_text: |
+  MOVE <x> <y> - Move to the specified coordinates
+  Examples:
+    move 10 15 - Move to coordinates [10, 15]
+    move 0 0  - Move to origin
+context_requirements:
+  - not_docked
+  - not_landed
+  - not_dead
+error_messages:
+  not_docked: Cannot move while docked at a station. Use 'launch' to undock first.
+  not_landed: Cannot move while on planetary surface. Use 'launch' to return to orbit first.
+  invalid_coords: Invalid coordinates. Format: move X Y

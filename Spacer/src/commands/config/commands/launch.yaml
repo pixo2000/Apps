@@ -1,0 +1,9 @@
+name: launch
+aliases:
+  - undock
+  - takeoff
+description: Launch from a station or planetary surface
+help_text: |
+  LAUNCH - Return to space from a station or planetary surface
+error_messages:
+  not_applicable: You are already in space.
