@@ -102,3 +102,9 @@ remove dimensions.json file cuz its not important -> just remove the path to it
 test sys scan on planet etc
 
 check if all commands work after refactor and new commnd system; remove coords and remove not used code
+
+functions that are used by multiple commands should be moved
+
+fix moving to current coords returning error
+
+new move animation pls
