@@ -15,7 +15,6 @@ command_registry = CommandRegistry()
 def initialize_commands():
     """Load all commands into the registry"""
     command_registry.load_all_commands()
-    print(f"Initialized {len(command_registry.commands)} commands")
 
 def handle_input(player):
     """Process player commands and execute appropriate actions"""
