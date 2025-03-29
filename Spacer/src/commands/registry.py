@@ -10,6 +10,7 @@ class CommandRegistry:
     def __init__(self):
         self.commands = {}  # Map of command names to command objects
         self.aliases = {}   # Map of aliases to primary command names
+        self.registered_aliases = set()  # Track which aliases have been registered
     
     def register(self, command):
         """Register a command in the registry"""
@@ -19,11 +20,15 @@ class CommandRegistry:
         # Register primary command name
         self.commands[command.name] = command
         
-        # Register aliases
+        # Register aliases, skipping duplicates silently
         for alias in command.aliases:
-            if alias in self.aliases:
+            if alias in self.aliases and alias not in self.registered_aliases:
                 print(f"Warning: Alias '{alias}' already exists for another command")
-            self.aliases[alias] = command.name
+            
+            # Only register if not already registered to avoid duplicate warnings
+            if alias not in self.registered_aliases:
+                self.aliases[alias] = command.name
+                self.registered_aliases.add(alias)
     
     def get_command(self, command_name):
         """Get a command by name or alias"""
