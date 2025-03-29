@@ -12,9 +12,18 @@ save_mgr = SaveManager()
 # Create command registry
 command_registry = CommandRegistry()
 
+# Track if commands have been initialized
+_commands_initialized = False
+
 def initialize_commands():
-    """Load all commands into the registry"""
-    command_registry.load_all_commands()
+    """Load all commands into the registry, but only on first run"""
+    global _commands_initialized
+    
+    if not _commands_initialized:
+        # Only load commands the first time
+        command_registry.registered_aliases = set()
+        command_registry.load_all_commands()
+        _commands_initialized = True
 
 def handle_input(player):
     """Process player commands and execute appropriate actions"""
