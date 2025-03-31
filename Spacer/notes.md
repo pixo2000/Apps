@@ -102,3 +102,7 @@ fix moving to current coords returning error
 new move animation pls
 
 better self destruct
+
+maybe das kozept mit ungenauen koordinaten beim scan und man muss manchmal näher dran
+
+fix dynamic command loading -> just change the lines in the commands to load dynamicly or smth
