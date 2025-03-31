@@ -2,7 +2,8 @@
 Dimensions command for showing available star systems.
 """
 from src.commands.base_command import BaseCommand
-from src.config import WARP_PATHS, DIMENSION_DESCRIPTIONS
+from src.config import WARP_PATHS
+from src.world.dimension import Dimension
 
 class DimensionsCommand(BaseCommand):
     def __init__(self):
@@ -30,8 +31,14 @@ class DimensionsCommand(BaseCommand):
             if destinations:
                 print("\nAvailable jump destinations:")
                 for dest in destinations:
-                    # Add description if available
-                    description = DIMENSION_DESCRIPTIONS.get(dest, "Unknown system")
+                    # Load dimension data to get title
+                    try:
+                        dim = Dimension(dest)
+                        description = dim.title
+                    except:
+                        # Fallback if dimension can't be loaded
+                        description = "Unknown system"
+                    
                     if dest in known_dims:
                         print(f"  {dest} - {description}")
                     else:

@@ -3,12 +3,13 @@
     "uuid": "f23c82cf-aacf-430a-9925-5a2f1ac92022",
     "position": {
         "x": 0,
-        "y": -59,
-        "dimension": "A01"
+        "y": 0,
+        "dimension": "D14"
     },
     "discoveries": {
         "known_dimensions": [
-            "A01"
+            "A01",
+            "D14"
         ],
         "known_bodies": {
             "A01": [
@@ -17,15 +18,18 @@
                 "Ceres",
                 "Juno",
                 "Earth:Luna"
+            ],
+            "D14": [
+                "Sirius"
             ]
         }
     },
     "creation_date": "2025-03-22T16:12:33.534292",
-    "last_login": "31.03.25 - 05:38",
+    "last_login": "31.03.25 - 05:55",
     "is_dead": false,
     "landed_on": null,
     "landed_on_body": null,
     "landed_on_moon": null,
     "docked_at": null,
-    "playtime": "00:00:17:07"
+    "playtime": "00:00:28:28"
 }
