@@ -106,3 +106,24 @@ better self destruct
 maybe das kozept mit ungenauen koordinaten beim scan und man muss manchmal näher dran
 
 fix dynamic command loading -> just change the lines in the commands to load dynamicly or smth
+
+check error messages cuz sometimes its just json and smtimes yaml
+
+check when wich scanning works
+
+dimensions:
+  A01: "Alpha System - Home System"
+  B02: "Beta System - Mining Colony"
+  C03: "Gamma System - Research Outpost"
+  D04: "Delta System - Frontier Outpost"
+  E05: "Epsilon System - Abandoned Colony"
+  F06: "Zeta System - Unknown Territory"
+  G07: "Eta System - Unexplored Region"
+  H08: "Theta System - Nebula Cluster"
+  I09: "Iota System - Black Hole Vicinity"
+  J10: "Kappa System - Ancient Ruins"
+  K11: "Lambda System - Asteroid Field"
+  L12: "Mu System - Gas Giant Cluster"
+  V99: "Void - The Empty Abyss"
+
+fi jump animaton and discovery
