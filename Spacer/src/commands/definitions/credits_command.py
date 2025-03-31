@@ -1,20 +1,20 @@
 """
-Credits command for Spacer game.
+Credits command for displaying game credits.
 """
 from src.commands.base_command import BaseCommand
-from src.commands.player_commands import handle_credits_command
 
 class CreditsCommand(BaseCommand):
     def __init__(self):
-        super().__init__(
-            name="credits",
-            aliases=["about"],
-            description="Display game credits",
-            context_requirements=[],
-            error_messages={}
-        )
+        # Lade Konfiguration aus der YAML-Datei
+        super().__init__()
     
     def execute(self, player, args):
         """Execute the credits command"""
-        handle_credits_command()
+        print("\n== SPACER: INTERSTELLAR EXPLORATION SIMULATOR ==")
+        print("\nDeveloped by: LU\n")
+        print("A text-based space exploration game written in Python")
+        print("Version: Alpha 0.1\n")
+        print("Special thanks to all testers and contributors!")
+        print("=========================================")
+        
         return "positive"

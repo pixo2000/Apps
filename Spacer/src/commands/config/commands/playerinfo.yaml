@@ -1,11 +1,12 @@
 name: playerinfo
 aliases:
   - pi
-  - info
-  - stats
+  - myinfo
+  - status
 description: Display player information
 help_text: |
-  PLAYERINFO - Display your player information
-  PLAYERINFO <player_name> - Display information about another player
+  PLAYERINFO - Show information about your captain
+  PLAYERINFO <name> - Show information about another captain
 context_requirements:
   - not_dead
+error_messages: {}

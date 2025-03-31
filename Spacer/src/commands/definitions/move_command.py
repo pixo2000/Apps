@@ -10,17 +10,8 @@ save_mgr = SaveManager()
 
 class MoveCommand(BaseCommand):
     def __init__(self):
-        super().__init__(
-            name="move",
-            aliases=["goto", "nav"],
-            description="Move to specific coordinates",
-            context_requirements=["not_docked", "not_landed", "not_dead"],
-            error_messages={
-                "not_docked": "Cannot move while docked at a station. Use 'launch' to undock first.",
-                "not_landed": "Cannot move while on planetary surface. Use 'launch' to return to orbit first.",
-                "invalid_coords": "Invalid coordinates. Format: move X Y"
-            }
-        )
+        # Let the base class handle loading from YAML
+        super().__init__()
     
     def execute(self, player, args):
         """Execute the move command"""

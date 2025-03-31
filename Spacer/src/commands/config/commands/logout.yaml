@@ -1,6 +1,9 @@
 name: logout
 aliases:
   - signout
-description: Save and return to login screen
+  - disconnect
+description: Log out and return to title screen
 help_text: |
-  LOGOUT - Save your progress and return to the login screen
+  LOGOUT - Save your game and return to the title screen
+context_requirements: []
+error_messages: {}

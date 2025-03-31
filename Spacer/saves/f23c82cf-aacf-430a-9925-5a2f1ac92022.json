@@ -2,7 +2,7 @@
     "name": "Test2",
     "uuid": "f23c82cf-aacf-430a-9925-5a2f1ac92022",
     "position": {
-        "x": 60,
+        "x": 0,
         "y": -59,
         "dimension": "A01"
     },
@@ -21,11 +21,11 @@
         }
     },
     "creation_date": "2025-03-22T16:12:33.534292",
-    "last_login": "31.03.25 - 05:29",
+    "last_login": "31.03.25 - 05:38",
     "is_dead": false,
     "landed_on": null,
     "landed_on_body": null,
     "landed_on_moon": null,
     "docked_at": null,
-    "playtime": "00:00:16:31"
+    "playtime": "00:00:17:07"
 }

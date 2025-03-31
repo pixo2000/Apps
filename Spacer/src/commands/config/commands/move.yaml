@@ -13,6 +13,6 @@ context_requirements:
   - not_landed
   - not_dead
 error_messages:
-  not_docked: Cannot move while docked at a station. Use 'launch' to undock first.
-  not_landed: Cannot move while on planetary surface. Use 'launch' to return to orbit first.
-  invalid_coords: Invalid coordinates. Format: move X Y
+  not_docked: "Cannot move while docked at a station. Use 'launch' to undock first."
+  not_landed: "Cannot move while on planetary surface. Use 'launch' to return to orbit first."
+  invalid_coords: "Invalid coordinates. Format: move X Y"

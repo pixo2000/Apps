@@ -2,15 +2,12 @@
 Main command router for player inputs.
 """
 import time
-from src.commands.registry import CommandRegistry
+from src.commands.registry import cmd_registry
 from src.commands.station_commands import handle_station_input, handle_planet_input
 from src.core.save_manager import SaveManager
 
 # Create save manager instance
 save_mgr = SaveManager()
-
-# Create command registry
-command_registry = CommandRegistry()
 
 # Track if commands have been initialized
 _commands_initialized = False
@@ -21,8 +18,8 @@ def initialize_commands():
     
     if not _commands_initialized:
         # Only load commands the first time
-        command_registry.registered_aliases = set()
-        command_registry.load_all_commands()
+        cmd_registry.registered_aliases = set()
+        cmd_registry.load_all_commands()
         _commands_initialized = True
 
 def handle_input(player):
@@ -53,7 +50,7 @@ def handle_input(player):
     args = parts[1] if len(parts) > 1 else ""
     
     # Get the command object
-    command = command_registry.get_command(command_name)
+    command = cmd_registry.get_command(command_name)
     
     # If command not found
     if not command:

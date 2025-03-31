@@ -1,19 +1,13 @@
 """
-Dimensions command for Spacer game.
+Dimensions command for showing available star systems.
 """
 from src.commands.base_command import BaseCommand
-from src.world.dimension import Dimension
-from src.config import WARP_PATHS
+from src.config import WARP_PATHS, DIMENSION_DESCRIPTIONS
 
 class DimensionsCommand(BaseCommand):
     def __init__(self):
-        super().__init__(
-            name="dimensions",
-            aliases=["dims", "systems"],
-            description="List available dimensions",
-            context_requirements=["not_dead"],
-            error_messages={}
-        )
+        # Lade Konfiguration aus der YAML-Datei
+        super().__init__()
     
     def execute(self, player, args):
         """Execute the dimensions command"""
@@ -21,42 +15,30 @@ class DimensionsCommand(BaseCommand):
         if not self.validate_context(player):
             return "positive"
         
-        available = Dimension.get_available_dimensions()
+        # Get current dimension
         current_dim = player.dimension.name
         
-        print("\n=== AVAILABLE DIMENSIONS ===")
-        # First show dimensions that can be warped to from current location
-        if current_dim in WARP_PATHS:
-            print(f"\nWarp destinations from {current_dim}:")
-            for dim_name in WARP_PATHS[current_dim]:
-                try:
-                    temp_dim = Dimension(dim_name)
-                    discovered = dim_name in player.known_dimensions
-                    status = "DISCOVERED" if discovered else "UNDISCOVERED"
-                    
-                    if discovered:
-                        print(f"» {dim_name}: {temp_dim.title} - {temp_dim.description}")
-                    else:
-                        print(f"» {dim_name}: {status}")
-                except Exception as e:
-                    print(f"» {dim_name}: ERROR - {str(e)}")
-        else:
-            print("\nNo warp destinations available from current location.")
+        # Get all known dimensions
+        known_dims = player.known_dimensions
         
-        # Then show all known dimensions
-        print("\nAll known dimensions:")
-        for i, dim in enumerate(available):
-            try:
-                temp_dim = Dimension(dim)
-                discovered = dim in player.known_dimensions
-                status = "DISCOVERED" if discovered else "UNDISCOVERED"
-                
-                if discovered:
-                    print(f"» {dim}: {temp_dim.title} - {temp_dim.description}")
-                else:
-                    print(f"» {dim}: {status}")
-            except:
-                print(f"» {dim}")
-        print("===========================\n")
+        print("\n== Known Dimensions ==")
+        print(f"You are currently in: {current_dim} - {player.dimension.title}")
+        
+        # List available jump destinations from current dimension
+        if current_dim in WARP_PATHS:
+            destinations = WARP_PATHS[current_dim]
+            if destinations:
+                print("\nAvailable jump destinations:")
+                for dest in destinations:
+                    # Add description if available
+                    description = DIMENSION_DESCRIPTIONS.get(dest, "Unknown system")
+                    if dest in known_dims:
+                        print(f"  {dest} - {description}")
+                    else:
+                        print(f"  {dest} - {description} (Unexplored)")
+            else:
+                print("\nNo known jump paths from this dimension.")
+        else:
+            print("\nNo known jump paths from this dimension.")
         
         return "positive"

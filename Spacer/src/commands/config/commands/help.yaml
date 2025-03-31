@@ -2,6 +2,11 @@ name: help
 aliases:
   - h
   - "?"
-description: Display help information
+  - commands
+description: "Display available commands or get help on a specific command"
 help_text: |
-  HELP - Show available commands and how to use them
+  HELP - Show a list of all available commands
+  HELP <command> - Show detailed help for a specific command
+context_requirements: []
+error_messages:
+  unknown_command: "Unknown command: '{command}'. Type 'help' for a list of commands."
