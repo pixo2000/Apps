@@ -1,6 +1,6 @@
 name: land
 aliases:
-  - touchdown
+  - descend
 description: Land on a planet or moon
 help_text: |
   LAND - Land on a planet or moon at your current coordinates
@@ -9,5 +9,5 @@ context_requirements:
   - not_landed
   - not_dead
 error_messages:
-  not_docked: Cannot land while docked at a station. Use 'launch' to undock first.
-  not_landed: You are already on a planetary surface.
+  not_docked: "Cannot land while docked at a station. Use 'launch' to undock first."
+  not_landed: "You are already landed on a surface."

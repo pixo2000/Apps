@@ -1,6 +1,7 @@
 name: dock
 aliases:
   - board
+  - enter
 description: Dock at a station
 help_text: |
   DOCK - Dock at a station at your current coordinates
@@ -9,5 +10,5 @@ context_requirements:
   - not_landed
   - not_dead
 error_messages:
-  not_docked: You are already docked at a station.
-  not_landed: Cannot dock while on planetary surface. Use 'launch' to return to orbit first.
+  not_docked: "You are already docked at a station."
+  not_landed: "Cannot dock while on planetary surface. Use 'launch' to return to orbit first."

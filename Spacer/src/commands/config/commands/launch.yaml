@@ -2,8 +2,10 @@ name: launch
 aliases:
   - undock
   - takeoff
-description: Launch from a station or planetary surface
+  - liftoff
+description: Launch from a station or planet surface
 help_text: |
-  LAUNCH - Return to space from a station or planetary surface
-error_messages:
-  not_applicable: You are already in space.
+  LAUNCH - Leave a station or planet and return to space
+context_requirements:
+  - not_dead
+error_messages: {}

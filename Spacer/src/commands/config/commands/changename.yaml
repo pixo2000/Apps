@@ -1,11 +1,12 @@
 name: changename
 aliases:
   - rename
-description: Change your captain name
+description: Change your captain's name
 help_text: |
-  CHANGENAME <new_name> - Change your captain name
-  Example: changename Captain_Kirk
+  CHANGENAME <new name> - Change your captain's name to a new one
+  
+  The name must be 3-15 characters and can only contain letters, numbers, and underscores.
 context_requirements:
   - not_dead
 error_messages:
-  invalid_format: Invalid command format. Use: changename YourNewName
+  no_name: "No name provided. Usage: changename <new name>"

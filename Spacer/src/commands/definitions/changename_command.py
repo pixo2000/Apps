@@ -1,20 +1,13 @@
 """
-ChangeName command for Spacer game.
+Change name command for updating player name.
 """
 from src.commands.base_command import BaseCommand
 from src.commands.player_commands import handle_change_name_command
 
-class ChangeNameCommand(BaseCommand):
+class ChangenameCommand(BaseCommand):
     def __init__(self):
-        super().__init__(
-            name="changename",
-            aliases=["rename"],
-            description="Change your captain name",
-            context_requirements=["not_dead"],
-            error_messages={
-                "invalid_format": "Invalid command format. Use: changename YourNewName"
-            }
-        )
+        # Lade Konfiguration aus der YAML-Datei
+        super().__init__()
     
     def execute(self, player, args):
         """Execute the changename command"""
@@ -22,13 +15,12 @@ class ChangeNameCommand(BaseCommand):
         if not self.validate_context(player):
             return "positive"
         
-        # Check if new name is provided
+        # Check if name is provided
         new_name = args.strip()
         if not new_name:
-            print(f"\n✗ {self.error_messages['invalid_format']}")
+            print(f"\n✗ {self.error_messages.get('no_name', 'No name provided. Usage: changename <new name>')}")
             return "positive"
         
-        # Handle change name command
+        # Handle name change
         handle_change_name_command(player, new_name)
-        
         return "positive"

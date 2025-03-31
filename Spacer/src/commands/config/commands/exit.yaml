@@ -1,7 +1,9 @@
 name: exit
 aliases:
   - quit
-  - q
-description: Save and exit the game
+  - bye
+description: Exit the game
 help_text: |
-  EXIT - Save your progress and exit the game
+  EXIT - Save your game and exit the application
+context_requirements: []
+error_messages: {}

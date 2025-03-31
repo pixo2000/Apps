@@ -1,40 +1,39 @@
 """
-Whereami command for Spacer game.
+Whereami command for displaying current position and environment.
 """
 from src.commands.base_command import BaseCommand
-from src.core.save_manager import SaveManager
-
-# Create save manager for saving after command execution
-save_mgr = SaveManager()
+from src.world.station import check_coords_for_objects
 
 class WhereAmICommand(BaseCommand):
     def __init__(self):
-        super().__init__(
-            name="whereami",
-            aliases=["location", "pos", "position"],
-            description="Display your current location",
-            context_requirements=["not_dead"],
-            error_messages={}
-        )
+        # Lade Konfiguration aus der YAML-Datei
+        super().__init__()
     
     def execute(self, player, args):
         """Execute the whereami command"""
-        # Validate context
-        if not self.validate_context(player):
-            return "positive"
+        # Get player's current position
+        x = player.position("x")
+        y = player.position("y")
+        dim_name = player.position("dimension")
         
-        dimension = player.position('dimension')
-        x_pos = player.position('x')
-        y_pos = player.position('y')
+        # Show current position
+        print(f"\nYou are at coordinates [{x}, {y}] in dimension {dim_name}.")
+        print(f"Dimension name: {player.dimension.title}")
+        print(f"Description: {player.dimension.description}")
         
-        print("\n=== CURRENT LOCATION ===")
-        print(f"» Dimension: {dimension}")
-        print(f"» Coordinates: [{x_pos}, {y_pos}]")
-        try:
-            dim_title = player.dimension.title
-            print(f"» System: {dim_title}")
-        except AttributeError:
-            pass
-        print("=======================\n")
+        # Check if there's anything at the current position
+        result = check_coords_for_objects(x, y, dim_name, {"bodies": player.dimension.properties})
+        
+        if result["found"]:
+            print("\nAt your current position:")
+            for obj in result["objects"]:
+                if "parent" in obj and "grandparent" in obj:
+                    print(f"- {obj['name']} ({obj['type']}) on {obj['parent']}, Moon of {obj['grandparent']}")
+                elif "parent" in obj:
+                    print(f"- {obj['name']} ({obj['type']}) on {obj['parent']}")
+                else:
+                    print(f"- {obj['name']} ({obj['type']})")
+        
+        # TODO: Add more environmental information here
         
         return "positive"

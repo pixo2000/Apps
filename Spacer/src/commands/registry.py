@@ -11,11 +11,15 @@ class CommandRegistry:
         self.commands = {}  # Map of command names to command objects
         self.aliases = {}   # Map of aliases to primary command names
         self.registered_aliases = set()  # Track which aliases have been registered
+        self.command_classes = {}  # Store command classes for reloading
     
     def register(self, command):
         """Register a command in the registry"""
         if not isinstance(command, BaseCommand):
             raise TypeError("Command must be an instance of BaseCommand")
+        
+        # Store the class for reloading
+        self.command_classes[command.name] = command.__class__
         
         # Register primary command name
         self.commands[command.name] = command
@@ -43,6 +47,38 @@ class CommandRegistry:
         
         return None
     
+    def reload_command(self, command_name):
+        """Reload a specific command from its configuration"""
+        if command_name in self.command_classes:
+            cmd_class = self.command_classes[command_name]
+            try:
+                # Remove old command and its aliases
+                old_command = self.commands.get(command_name)
+                if old_command:
+                    for alias in old_command.aliases:
+                        if alias in self.aliases:
+                            del self.aliases[alias]
+                            self.registered_aliases.remove(alias)
+                
+                # Create new command instance which will load fresh config
+                new_command = cmd_class()
+                
+                # Register the new instance
+                self.register(new_command)
+                return True
+            except Exception as e:
+                print(f"Error reloading command '{command_name}': {e}")
+        return False
+    
+    def reload_all_commands(self):
+        """Reload all commands from their configurations"""
+        success_count = 0
+        for cmd_name in list(self.command_classes.keys()):
+            if self.reload_command(cmd_name):
+                success_count += 1
+        return success_count
+    
+    # Alias for compatibility
     def load_all_commands(self):
         """Dynamically load all command modules from the definitions directory"""
         # Get the path to the definitions directory
@@ -98,3 +134,6 @@ class CommandRegistry:
         
         # Execute the command
         return command.execute(player, args)
+
+# Create a singleton instance of CommandRegistry for use across the application
+cmd_registry = CommandRegistry()

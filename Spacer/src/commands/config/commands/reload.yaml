@@ -1,0 +1,8 @@
+name: reload
+aliases:
+  - refresh
+description: Reload all command configurations
+help_text: |
+  RELOAD - Reload all command configurations to pick up changes in YAML files
+context_requirements: []
+error_messages: {}

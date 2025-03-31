@@ -5,5 +5,8 @@ aliases:
 description: Initiate self-destruct sequence (kills your character)
 help_text: |
   SELF-DESTRUCT - Permanently kill your character
+  
+  WARNING: This command will kill your character permanently.
+  All progress will be lost for this captain.
 context_requirements:
   - not_dead
