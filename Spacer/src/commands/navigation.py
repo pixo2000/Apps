@@ -140,28 +140,6 @@ def handle_move_command(player, x, y):
         if dock == "y" or dock == "yes":
             print(f"\nDocking at {station.name}...")
             player.docked_at = station
-    
-    # Check for planets or other points of interest
-    dim_name = player.dimension.name
-    for body_name, body_data in player.dimension.properties.items():
-        if "Coordinates" in body_data:
-            body_x = int(body_data["Coordinates"]["x"])
-            body_y = int(body_data["Coordinates"]["y"])
-            if body_x == player.x and body_y == player.y:
-                # Check if this is a new discovery
-                is_new_discovery = False
-                if dim_name not in player.known_bodies or body_name not in player.known_bodies[dim_name]:
-                    is_new_discovery = True
-                    # Add to known bodies
-                    if dim_name not in player.known_bodies:
-                        player.known_bodies[dim_name] = []
-                    player.known_bodies[dim_name].append(body_name)
-                
-                if is_new_discovery:
-                    print(f"\nYou've discovered {body_name}!")
-                else:
-                    print(f"\nYou've reached {body_name}!")
-                break
 
 def handle_jump_command(player, dimension_name):
     """Jump to a different dimension"""
