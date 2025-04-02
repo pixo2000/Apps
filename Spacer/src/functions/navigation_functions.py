@@ -82,9 +82,9 @@ def perform_jump(player, dimension_name):
     old_dimension = player.dimension.name
     player.dimension = new_dimension
     
-    # Default position should be 0,0 in a new dimension
-    player.x = 0
-    player.y = 0
+    # Set spawn coordinates to [10, 10] in the new dimension
+    player.x = 10
+    player.y = 10
     
     # Add to known dimensions
     if dimension_name not in player.known_dimensions:

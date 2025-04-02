@@ -54,11 +54,11 @@
         }
     },
     "creation_date": "20.03.25 - 15:20",
-    "last_login": "26.03.25 - 19:03",
-    "is_dead": true,
+    "last_login": "02.04.25 - 17:29",
+    "is_dead": false,
     "landed_on": null,
     "landed_on_body": null,
     "landed_on_moon": null,
     "docked_at": null,
-    "playtime": "00:01:32:20"
+    "playtime": "00:01:32:35"
 }

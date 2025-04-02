@@ -3,7 +3,7 @@
     "uuid": "41a97d1e-6514-41eb-84ba-73d9b7e6ed7b",
     "position": {
         "x": 2345,
-        "y": 1477,
+        "y": -1477,
         "dimension": "A01"
     },
     "discoveries": {
@@ -18,11 +18,11 @@
         }
     },
     "creation_date": "2025-03-21T18:21:35.618139",
-    "last_login": "29.03.25 - 23:25",
-    "is_dead": true,
+    "last_login": "02.04.25 - 17:29",
+    "is_dead": false,
     "landed_on": null,
     "landed_on_body": null,
     "landed_on_moon": null,
     "docked_at": null,
-    "playtime": "00:00:13:10"
+    "playtime": "00:00:13:52"
 }
