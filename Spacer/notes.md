@@ -109,7 +109,7 @@ fix dynamic command loading -> just change the lines in the commands to load dyn
 
 check error messages cuz sometimes its just json and smtimes yaml
 
-check when wich scanning works
+fix scancoords with hidden signals
 
 dimensions:
   A01: "Alpha System - Home System"
@@ -127,3 +127,9 @@ dimensions:
   V99: "Void - The Empty Abyss"
 
 fi jump animaton and discovery
+
+fix death -> fix spawn point why ever is it at 0 0
+
+always know wiesbaden and earth? any maybe also star
+
+scan hidden signals?

@@ -2,9 +2,8 @@
 Scanner command handlers for celestial body detection.
 """
 import time
-import math
 from src.world.scanner import handle_scan, scan_celestial_body
-from src.world.station import STATIONS, check_coords_for_objects
+from src.world.station import check_coords_for_objects
 from src.config import HIDDEN_SIGNALS
 
 def handle_scan_command(player):
@@ -14,59 +13,6 @@ def handle_scan_command(player):
 def handle_specific_scan_command(player, body_name):
     """Handle scanning a specific celestial body"""
     scan_celestial_body(player, body_name)
-
-def handle_simple_scan(player):
-    """Scan surroundings for points of interest (simplified version of scanner)"""
-    print("\nScanning surrounding space...")
-    time.sleep(1)
-    
-    # Get player position
-    player_x = player.x
-    player_y = player.y
-    dim_name = player.dimension.name
-    
-    # Find nearby celestial bodies
-    nearby_bodies = []
-    for body_name, body_data in player.dimension.properties.items():
-        if "Coordinates" in body_data:
-            body_x = int(body_data["Coordinates"]["x"])
-            body_y = int(body_data["Coordinates"]["y"])
-            distance = max(abs(player_x - body_x), abs(player_y - body_y))
-            
-            # Check if this body is already known to the player
-            is_known = False
-            if dim_name in player.known_bodies and body_name in player.known_bodies[dim_name]:
-                is_known = True
-                
-            # For stars, they are always detectable regardless of discovery
-            is_star = body_data.get("type", "").lower() == "star"
-            
-            # Only show details for known bodies or stars, otherwise show as "Unknown"
-            if distance <= 10:  # Detect bodies within 10 units
-                if is_known or is_star:
-                    nearby_bodies.append((body_name, body_data["type"], distance))
-                else:
-                    # For unknown bodies, show only limited information
-                    nearby_bodies.append(("Unknown Object", "Unknown", distance))
-    
-    # Also check for hidden signals
-    if dim_name in HIDDEN_SIGNALS:
-        for signal_name, coords in HIDDEN_SIGNALS[dim_name].items():
-            signal_x = coords["x"]
-            signal_y = coords["y"]
-            distance = max(abs(player_x - signal_x), abs(player_y - signal_y))
-            
-            # For hidden signals, only show coordinates if within range
-            if distance <= 60:  # Detect from scan range distance
-                nearby_bodies.append(("Unknown", "Unknown", distance))
-    
-    # Display results
-    if nearby_bodies:
-        print("\nDetected celestial bodies:")
-        for name, body_type, dist in sorted(nearby_bodies, key=lambda x: x[2]):
-            print(f"  {name} ({body_type}) - Distance: {dist} units")
-    else:
-        print("\nNo significant celestial bodies detected nearby.")
 
 def handle_coordinate_scan(player, coords):
     """
@@ -103,7 +49,9 @@ def handle_coordinate_scan(player, coords):
     if result["found"]:
         print(f"\n=== SCAN RESULTS FOR [{x}, {y}] ===")
         for obj in result["objects"]:
-            if "parent" in obj:
+            if "parent" in obj and "grandparent" in obj:
+                print(f"Detected: {obj['name']} ({obj['type']} on {obj['parent']}, Moon of {obj['grandparent']})")
+            elif "parent" in obj:
                 print(f"Detected: {obj['name']} ({obj['type']} of {obj['parent']})")
             else:
                 print(f"Detected: {obj['name']} ({obj['type']})")

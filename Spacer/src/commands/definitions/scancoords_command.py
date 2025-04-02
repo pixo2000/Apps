@@ -6,7 +6,7 @@ from src.commands.scan_commands import handle_coordinate_scan
 
 class ScanCoordsCommand(BaseCommand):
     def __init__(self):
-        # Lade Konfiguration aus der YAML-Datei
+        # Load configuration from the YAML file
         super().__init__()
     
     def execute(self, player, args):
