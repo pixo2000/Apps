@@ -87,6 +87,6 @@ if __name__ == '__main__':
     cleanup_thread.start()
     
     # Run the Flask app with SocketIO
-    socketio.run(app, host='0.0.0.0', port=5500, debug=True)
+    socketio.run(app, host='0.0.0.0', port=5500, debug=False)
     # If port 80 doesn't work (might need admin privileges), try:
     # socketio.run(app, host='0.0.0.0', port=5000, debug=True)

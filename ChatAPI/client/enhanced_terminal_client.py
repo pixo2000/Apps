@@ -3,8 +3,46 @@ import sys
 import threading
 import time
 import argparse
-import readline
+# Import readline only on non-Windows platforms
+if os.name != 'nt':
+    import readline
+else:
+    # On Windows, try to use pyreadline if available
+    try:
+        import pyreadline as readline
+    except ImportError:
+        # If pyreadline is not available, continue without readline functionality
+        pass
 from datetime import datetime
+
+# Check for required packages with proper version
+try:
+    import websocket_client as websocket
+except ImportError:
+    try:
+        from websocket import WebSocketApp
+        # If we get here, a version of websocket is installed, but may be wrong
+        print("\nWARNING: You may have the wrong websocket package installed.")
+        print("This application requires 'websocket-client', not 'websocket'.")
+        print("Please install the correct package using:")
+        print("    pip uninstall websocket")
+        print("    pip install websocket-client\n")
+    except ImportError:
+        print("\nERROR: websocket-client package is not installed.")
+        print("Please install it using one of the following commands:")
+        print("    pip install websocket-client")
+        print("    python -m pip install websocket-client\n")
+        sys.exit(1)
+
+try:
+    import socketio
+except ImportError:
+    print("\nERROR: python-socketio package is not installed.")
+    print("Please install it using one of the following commands:")
+    print("    pip install python-socketio")
+    print("    python -m pip install python-socketio\n")
+    sys.exit(1)
+
 from socketclient import WebSocketClient
 
 class EnhancedTerminalChat:
@@ -160,8 +198,14 @@ def main():
         client.run()
     except KeyboardInterrupt:
         print("\nExiting...")
+    except ConnectionError as e:
+        print(f"\nConnection Error: {str(e)}")
+        print("Please check if:")
+        print("- The server is running at the specified address and port")
+        print("- Your network connection is working properly")
+        print("- All required packages are installed (websocket-client, socketio)")
     except Exception as e:
-        print(f"Error: {str(e)}")
+        print(f"\nError: {str(e)}")
     
 if __name__ == "__main__":
     main()
