@@ -3,7 +3,7 @@ import json
 import time
 
 class ChatClient:
-    def __init__(self, server_url="http://localhost", port=80):
+    def __init__(self, server_url="http://localhost", port=5500):
         self.server_url = f"{server_url}:{port}"
         self.username = "Anonymous"
         self.last_message_index = 0
