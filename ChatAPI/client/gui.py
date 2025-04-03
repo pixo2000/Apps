@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk, scrolledtext, messagebox
 import threading
 import time
-from main import ChatClient
+from socketclient import WebSocketClient
 
 class ChatApp:
     def __init__(self, root):
@@ -11,14 +11,12 @@ class ChatApp:
         self.root.geometry("600x700")
         
         # Create the chat client
-        self.client = ChatClient()
+        self.client = WebSocketClient()
+        # Register the message callback
+        self.client.register_message_callback(self.update_chat_display)
         
         # Create frames
         self.setup_ui()
-        
-        # Start message polling
-        self.poll_thread = threading.Thread(target=self.poll_messages, daemon=True)
-        self.poll_thread.start()
         
     def setup_ui(self):
         # Connection frame
@@ -32,7 +30,7 @@ class ChatApp:
         
         ttk.Label(connection_frame, text="Port:").grid(row=0, column=2, padx=5, pady=5)
         self.server_port = ttk.Entry(connection_frame, width=6)
-        self.server_port.insert(0, "80")
+        self.server_port.insert(0, "5500")
         self.server_port.grid(row=0, column=3, padx=5, pady=5)
         
         self.connect_button = ttk.Button(connection_frame, text="Connect", command=self.connect_to_server)
@@ -86,10 +84,14 @@ class ChatApp:
             messagebox.showerror("Invalid Port", "Please enter a valid port number")
             return
         
-        self.client = ChatClient(url, port)
-        if self.client.check_server():
+        self.client.server_url = url
+        self.client.port = port
+        
+        if self.client.connect_to_server():
             self.status_var.set(f"Connected to {url}:{port}")
             messagebox.showinfo("Connection Successful", "Connected to the chat server!")
+            # Get message history when connected
+            self.client.get_message_history()
         else:
             self.status_var.set("Failed to connect")
             messagebox.showerror("Connection Failed", "Could not connect to the server")
@@ -111,18 +113,7 @@ class ChatApp:
         if success:
             self.message_input.delete(0, tk.END)
         else:
-            messagebox.showerror("Send Failed", "Failed to send message")
-    
-    def poll_messages(self):
-        while True:
-            try:
-                if hasattr(self, 'client'):
-                    new_messages = self.client.get_new_messages()
-                    if new_messages:
-                        self.update_chat_display(new_messages)
-            except Exception as e:
-                print(f"Error polling messages: {e}")
-            time.sleep(1)
+            messagebox.showerror("Send Failed", "Failed to send message. Are you connected?")
     
     def update_chat_display(self, messages):
         self.chat_display.config(state='normal')

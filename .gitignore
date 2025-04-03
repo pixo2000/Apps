@@ -45,3 +45,5 @@ Spacer/src/functions/__pycache__/navigation_functions.cpython-312.pyc
 Spacer/src/commands/definitions/__pycache__/reload_command.cpython-312.pyc
 Spacer/src/commands/definitions/__pycache__/self_destruct_command.cpython-312.pyc
 ChatAPI/client/__pycache__/main.cpython-313.pyc
+ChatAPI/client/__pycache__/main.cpython-312.pyc
+ChatAPI/client/__pycache__/socketclient.cpython-312.pyc
