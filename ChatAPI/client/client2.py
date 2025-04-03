@@ -126,7 +126,7 @@ class EnhancedTerminalChat:
     def add_system_message(self, text):
         """Add a system message to the chat."""
         system_msg = {
-            'username': '[System]',
+            'username': 'System',
             'message': text,
             'timestamp': datetime.now().strftime('%H:%M:%S')
         }
