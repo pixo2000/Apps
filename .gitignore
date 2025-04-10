@@ -48,3 +48,5 @@ ChatAPI/client/__pycache__/main.cpython-313.pyc
 ChatAPI/client/__pycache__/main.cpython-312.pyc
 ChatAPI/client/__pycache__/socketclient.cpython-312.pyc
 ChatAPI/client/__pycache__/socketclient.cpython-313.pyc
+LoginAPI/server/.env
+LoginAPI/test-client/.env
