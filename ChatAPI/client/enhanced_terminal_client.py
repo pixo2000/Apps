@@ -46,7 +46,7 @@ except ImportError:
 from socketclient import WebSocketClient
 
 class EnhancedTerminalChat:
-    def __init__(self, server_url="http://localhost", port=5500):
+    def __init__(self, server_url="http://10.68.240.41", port=5500):
         self.server_url = server_url
         self.port = port
         self.username = "Anonymous"

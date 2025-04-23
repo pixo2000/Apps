@@ -1,129 +1,228 @@
 import tkinter as tk
-from tkinter import ttk, scrolledtext, messagebox
+from tkinter import ttk, messagebox, scrolledtext
+import requests
 import threading
 import time
-from socketclient import WebSocketClient
+import socket
+import json
 
-class ChatApp:
+class ChatClient:
     def __init__(self, root):
         self.root = root
         self.root.title("Chat Application")
-        self.root.geometry("600x700")
+        self.root.geometry("800x600")
+        self.root.minsize(600, 400)
         
-        # Create the chat client
-        self.client = WebSocketClient()
-        # Register the message callback
-        self.client.register_message_callback(self.update_chat_display)
+        self.server_url = "http://localhost:80"  # Change this to your server address
+        self.user_id = None
+        self.username = None
+        self.computer_name = socket.gethostname()
+        self.message_count = 0
+        self.polling = False
         
-        # Create frames
-        self.setup_ui()
-        
-    def setup_ui(self):
-        # Connection frame
-        connection_frame = ttk.LabelFrame(self.root, text="Server Connection")
-        connection_frame.pack(fill="x", padx=10, pady=5)
-        
-        ttk.Label(connection_frame, text="Server URL:").grid(row=0, column=0, padx=5, pady=5)
-        self.server_url = ttk.Entry(connection_frame)
-        self.server_url.insert(0, "http://localhost")
-        self.server_url.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
-        
-        ttk.Label(connection_frame, text="Port:").grid(row=0, column=2, padx=5, pady=5)
-        self.server_port = ttk.Entry(connection_frame, width=6)
-        self.server_port.insert(0, "5500")
-        self.server_port.grid(row=0, column=3, padx=5, pady=5)
-        
-        self.connect_button = ttk.Button(connection_frame, text="Connect", command=self.connect_to_server)
-        self.connect_button.grid(row=0, column=4, padx=5, pady=5)
-        
-        # Username frame
-        username_frame = ttk.LabelFrame(self.root, text="Your Identity")
-        username_frame.pack(fill="x", padx=10, pady=5)
-        
-        ttk.Label(username_frame, text="Username:").grid(row=0, column=0, padx=5, pady=5)
-        self.username_entry = ttk.Entry(username_frame)
-        self.username_entry.insert(0, "Anonymous")
-        self.username_entry.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
-        
-        self.set_username_button = ttk.Button(username_frame, text="Set Username", command=self.set_username)
-        self.set_username_button.grid(row=0, column=2, padx=5, pady=5)
-        
-        # Chat display
-        chat_frame = ttk.LabelFrame(self.root, text="Chat Messages")
-        chat_frame.pack(fill="both", expand=True, padx=10, pady=5)
-        
-        self.chat_display = scrolledtext.ScrolledText(chat_frame, wrap=tk.WORD, state='disabled')
-        self.chat_display.pack(fill="both", expand=True, padx=5, pady=5)
-        
-        # Input frame
-        input_frame = ttk.Frame(self.root)
-        input_frame.pack(fill="x", padx=10, pady=5)
-        
-        self.message_input = ttk.Entry(input_frame)
-        self.message_input.pack(fill="x", side="left", expand=True, padx=(0, 5))
-        self.message_input.bind("<Return>", lambda event: self.send_message())
-        
-        self.send_button = ttk.Button(input_frame, text="Send", command=self.send_message)
-        self.send_button.pack(side="right")
-        
-        # Status bar
-        self.status_var = tk.StringVar()
-        self.status_var.set("Disconnected")
-        self.status_bar = ttk.Label(self.root, textvariable=self.status_var, relief=tk.SUNKEN, anchor="w")
-        self.status_bar.pack(fill="x", side="bottom", padx=10, pady=5)
-        
-        # Configure grid weights
-        connection_frame.columnconfigure(1, weight=1)
-        username_frame.columnconfigure(1, weight=1)
+        self.create_login_frame()
     
-    def connect_to_server(self):
-        url = self.server_url.get()
-        try:
-            port = int(self.server_port.get())
-        except ValueError:
-            messagebox.showerror("Invalid Port", "Please enter a valid port number")
+    def create_login_frame(self):
+        self.login_frame = ttk.Frame(self.root, padding=20)
+        self.login_frame.pack(fill=tk.BOTH, expand=True)
+        
+        ttk.Label(self.login_frame, text="Chat Application", font=("Arial", 18, "bold")).pack(pady=10)
+        
+        self.username_frame = ttk.Frame(self.login_frame)
+        self.username_frame.pack(pady=20, fill=tk.X)
+        
+        ttk.Label(self.username_frame, text="Username:").pack(side=tk.LEFT, padx=5)
+        self.username_entry = ttk.Entry(self.username_frame, width=30)
+        self.username_entry.pack(side=tk.LEFT, padx=5, fill=tk.X, expand=True)
+        self.username_entry.focus()
+        
+        self.login_button = ttk.Button(self.login_frame, text="Login / Register", command=self.register_user)
+        self.login_button.pack(pady=10)
+        
+        self.status_label = ttk.Label(self.login_frame, text="")
+        self.status_label.pack(pady=5)
+        
+        # Bind Enter key to login button
+        self.username_entry.bind("<Return>", lambda event: self.register_user())
+    
+    def create_chat_frame(self):
+        self.chat_frame = ttk.Frame(self.root, padding=10)
+        self.chat_frame.pack(fill=tk.BOTH, expand=True)
+        
+        # Top info bar
+        self.info_frame = ttk.Frame(self.chat_frame)
+        self.info_frame.pack(fill=tk.X, pady=(0, 10))
+        
+        ttk.Label(self.info_frame, text=f"Logged in as: {self.username} ({self.computer_name})").pack(side=tk.LEFT)
+        self.logout_button = ttk.Button(self.info_frame, text="Logout", command=self.logout)
+        self.logout_button.pack(side=tk.RIGHT)
+        
+        # Split view with users list and chat
+        self.paned_window = ttk.PanedWindow(self.chat_frame, orient=tk.HORIZONTAL)
+        self.paned_window.pack(fill=tk.BOTH, expand=True)
+        
+        # Users list
+        self.users_frame = ttk.Frame(self.paned_window)
+        self.paned_window.add(self.users_frame, weight=1)
+        
+        ttk.Label(self.users_frame, text="Online Users").pack(fill=tk.X)
+        self.users_list = tk.Listbox(self.users_frame)
+        self.users_list.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        # Chat area
+        self.messages_frame = ttk.Frame(self.paned_window)
+        self.paned_window.add(self.messages_frame, weight=3)
+        
+        # Messages display
+        self.messages_display = scrolledtext.ScrolledText(self.messages_frame, state=tk.DISABLED)
+        self.messages_display.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        # Message input
+        self.input_frame = ttk.Frame(self.chat_frame)
+        self.input_frame.pack(fill=tk.X, pady=10)
+        
+        self.message_entry = ttk.Entry(self.input_frame)
+        self.message_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 5))
+        
+        self.send_button = ttk.Button(self.input_frame, text="Send", command=self.send_message)
+        self.send_button.pack(side=tk.RIGHT)
+        
+        # Bind Enter key to send button
+        self.message_entry.bind("<Return>", lambda event: self.send_message())
+    
+    def register_user(self):
+        username = self.username_entry.get().strip()
+        
+        if not username:
+            messagebox.showerror("Error", "Username cannot be empty")
             return
         
-        self.client.server_url = url
-        self.client.port = port
+        try:
+            response = requests.post(
+                f"{self.server_url}/api/register",
+                json={
+                    "username": username,
+                    "computer_name": self.computer_name
+                }
+            )
+            
+            data = response.json()
+            
+            if response.status_code == 200 and data.get('status') == 'success':
+                self.user_id = data.get('user_id')
+                self.username = data.get('username')
+                
+                # Clear login frame and create chat frame
+                self.login_frame.destroy()
+                self.create_chat_frame()
+                
+                # Start polling for messages
+                self.polling = True
+                self.poll_thread = threading.Thread(target=self.poll_messages, daemon=True)
+                self.poll_thread.start()
+                
+                self.users_thread = threading.Thread(target=self.poll_users, daemon=True)
+                self.users_thread.start()
+            else:
+                messagebox.showerror("Error", data.get('message', 'Failed to register'))
         
-        if self.client.connect_to_server():
-            self.status_var.set(f"Connected to {url}:{port}")
-            messagebox.showinfo("Connection Successful", "Connected to the chat server!")
-            # Get message history when connected
-            self.client.get_message_history()
-        else:
-            self.status_var.set("Failed to connect")
-            messagebox.showerror("Connection Failed", "Could not connect to the server")
-    
-    def set_username(self):
-        username = self.username_entry.get()
-        if username:
-            self.client.set_username(username)
-            messagebox.showinfo("Username Set", f"Your username is now: {username}")
-        else:
-            messagebox.showerror("Invalid Username", "Username cannot be empty")
+        except Exception as e:
+            messagebox.showerror("Error", f"Connection error: {str(e)}")
     
     def send_message(self):
-        message = self.message_input.get()
+        message = self.message_entry.get().strip()
+        
         if not message:
             return
         
-        success = self.client.send_message(message)
-        if success:
-            self.message_input.delete(0, tk.END)
-        else:
-            messagebox.showerror("Send Failed", "Failed to send message. Are you connected?")
+        try:
+            response = requests.post(
+                f"{self.server_url}/api/send_message",
+                json={
+                    "user_id": self.user_id,
+                    "content": message
+                }
+            )
+            
+            data = response.json()
+            
+            if response.status_code == 200 and data.get('status') == 'success':
+                self.message_entry.delete(0, tk.END)
+            else:
+                messagebox.showerror("Error", data.get('message', 'Failed to send message'))
+        
+        except Exception as e:
+            messagebox.showerror("Error", f"Connection error: {str(e)}")
     
-    def update_chat_display(self, messages):
-        self.chat_display.config(state='normal')
-        for msg in messages:
-            formatted_msg = f"[{msg['timestamp']}] {msg['username']}: {msg['message']}\n"
-            self.chat_display.insert(tk.END, formatted_msg)
-        self.chat_display.config(state='disabled')
-        self.chat_display.see(tk.END)  # Auto-scroll to the bottom
+    def poll_messages(self):
+        while self.polling:
+            try:
+                response = requests.get(
+                    f"{self.server_url}/api/get_messages",
+                    params={
+                        "user_id": self.user_id,
+                        "since": self.message_count
+                    }
+                )
+                
+                data = response.json()
+                
+                if response.status_code == 200 and data.get('status') == 'success':
+                    new_messages = data.get('messages', [])
+                    self.message_count = data.get('message_count', self.message_count)
+                    
+                    for message in new_messages:
+                        self.display_message(message)
+            
+            except Exception as e:
+                print(f"Error polling messages: {str(e)}")
+            
+            time.sleep(1)
+    
+    def poll_users(self):
+        while self.polling:
+            try:
+                response = requests.get(
+                    f"{self.server_url}/api/get_users",
+                    params={"user_id": self.user_id}
+                )
+                
+                data = response.json()
+                
+                if response.status_code == 200 and data.get('status') == 'success':
+                    users = data.get('users', [])
+                    
+                    self.users_list.delete(0, tk.END)
+                    for user in users:
+                        self.users_list.insert(tk.END, f"{user['username']} ({user['computer_name']})")
+            
+            except Exception as e:
+                print(f"Error polling users: {str(e)}")
+            
+            time.sleep(5)  # Update user list every 5 seconds
+    
+    def display_message(self, message):
+        self.messages_display.config(state=tk.NORMAL)
+        timestamp = message.get('timestamp', '').split('T')[1].split('.')[0]  # Extract time portion
+        sender_name = message.get('sender_name', 'Unknown')
+        computer_name = message.get('computer_name', 'Unknown')
+        content = message.get('content', '')
+        
+        formatted_message = f"[{timestamp}] {sender_name} ({computer_name}): {content}\n"
+        self.messages_display.insert(tk.END, formatted_message)
+        self.messages_display.see(tk.END)  # Scroll to the end
+        self.messages_display.config(state=tk.DISABLED)
+    
+    def logout(self):
+        self.polling = False
+        self.user_id = None
+        self.username = None
+        
+        # Clear chat frame and create login frame
+        self.chat_frame.destroy()
+        self.create_login_frame()
 
 if __name__ == "__main__":
     root = tk.Tk()
-    app = ChatApp(root)
+    app = ChatClient(root)
     root.mainloop()
