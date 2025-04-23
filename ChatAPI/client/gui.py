@@ -13,7 +13,7 @@ class ChatClient:
         self.root.geometry("800x600")
         self.root.minsize(600, 400)
         
-        self.server_url = "http://localhost:80"  # Change this to your server address
+        self.server_url = "http://localhost:5500"  # Change this to your server address
         self.user_id = None
         self.username = None
         self.computer_name = socket.gethostname()
