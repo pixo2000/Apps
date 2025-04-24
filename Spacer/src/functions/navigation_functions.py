@@ -59,6 +59,10 @@ def perform_move(player, x, y):
         # Save the game with player's dead status
         save_mgr.save_game(player)
         return True
+    
+    if (x, y) == (player.x, player.y):
+        print("\nYou are already at the specified coordinates.")
+        return False
         
     # Calculate distance (which is also movement time)
     distance = max(abs(player.x - x), abs(player.y - y))
