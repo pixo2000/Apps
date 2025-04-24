@@ -2,8 +2,8 @@
     "name": "pixo2000",
     "uuid": "bc3af9a1-06a7-4949-b7b2-a7950c39da38",
     "position": {
-        "x": -2,
-        "y": 2,
+        "x": 10,
+        "y": 10,
         "dimension": "A01"
     },
     "discoveries": {
@@ -54,11 +54,11 @@
         }
     },
     "creation_date": "20.03.25 - 15:20",
-    "last_login": "02.04.25 - 17:29",
+    "last_login": "24.04.25 - 17:10",
     "is_dead": false,
     "landed_on": null,
     "landed_on_body": null,
     "landed_on_moon": null,
     "docked_at": null,
-    "playtime": "00:01:32:35"
+    "playtime": "00:01:33:49"
 }

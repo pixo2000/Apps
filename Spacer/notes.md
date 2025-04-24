@@ -128,6 +128,6 @@ dimensions:
 
 fi jump animaton and discovery
 
-fix death -> fix spawn point why ever is it at 0 0
+fix spawn point why ever is it at 0 0
 
 always know wiesbaden and earth? any maybe also star <-- no nothing cuz scan tutorial?

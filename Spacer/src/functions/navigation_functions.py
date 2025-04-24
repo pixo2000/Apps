@@ -22,6 +22,44 @@ def perform_move(player, x, y):
     Returns:
         bool: True if move was successful
     """
+    # Check if destination is inside a star before moving
+    if is_inside_star(player, x, y):
+        # Show warning and ask for confirmation
+        print(f"\n⚠️  WARNING: Destination [{x}, {y}] appears to be inside a star!")
+        print("Proceeding with this navigation will result in the destruction of your ship.")
+        
+        # Ask for confirmation
+        confirm = input("\nDo you want to proceed anyway? (y/n): ").strip().lower()
+        if confirm != 'y':
+            print("\nNavigation aborted. Staying at current position.")
+            return False
+            
+        # Player confirmed - start movement animation even though it will end in death
+        print(f"\nNavigating to coordinates [{x}, {y}]...")
+        
+        # Animate movement with a progress bar
+        distance = max(abs(player.x - x), abs(player.y - y))
+        for i in range(distance):
+            progress = int((i+1)/distance * 20)
+            bar = "█" * progress + "▒" * (20 - progress)
+            print(f"\r[{bar}] {i+1}/{distance} units traveled", end="", flush=True)
+            time.sleep(0.1)
+        
+        # Player has arrived at the star and is now dead
+        print(f"\nYou've reached coordinates [{x}, {y}]")
+        print("\n⚠️ CRITICAL ERROR: Temperature exceeding safe limits!")
+        print("\n☠️ Your ship has been incinerated by intense stellar radiation.")
+        print("\nYou are dead. Type 'restart' to begin a new game.")
+        
+        # Set player position and death status
+        player.x = x
+        player.y = y
+        player.is_dead = True
+        
+        # Save the game with player's dead status
+        save_mgr.save_game(player)
+        return True
+        
     # Calculate distance (which is also movement time)
     distance = max(abs(player.x - x), abs(player.y - y))
     
@@ -45,6 +83,48 @@ def perform_move(player, x, y):
     check_location(player)
     
     return True
+
+def is_inside_star(player, dest_x, dest_y):
+    """
+    Check if the destination coordinates are inside a star
+    
+    Args:
+        player: The player object
+        dest_x (int): Destination X-coordinate
+        dest_y (int): Destination Y-coordinate
+        
+    Returns:
+        bool: True if destination is inside a star
+    """
+    if not player.dimension:
+        return False
+        
+    dimension = player.dimension
+    
+    # Check all bodies in the dimension
+    for body_name, body_data in dimension.properties.items():
+        # Only check stars
+        if body_data.get("type", "").lower() == "star" and "Coordinates" in body_data and "size" in body_data:
+            try:
+                star_x = int(body_data["Coordinates"]["x"])
+                star_y = int(body_data["Coordinates"]["y"])
+                
+                # Get the star's boundaries directly from size
+                # The size represents how far the star extends in each direction from its center
+                star_width = int(body_data["size"]["width"])
+                star_height = int(body_data["size"]["height"])
+                
+                # Check if destination is within the star's boundaries
+                # If dest_x is between (star_x - star_width) and (star_x + star_width)
+                # AND dest_y is between (star_y - star_height) and (star_y + star_height)
+                if (star_x - star_width <= dest_x <= star_x + star_width and 
+                    star_y - star_height <= dest_y <= star_y + star_height):
+                    return True
+            except (ValueError, KeyError):
+                # Skip if we can't parse the coordinates or size properly
+                continue
+                
+    return False
 
 def perform_jump(player, dimension_name):
     """
