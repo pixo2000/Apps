@@ -97,8 +97,6 @@ check if all commands work after refactor and new commnd system; remove coords a
 
 functions that are used by multiple commands should be moved
 
-fix moving to current coords returning error
-
 new move animation pls
 
 better self destruct
@@ -129,3 +127,5 @@ dimensions:
 fi jump animaton and discovery
 
 always know wiesbaden and earth? any maybe also star <-- no nothing cuz scan tutorial?
+
+check if dev enviroment or if prod. if pord, generate the files into the appdata and if dev dont do anything -> maybe with variable like debug or stuff in main start
