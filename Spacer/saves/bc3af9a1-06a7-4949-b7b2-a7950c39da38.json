@@ -4,7 +4,7 @@
     "position": {
         "x": 10,
         "y": 10,
-        "dimension": "A01"
+        "dimension": "C12"
     },
     "discoveries": {
         "known_dimensions": [
@@ -54,11 +54,11 @@
         }
     },
     "creation_date": "20.03.25 - 15:20",
-    "last_login": "24.04.25 - 17:10",
+    "last_login": "24.04.25 - 17:18",
     "is_dead": false,
     "landed_on": null,
     "landed_on_body": null,
     "landed_on_moon": null,
     "docked_at": null,
-    "playtime": "00:01:33:49"
+    "playtime": "00:01:42:09"
 }
