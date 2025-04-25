@@ -251,7 +251,7 @@ def scan_celestial_body(player, body_name):
         signal_y = HIDDEN_SIGNALS[dim_name][body_name]["y"]
         distance = max(abs(player_x - signal_x), abs(player_y - signal_y))
         
-        # For hidden signals, always show the error message regardless of distance
+        # For hidden signals, always show the error message regardless of distance -> only if known. if not it does not exist and only with distance <=10
         print(f"\n✗ Cannot scan {body_name}: Signal not strong enough.")
         print("   You need a much more powerful direct scanning tool.")
         return
