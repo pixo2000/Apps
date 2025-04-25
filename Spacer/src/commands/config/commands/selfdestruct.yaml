@@ -1,10 +1,9 @@
-name: self-destruct
+name: selfsdestruct
 aliases:
-  - selfdestruct
   - sd
 description: Initiate self-destruct sequence (kills your character)
 help_text: |
-  SELF-DESTRUCT - Permanently kill your character
+  SELFDESTRUCT - Permanently kill your character
   
   WARNING: This command will kill your character permanently.
   All progress will be lost for this captain.
