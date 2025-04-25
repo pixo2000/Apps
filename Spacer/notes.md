@@ -83,7 +83,7 @@ fix dimensions command when compiled
 
 scan planet to be able to land etc
 
-sicher ob ich das void so haben will?
+sicher ob ich das void so haben will? -> fix formatting in void file name(scan black hole)
 
 mission and economy
 
@@ -93,36 +93,13 @@ scanning star returns size
 
 remove dimensions.json file cuz its not important -> just remove the path to it
 
-check if all commands work after refactor and new commnd system; remove coords and remove not used code
-
-functions that are used by multiple commands should be moved
-
-new move animation pls
+new move animation pls -> no but new move system
 
 better self destruct
 
 maybe das kozept mit ungenauen koordinaten beim scan und man muss manchmal näher dran
 
-fix dynamic command loading -> just change the lines in the commands to load dynamicly or smth
-
-check error messages cuz sometimes its just json and smtimes yaml
-
 fix scancoords with hidden signals -> code in scanner is noch da?
-
-dimensions:
-  A01: "Alpha System - Home System"
-  B02: "Beta System - Mining Colony"
-  C03: "Gamma System - Research Outpost"
-  D04: "Delta System - Frontier Outpost"
-  E05: "Epsilon System - Abandoned Colony"
-  F06: "Zeta System - Unknown Territory"
-  G07: "Eta System - Unexplored Region"
-  H08: "Theta System - Nebula Cluster"
-  I09: "Iota System - Black Hole Vicinity"
-  J10: "Kappa System - Ancient Ruins"
-  K11: "Lambda System - Asteroid Field"
-  L12: "Mu System - Gas Giant Cluster"
-  V99: "Void - The Empty Abyss"
 
 add message that you just jumped into an unknown system(or smth like this)
 
@@ -134,4 +111,4 @@ error when jumping to non-existing dimension
 
 command: discoveries system
 
-fix scanning moons
+auch bei schwarzen löchern etc sterben
