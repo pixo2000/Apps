@@ -2,9 +2,9 @@
     "name": "Test",
     "uuid": "41a97d1e-6514-41eb-84ba-73d9b7e6ed7b",
     "position": {
-        "x": 5,
-        "y": 5,
-        "dimension": "F27"
+        "x": 2345,
+        "y": -1477,
+        "dimension": "A01"
     },
     "discoveries": {
         "known_dimensions": [
@@ -21,7 +21,8 @@
                 "Earth",
                 "Ceres",
                 "Juno",
-                "Saturn"
+                "Saturn",
+                "Voyager 1"
             ],
             "D14": [
                 "Sirius",
@@ -37,11 +38,11 @@
         }
     },
     "creation_date": "2025-03-21T18:21:35.618139",
-    "last_login": "25.04.25 - 18:35",
+    "last_login": "25.04.25 - 18:41",
     "is_dead": false,
     "landed_on": null,
     "landed_on_body": null,
     "landed_on_moon": null,
     "docked_at": null,
-    "playtime": "00:04:56:32"
+    "playtime": "00:05:00:10"
 }

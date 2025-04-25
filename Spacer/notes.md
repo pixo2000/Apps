@@ -67,8 +67,6 @@ fix dimensions command when compiled
 
 scan planet to be able to land etc
 
-sicher ob ich das void so haben will? -> fix formatting in void file name(scan black hole)
-
 mission and economy
 
 tutorial -> LU
@@ -96,3 +94,9 @@ error when jumping to non-existing dimension
 command: discoveries system
 
 auch bei schwarzen löchern etc sterben
+
+rework star death to just use the dangerous body types
+
+sicher ob ich das void so haben will? -> fix formatting in void file name(scan black hole)
+
+fix scan anomaly etc and add a signal to voyager
