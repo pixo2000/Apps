@@ -6,13 +6,7 @@ from src.commands.player_commands import handle_self_destruct_command
 
 class SelfDestructCommand(BaseCommand):
     def __init__(self):
-        super().__init__(
-            name="self-destruct",
-            aliases=["selfdestruct", "sd"],
-            description="Initiate self-destruct sequence (kills your character)",
-            context_requirements=["not_dead"],
-            error_messages={}
-        )
+        super().__init__()
     
     def execute(self, player, args):
         """Execute the self-destruct command"""
