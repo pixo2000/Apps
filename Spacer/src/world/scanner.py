@@ -256,41 +256,6 @@ def scan_celestial_body(player, body_name):
         print("   You need a much more powerful direct scanning tool.")
         return
     
-    # Check if the celestial body is known to the player
-    is_known = False
-    is_moon = False
-    parent_planet = None
-    
-    # For stars, they are always considered known for scanning
-    for name, data in player.dimension.properties.items():
-        if name.lower() == body_name.lower() and data.get("type", "").lower() == "star":
-            is_known = True
-            break
-    
-    # If not a star, check if the body is in the player's known bodies list
-    if not is_known:
-        # First check direct planet/body knowledge
-        if dim_name in player.known_bodies:
-            for known_body in player.known_bodies[dim_name]:
-                # Check if it's a direct match (planet or asteroid)
-                if known_body.lower() == body_name.lower():
-                    is_known = True
-                    break
-                # Check if it's a moon (format: "planet:moon")
-                elif ":" in known_body:
-                    parent, moon = known_body.split(":", 1)
-                    if moon.lower() == body_name.lower():
-                        is_known = True
-                        is_moon = True
-                        parent_planet = parent
-                        break
-    
-    # If the body is not known, prevent scanning
-    if not is_known:
-        print(f"\n✗ Cannot scan {body_name}: You haven't discovered this celestial body yet.")
-        print("   Perform a system scan first to discover new bodies.")
-        return
-    
     # First check if it's a main celestial body
     body_data = None
     is_moon = False
@@ -306,7 +271,8 @@ def scan_celestial_body(player, body_name):
     # If not found as a primary body, check if it's a moon
     if not body_data:
         for planet_name, planet_data in player.dimension.properties.items():
-            if 'Moons' in planet_data:
+            if 'Moons' in planet_data and planet_name in player.known_bodies.get(dim_name, []):
+                # Only search for moons of planets that are already known
                 for moon_name, moon_data in planet_data['Moons'].items():
                     if moon_name.lower() == body_name.lower():
                         body_data = moon_data
@@ -316,10 +282,31 @@ def scan_celestial_body(player, body_name):
                         break
                 if is_moon:
                     break
-    
+
+    # If not found, or if it's a moon of an unknown planet, prevent scanning
     if not body_data:
         print(f"\n✗ Cannot scan {body_name}: Object not found in this system.")
         return
+    elif is_moon and parent_planet not in player.known_bodies.get(dim_name, []):
+        print(f"\n✗ Cannot scan {body_name}: You need to discover its parent planet first.")
+        print("   Perform a system scan to discover the parent planet.")
+        return
+    
+    # For primary bodies (non-moons), check if they are known or a star
+    if not is_moon:
+        is_known = False
+        is_star = body_data.get("type", "").lower() == "star"
+        
+        # Stars are always considered known
+        if is_star:
+            is_known = True
+        elif dim_name in player.known_bodies and body_name in player.known_bodies[dim_name]:
+            is_known = True
+            
+        if not is_known:
+            print(f"\n✗ Cannot scan {body_name}: You haven't discovered this celestial body yet.")
+            print("   Perform a system scan first to discover new bodies.")
+            return
     
     # Print detailed scan results
     print(f"\n=== DETAILED SCAN: {body_name} ===")
@@ -391,28 +378,10 @@ def scan_celestial_body(player, body_name):
     if dim_name not in player.known_bodies:
         player.known_bodies[dim_name] = []
         
-    # For primary bodies
+    # Only add primary bodies (not moons) to the known bodies list
     if not is_moon:
         # Add the body to the list if not already present
         if body_name not in player.known_bodies[dim_name]:
             player.known_bodies[dim_name].append(body_name)
-    # For moons, add both the parent planet and the moon to known list
-    else:
-        # Add the parent planet if not already known
-        if parent_planet not in player.known_bodies[dim_name]:
-            player.known_bodies[dim_name].append(parent_planet)
-            
-        # For moons, we'll add them with their parent name for uniqueness
-        moon_entry = f"{parent_planet}:{body_name}"
-        # Check if this moon is already in the list
-        moon_already_known = False
-        for entry in player.known_bodies[dim_name]:
-            if ':' in entry and entry == moon_entry:
-                moon_already_known = True
-                break
-                
-        # Add the moon if not already known
-        if not moon_already_known:
-            player.known_bodies[dim_name].append(moon_entry)
     
     print("==========================\n")

@@ -2,27 +2,39 @@
     "name": "Test",
     "uuid": "41a97d1e-6514-41eb-84ba-73d9b7e6ed7b",
     "position": {
-        "x": 10,
-        "y": 10,
+        "x": -150,
+        "y": -150,
         "dimension": "A01"
     },
     "discoveries": {
         "known_dimensions": [
             "A01",
-            "C12"
+            "C12",
+            "D14"
         ],
         "known_bodies": {
             "A01": [
-                "SOL"
+                "SOL",
+                "Mercury",
+                "Venus",
+                "Earth",
+                "Ceres",
+                "Juno",
+                "Saturn"
+            ],
+            "D14": [
+                "Sirius",
+                "Sirius Prime",
+                "Sirius Secundus"
             ]
         }
     },
     "creation_date": "2025-03-21T18:21:35.618139",
-    "last_login": "25.04.25 - 13:49",
+    "last_login": "25.04.25 - 14:01",
     "is_dead": false,
     "landed_on": null,
     "landed_on_body": null,
     "landed_on_moon": null,
     "docked_at": null,
-    "playtime": "00:00:22:04"
+    "playtime": "00:00:28:58"
 }

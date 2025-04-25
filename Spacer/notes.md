@@ -107,7 +107,7 @@ fix dynamic command loading -> just change the lines in the commands to load dyn
 
 check error messages cuz sometimes its just json and smtimes yaml
 
-fix scancoords with hidden signals
+fix scancoords with hidden signals -> code in scanner is noch da?
 
 dimensions:
   A01: "Alpha System - Home System"
@@ -124,8 +124,14 @@ dimensions:
   L12: "Mu System - Gas Giant Cluster"
   V99: "Void - The Empty Abyss"
 
-fi jump animaton and discovery
+add message that you just jumped into an unknown system(or smth like this)
 
 always know wiesbaden and earth? any maybe also star <-- no nothing cuz scan tutorial?
 
 check if dev enviroment or if prod. if pord, generate the files into the appdata and if dev dont do anything -> maybe with variable like debug or stuff in main start
+
+error when jumping to non-existing dimension
+
+command: discoveries system
+
+fix scanning moons
