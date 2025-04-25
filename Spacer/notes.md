@@ -10,13 +10,7 @@ maybe ne map?
 
 n paar notes sind uf meinem handy als voice gespeichert
 
-update restliche systeme
-
-stop command, comands while moving, renew pathing, dead when on sun
-
-bigger scan distance and more distance in C12
-
-show nav beacon on star when scanning
+show nav beacon on star when scanning -> idk maybe just all nav beacons at same coords
 
 remove not needed code
 remove many comments
@@ -29,11 +23,7 @@ playerinfo bei live game wird schwer mit playtime etc
 
 mit ki server copcept mit player können player sehen etc machen
 
-check signal scanning voyager
-
 test everything
-
-scan coords with move range
 
 abort stuff, move when cmmand-> on top of input sticky
 
@@ -67,17 +57,11 @@ fix that users can jump everywhere fuck my testers for not reporting
 
 undock command, start alias
 
-only scan planets you know
-
 jump Blub does not give the right error message
 
 movement satz des pytagoras einfach damit schräg geht für später
 
-jump nav beacon
-
-sometimes you have 1 fake jump bar stuck at 0 on top of the real one
-
-nav beacon vor dimensions
+nav beacon vor dimensions -> halt um den weg zu possible dimensions zu finden
 
 fix dimensions command when compiled
 
