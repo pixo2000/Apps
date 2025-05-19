@@ -1,0 +1,30 @@
+{
+    "name": "Test2",
+    "uuid": "5abc76f2-6260-4e26-a7e6-d6acb2fc33ff",
+    "position": {
+        "x": 8,
+        "y": 2,
+        "dimension": "A01"
+    },
+    "discoveries": {
+        "known_dimensions": [
+            "A01"
+        ],
+        "known_bodies": {
+            "A01": [
+                "Earth",
+                "Ceres",
+                "SOL",
+                "Juno"
+            ]
+        }
+    },
+    "creation_date": "2025-04-29T12:11:12.332982",
+    "last_login": "29.04.25 - 12:13",
+    "is_dead": false,
+    "landed_on": null,
+    "landed_on_body": null,
+    "landed_on_moon": null,
+    "docked_at": null,
+    "playtime": "00:00:02:29"
+}
