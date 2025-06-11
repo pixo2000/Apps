@@ -1,3 +1,4 @@
+# SnapTap
 
     When you press and hold down the "A" key, SnapKey remembers it.
     If you then press the "D" key while still holding down "A" SnapKey automatically releases the "A" key for you.
