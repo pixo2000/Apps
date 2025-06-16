@@ -1,0 +1,14 @@
+# No external dependencies required for the main ping monitoring
+# All used libraries are part of Python standard library:
+# - threading
+# - subprocess  
+# - time
+# - csv
+# - datetime
+# - re
+# - os
+# - typing
+
+# Optional: For creating graphs from the collected data
+matplotlib>=3.5.0
+pandas>=1.3.0
