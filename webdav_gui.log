@@ -1,0 +1,198 @@
+2025-07-01 13:15:19,689 - INFO - Initializing VideoStreamerGUI
+2025-07-01 13:15:19,738 - INFO - Attempting WebDAV connection
+2025-07-01 13:15:19,739 - INFO - WebDAV connection successful
+2025-07-01 13:15:19,740 - INFO - Starting video refresh
+2025-07-01 13:15:19,740 - DEBUG - Clearing existing treeview items
+2025-07-01 13:15:19,740 - DEBUG - Trying path 1: /Konzept MNS-Studios Krissel/Ablage Filmaterial, Fertige Filme/
+2025-07-01 13:15:19,742 - DEBUG - Starting new HTTPS connection (1): wolke7.niemoellerschule.digital:443
+2025-07-01 13:15:20,335 - DEBUG - https://wolke7.niemoellerschule.digital:443 "PROPFIND /remote.php/dav/files/Paul.Schoeneck//Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial,%20Fertige%20Filme/ HTTP/1.1" 207 None
+2025-07-01 13:15:20,339 - INFO - Successfully accessed path: /Konzept MNS-Studios Krissel/Ablage Filmaterial, Fertige Filme/
+2025-07-01 13:15:20,340 - INFO - Found 88 total files
+2025-07-01 13:15:20,341 - INFO - Filtered to 85 video files
+2025-07-01 13:15:20,341 - DEBUG - Sorting videos by modification time
+2025-07-01 13:15:20,342 - DEBUG - Adding videos to treeview
+2025-07-01 13:15:20,342 - DEBUG - Processing video 1/85: /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Fr%c3%bchlingserwachen%20an%20der%20MNS%20-%20enhc.mp4
+2025-07-01 13:15:20,343 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Fr%c3%bchlingserwachen%20an%20der%20MNS%20-%20enhc.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,344 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Media%20Surfer%202024%20V1.mov: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,344 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Schulsportfest%202024_imp.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,345 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Digitale_helden_Komplett.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,345 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Gro%c3%9fartiger%20Tag.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,346 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Willkommen%202025.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,346 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Willkommen%202025.mov: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,347 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Weihnachtskonzert%20Intro2.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,348 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Werbung%20Gr%c3%bcnes%20Klassenzimmer%20HQ.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,348 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Willkommen%202023.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,349 - DEBUG - Processing video 11/85: /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Weihnachtskonzert%202023.mp4
+2025-07-01 13:15:20,349 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Weihnachtskonzert%202023.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,350 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Weihnachtskonzert%20Intro.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,350 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Weihnachtskonzert%202023-NEU_Vorschau.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,351 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/TdoT-Endlosschleife-Drohne.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,351 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Weihnachtskonzert%202022.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,352 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/TdoT%202025%205er.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,353 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/TdoT%20E-Phase%202024.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,353 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/TdoT_5.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,354 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Tag%20der%20offenen%20T%c3%bcr%205er%202023.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,354 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Tag%20der%20offenen%20T%c3%bcr%20E%202023.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,355 - DEBUG - Processing video 21/85: /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/TdoT%205er%202024.mp4
+2025-07-01 13:15:20,355 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/TdoT%205er%202024.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,356 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Stadtradeln%202023.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,356 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Spuren-der-Erinnerung-gut.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,357 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Sponsorenlauf%202024.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,357 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Schulsportfest%202024.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,357 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Skifahrt%202024.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,358 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Spuren-der-Erinnerung.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,359 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Spenden%c3%bcbergabe_2023.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,359 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Sch%c3%b6nes%20neues%20Jahr%202024.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,359 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Spenden%20Erdbeben.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,360 - DEBUG - Processing video 31/85: /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Neubau%20Spatenstich.mp4
+2025-07-01 13:15:20,360 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Neubau%20Spatenstich.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,361 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/OperationYellow.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,362 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Richtfest%20Neubau.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,362 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Oberstufenraum%20Untergeschoss.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,363 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/MNS-RundtourSK.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,363 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/MW-E%202023.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,364 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/MNS%20News%20Sendung%2009.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,364 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Autorenlesung%20Yelin%20E-Phase%2027.01.2025%201%20Stunde.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,365 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/MNS%20News%20Sendung%206.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,366 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/MNS%20News%20Sendung%208.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,366 - DEBUG - Processing video 41/85: /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/MNS%20News%20Sendung%207.mp4
+2025-07-01 13:15:20,367 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/MNS%20News%20Sendung%207.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,367 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/MNS%20News%20Sendung%204.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,368 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/MNS%20News%20Sendung%205.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,368 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Media%20Surfer%202024%20V1.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,369 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/MNS%20News%203.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,369 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/MNS%20News%20Sendung%202.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,370 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Mentorenwerbung.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,370 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Mathepreisverleihung%202024.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,371 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Maxima.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,371 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Makerspace_2023.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,372 - DEBUG - Processing video 51/85: /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Makerspace_2024.mp4
+2025-07-01 13:15:20,372 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Makerspace_2024.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,373 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Makerspace%20neuer%20Film%20vom%2008.10.2024.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,373 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Johanna%20Uhlenberg%20Bild.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,374 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/iPad%20Neuordnung%202022.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,374 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Interview%20Neubau%20mit%20UT.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,375 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Interview%20Neubau.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,375 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Ich%20steh%20auf%20f%c3%bcr%20Demokratie.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,376 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Halloween%20Party%205er%202024.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,376 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/HerzlichWillkommenTdoT.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,377 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Fantasietiere%20der%206-4.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,377 - DEBUG - Processing video 61/85: /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Einschulungsfeier%205er%202024.mp4
+2025-07-01 13:15:20,377 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Einschulungsfeier%205er%202024.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,378 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Garten%20Gr%c3%bcnes%20Klassenzimmer.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,378 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Digitale%20Helden%20Trailer%202.0.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,379 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Digitale%20Helden%20Trailer%203.0.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,379 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Disney-Konzert.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,379 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Bundesjugendspiele%202024.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,380 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/DELF-Diplom%20Verleihung.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,380 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/dialog%20p.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,381 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Autorenlesung%20Yelin%20E-Phase%2027.01.2025%2010%20Minuten.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,381 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Beuys-Eiche%202024.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,382 - DEBUG - Processing video 71/85: /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Autorentag.mp4
+2025-07-01 13:15:20,382 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Autorentag.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,383 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Auff%c3%bchrung%20Theater%20AG.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,383 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/ABI%20Streich%202024.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,384 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Autorenlesung%20Yelin%20E-Phase%2027.01.2025%202%20Minuten.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,384 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Architektur%20Pullout.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,385 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Abi%20Gl%c3%bcckw%c3%bcnsche.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,385 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Do-It-Yourself%20AG%20Hausmeister%20W%c3%a4nde%20Streichen.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,385 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Bundesjugendspiele%202025.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,386 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Makerspace%20Leonardo%20Projekt.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,386 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/EconoMI%20Wettbewerb.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,387 - DEBUG - Processing video 81/85: /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Hinweise%20Schulsporttag%202025.mp4
+2025-07-01 13:15:20,387 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Hinweise%20Schulsporttag%202025.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,387 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/MNS%20Skifahrt%202025.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,388 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/MNS%20Leichtathletik%20U14%20Schulamtsentscheid.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,388 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Abi%20Streich%202025.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,389 - WARNING - Error formatting date for /remote.php/dav/files/Paul.Schoeneck/Konzept%20MNS-Studios%20Krissel/Ablage%20Filmaterial%2c%20Fertige%20Filme/Weihnachtskonzert%202024.mp4: 'str' object cannot be interpreted as an integer
+2025-07-01 13:15:20,389 - DEBUG - Starting default sort by date
+2025-07-01 13:15:20,389 - DEBUG - Sorting treeview by column: Date
+2025-07-01 13:15:20,390 - DEBUG - Sorting 85 items
+2025-07-01 13:15:20,390 - WARNING - Error getting timestamp for item I001: could not convert string to float: 'Wed, 21 May 2025 11:02:08 GMT'
+2025-07-01 13:15:20,391 - WARNING - Error getting timestamp for item I002: could not convert string to float: 'Wed, 12 Feb 2025 13:24:38 GMT'
+2025-07-01 13:15:20,391 - WARNING - Error getting timestamp for item I003: could not convert string to float: 'Wed, 12 Feb 2025 13:24:27 GMT'
+2025-07-01 13:15:20,391 - WARNING - Error getting timestamp for item I004: could not convert string to float: 'Wed, 12 Feb 2025 13:23:56 GMT'
+2025-07-01 13:15:20,392 - WARNING - Error getting timestamp for item I005: could not convert string to float: 'Wed, 12 Feb 2025 13:23:56 GMT'
+2025-07-01 13:15:20,392 - WARNING - Error getting timestamp for item I006: could not convert string to float: 'Wed, 12 Feb 2025 13:22:42 GMT'
+2025-07-01 13:15:20,392 - WARNING - Error getting timestamp for item I007: could not convert string to float: 'Wed, 12 Feb 2025 13:22:41 GMT'
+2025-07-01 13:15:20,393 - WARNING - Error getting timestamp for item I008: could not convert string to float: 'Wed, 12 Feb 2025 13:22:36 GMT'
+2025-07-01 13:15:20,393 - WARNING - Error getting timestamp for item I009: could not convert string to float: 'Wed, 12 Feb 2025 13:22:36 GMT'
+2025-07-01 13:15:20,394 - WARNING - Error getting timestamp for item I00A: could not convert string to float: 'Wed, 12 Feb 2025 13:22:36 GMT'
+2025-07-01 13:15:20,394 - WARNING - Error getting timestamp for item I00B: could not convert string to float: 'Wed, 12 Feb 2025 13:22:35 GMT'
+2025-07-01 13:15:20,394 - WARNING - Error getting timestamp for item I00C: could not convert string to float: 'Wed, 12 Feb 2025 13:22:35 GMT'
+2025-07-01 13:15:20,395 - WARNING - Error getting timestamp for item I00D: could not convert string to float: 'Wed, 12 Feb 2025 13:22:34 GMT'
+2025-07-01 13:15:20,395 - WARNING - Error getting timestamp for item I00E: could not convert string to float: 'Wed, 12 Feb 2025 13:22:33 GMT'
+2025-07-01 13:15:20,395 - WARNING - Error getting timestamp for item I00F: could not convert string to float: 'Wed, 12 Feb 2025 13:22:33 GMT'
+2025-07-01 13:15:20,396 - WARNING - Error getting timestamp for item I010: could not convert string to float: 'Wed, 12 Feb 2025 13:22:32 GMT'
+2025-07-01 13:15:20,396 - WARNING - Error getting timestamp for item I011: could not convert string to float: 'Wed, 12 Feb 2025 13:22:32 GMT'
+2025-07-01 13:15:20,396 - WARNING - Error getting timestamp for item I012: could not convert string to float: 'Wed, 12 Feb 2025 13:22:32 GMT'
+2025-07-01 13:15:20,396 - WARNING - Error getting timestamp for item I013: could not convert string to float: 'Wed, 12 Feb 2025 13:22:31 GMT'
+2025-07-01 13:15:20,397 - WARNING - Error getting timestamp for item I014: could not convert string to float: 'Wed, 12 Feb 2025 13:22:31 GMT'
+2025-07-01 13:15:20,397 - WARNING - Error getting timestamp for item I015: could not convert string to float: 'Wed, 12 Feb 2025 13:22:31 GMT'
+2025-07-01 13:15:20,398 - WARNING - Error getting timestamp for item I016: could not convert string to float: 'Wed, 12 Feb 2025 13:22:30 GMT'
+2025-07-01 13:15:20,398 - WARNING - Error getting timestamp for item I017: could not convert string to float: 'Wed, 12 Feb 2025 13:22:28 GMT'
+2025-07-01 13:15:20,399 - WARNING - Error getting timestamp for item I018: could not convert string to float: 'Wed, 12 Feb 2025 13:22:27 GMT'
+2025-07-01 13:15:20,399 - WARNING - Error getting timestamp for item I019: could not convert string to float: 'Wed, 12 Feb 2025 13:22:26 GMT'
+2025-07-01 13:15:20,400 - WARNING - Error getting timestamp for item I01A: could not convert string to float: 'Wed, 12 Feb 2025 13:22:26 GMT'
+2025-07-01 13:15:20,401 - WARNING - Error getting timestamp for item I01B: could not convert string to float: 'Wed, 12 Feb 2025 13:22:26 GMT'
+2025-07-01 13:15:20,402 - WARNING - Error getting timestamp for item I01C: could not convert string to float: 'Wed, 12 Feb 2025 13:22:24 GMT'
+2025-07-01 13:15:20,403 - WARNING - Error getting timestamp for item I01D: could not convert string to float: 'Wed, 12 Feb 2025 13:22:23 GMT'
+2025-07-01 13:15:20,404 - WARNING - Error getting timestamp for item I01E: could not convert string to float: 'Wed, 12 Feb 2025 13:22:23 GMT'
+2025-07-01 13:15:20,405 - WARNING - Error getting timestamp for item I01F: could not convert string to float: 'Wed, 12 Feb 2025 13:22:22 GMT'
+2025-07-01 13:15:20,405 - WARNING - Error getting timestamp for item I020: could not convert string to float: 'Wed, 12 Feb 2025 13:22:22 GMT'
+2025-07-01 13:15:20,406 - WARNING - Error getting timestamp for item I021: could not convert string to float: 'Wed, 12 Feb 2025 13:22:21 GMT'
+2025-07-01 13:15:20,407 - WARNING - Error getting timestamp for item I022: could not convert string to float: 'Wed, 12 Feb 2025 13:22:20 GMT'
+2025-07-01 13:15:20,408 - WARNING - Error getting timestamp for item I023: could not convert string to float: 'Wed, 12 Feb 2025 13:22:19 GMT'
+2025-07-01 13:15:20,408 - WARNING - Error getting timestamp for item I024: could not convert string to float: 'Wed, 12 Feb 2025 13:22:19 GMT'
+2025-07-01 13:15:20,409 - WARNING - Error getting timestamp for item I025: could not convert string to float: 'Wed, 12 Feb 2025 13:22:18 GMT'
+2025-07-01 13:15:20,411 - WARNING - Error getting timestamp for item I026: could not convert string to float: 'Wed, 12 Feb 2025 13:22:17 GMT'
+2025-07-01 13:15:20,411 - WARNING - Error getting timestamp for item I027: could not convert string to float: 'Wed, 12 Feb 2025 13:22:17 GMT'
+2025-07-01 13:15:20,412 - WARNING - Error getting timestamp for item I028: could not convert string to float: 'Wed, 12 Feb 2025 13:22:17 GMT'
+2025-07-01 13:15:20,413 - WARNING - Error getting timestamp for item I029: could not convert string to float: 'Wed, 12 Feb 2025 13:22:16 GMT'
+2025-07-01 13:15:20,414 - WARNING - Error getting timestamp for item I02A: could not convert string to float: 'Wed, 12 Feb 2025 13:22:14 GMT'
+2025-07-01 13:15:20,415 - WARNING - Error getting timestamp for item I02B: could not convert string to float: 'Wed, 12 Feb 2025 13:22:14 GMT'
+2025-07-01 13:15:20,416 - WARNING - Error getting timestamp for item I02C: could not convert string to float: 'Wed, 12 Feb 2025 13:22:13 GMT'
+2025-07-01 13:15:20,416 - WARNING - Error getting timestamp for item I02D: could not convert string to float: 'Wed, 12 Feb 2025 13:22:12 GMT'
+2025-07-01 13:15:20,417 - WARNING - Error getting timestamp for item I02E: could not convert string to float: 'Wed, 12 Feb 2025 13:22:12 GMT'
+2025-07-01 13:15:20,418 - WARNING - Error getting timestamp for item I02F: could not convert string to float: 'Wed, 12 Feb 2025 13:22:10 GMT'
+2025-07-01 13:15:20,419 - WARNING - Error getting timestamp for item I030: could not convert string to float: 'Wed, 12 Feb 2025 13:22:09 GMT'
+2025-07-01 13:15:20,420 - WARNING - Error getting timestamp for item I031: could not convert string to float: 'Wed, 12 Feb 2025 13:22:09 GMT'
+2025-07-01 13:15:20,422 - WARNING - Error getting timestamp for item I032: could not convert string to float: 'Wed, 12 Feb 2025 13:22:07 GMT'
+2025-07-01 13:15:20,423 - WARNING - Error getting timestamp for item I033: could not convert string to float: 'Wed, 12 Feb 2025 13:22:07 GMT'
+2025-07-01 13:15:20,424 - WARNING - Error getting timestamp for item I034: could not convert string to float: 'Wed, 12 Feb 2025 13:22:06 GMT'
+2025-07-01 13:15:20,424 - WARNING - Error getting timestamp for item I035: could not convert string to float: 'Wed, 12 Feb 2025 13:22:05 GMT'
+2025-07-01 13:15:20,425 - WARNING - Error getting timestamp for item I036: could not convert string to float: 'Wed, 12 Feb 2025 13:22:05 GMT'
+2025-07-01 13:15:20,425 - WARNING - Error getting timestamp for item I037: could not convert string to float: 'Wed, 12 Feb 2025 13:22:04 GMT'
+2025-07-01 13:15:20,426 - WARNING - Error getting timestamp for item I038: could not convert string to float: 'Wed, 12 Feb 2025 13:22:03 GMT'
+2025-07-01 13:15:20,427 - WARNING - Error getting timestamp for item I039: could not convert string to float: 'Wed, 12 Feb 2025 13:21:59 GMT'
+2025-07-01 13:15:20,428 - WARNING - Error getting timestamp for item I03A: could not convert string to float: 'Wed, 12 Feb 2025 13:21:55 GMT'
+2025-07-01 13:15:20,429 - WARNING - Error getting timestamp for item I03B: could not convert string to float: 'Wed, 12 Feb 2025 13:21:55 GMT'
+2025-07-01 13:15:20,429 - WARNING - Error getting timestamp for item I03C: could not convert string to float: 'Wed, 12 Feb 2025 13:21:53 GMT'
+2025-07-01 13:15:20,430 - WARNING - Error getting timestamp for item I03D: could not convert string to float: 'Wed, 12 Feb 2025 13:21:52 GMT'
+2025-07-01 13:15:20,431 - WARNING - Error getting timestamp for item I03E: could not convert string to float: 'Wed, 12 Feb 2025 13:21:52 GMT'
+2025-07-01 13:15:20,432 - WARNING - Error getting timestamp for item I03F: could not convert string to float: 'Wed, 12 Feb 2025 13:21:51 GMT'
+2025-07-01 13:15:20,433 - WARNING - Error getting timestamp for item I040: could not convert string to float: 'Wed, 12 Feb 2025 13:21:51 GMT'
+2025-07-01 13:15:20,434 - WARNING - Error getting timestamp for item I041: could not convert string to float: 'Wed, 12 Feb 2025 13:21:51 GMT'
+2025-07-01 13:15:20,435 - WARNING - Error getting timestamp for item I042: could not convert string to float: 'Wed, 12 Feb 2025 13:21:48 GMT'
+2025-07-01 13:15:20,435 - WARNING - Error getting timestamp for item I043: could not convert string to float: 'Wed, 12 Feb 2025 13:21:48 GMT'
+2025-07-01 13:15:20,436 - WARNING - Error getting timestamp for item I044: could not convert string to float: 'Wed, 12 Feb 2025 13:21:48 GMT'
+2025-07-01 13:15:20,437 - WARNING - Error getting timestamp for item I045: could not convert string to float: 'Wed, 12 Feb 2025 13:21:46 GMT'
+2025-07-01 13:15:20,438 - WARNING - Error getting timestamp for item I046: could not convert string to float: 'Wed, 12 Feb 2025 13:21:46 GMT'
+2025-07-01 13:15:20,438 - WARNING - Error getting timestamp for item I047: could not convert string to float: 'Wed, 12 Feb 2025 13:21:42 GMT'
+2025-07-01 13:15:20,439 - WARNING - Error getting timestamp for item I048: could not convert string to float: 'Wed, 12 Feb 2025 13:21:40 GMT'
+2025-07-01 13:15:20,440 - WARNING - Error getting timestamp for item I049: could not convert string to float: 'Wed, 12 Feb 2025 13:21:39 GMT'
+2025-07-01 13:15:20,440 - WARNING - Error getting timestamp for item I04A: could not convert string to float: 'Wed, 12 Feb 2025 13:21:38 GMT'
+2025-07-01 13:15:20,441 - WARNING - Error getting timestamp for item I04B: could not convert string to float: 'Wed, 12 Feb 2025 13:21:35 GMT'
+2025-07-01 13:15:20,442 - WARNING - Error getting timestamp for item I04C: could not convert string to float: 'Wed, 12 Feb 2025 13:21:34 GMT'
+2025-07-01 13:15:20,442 - WARNING - Error getting timestamp for item I04D: could not convert string to float: 'Wed, 12 Feb 2025 13:17:30 GMT'
+2025-07-01 13:15:20,443 - WARNING - Error getting timestamp for item I04E: could not convert string to float: 'Wed, 04 Jun 2025 15:26:25 GMT'
+2025-07-01 13:15:20,444 - WARNING - Error getting timestamp for item I04F: could not convert string to float: 'Wed, 02 Apr 2025 14:56:37 GMT'
+2025-07-01 13:15:20,445 - WARNING - Error getting timestamp for item I050: could not convert string to float: 'Thu, 27 Feb 2025 13:16:22 GMT'
+2025-07-01 13:15:20,446 - WARNING - Error getting timestamp for item I051: could not convert string to float: 'Thu, 26 Jun 2025 17:59:31 GMT'
+2025-07-01 13:15:20,447 - WARNING - Error getting timestamp for item I052: could not convert string to float: 'Thu, 24 Apr 2025 15:46:18 GMT'
+2025-07-01 13:15:20,448 - WARNING - Error getting timestamp for item I053: could not convert string to float: 'Sun, 04 May 2025 12:54:00 GMT'
+2025-07-01 13:15:20,449 - WARNING - Error getting timestamp for item I054: could not convert string to float: 'Fri, 27 Jun 2025 11:09:41 GMT'
+2025-07-01 13:15:20,450 - WARNING - Error getting timestamp for item I055: could not convert string to float: 'Fri, 21 Feb 2025 06:48:12 GMT'
+2025-07-01 13:15:20,451 - DEBUG - Moving items to new positions
+2025-07-01 13:15:20,452 - DEBUG - Sort by Date completed successfully
+2025-07-01 13:15:20,453 - INFO - Video refresh completed successfully - 85 videos loaded
