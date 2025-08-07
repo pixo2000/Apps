@@ -1,0 +1,6 @@
+Assets:
+https://dash.valorant-api.com/
+
+Stats:
+Offical: https://developer.riotgames.com/apis
+Unoffical: https://docs.henrikdev.xyz/ 
