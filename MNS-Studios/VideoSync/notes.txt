@@ -1,0 +1,11 @@
+admin selects a video file and order in wich they are to play
+
+it gets loaded to the server wich is in permanent connection with the clients 
+
+active clients show up for the admin
+
+server only has the order of files and the videos that are currently playing.
+
+server sends the clients the videos and order and they play it with sound in fullscreen via VLC.
+
+admin can control volume of all clients in a list
