@@ -11,4 +11,12 @@ server sends the clients the videos and order and they play it with sound in ful
 admin can control volume of all clients in a list
 
 
+encryption
+
 send to server when complete
+
+sync plaslist als letztes damit video playback net broken is
+
+dynamic playlist und show wo die raspis gerade sind
+
+ton control und sync status
