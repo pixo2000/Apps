@@ -9,3 +9,6 @@ server only has the order of files and the videos that are currently playing.
 server sends the clients the videos and order and they play it with sound in fullscreen via VLC.
 
 admin can control volume of all clients in a list
+
+
+send to server when complete
