@@ -5,7 +5,7 @@ from __future__ import annotations
 """PySide6 Multimedia player example"""
 
 import sys
-from PySide6.QtCore import QStandardPaths, Qt, Slot
+from PySide6.QtCore import QStandardPaths, Qt, Slot, QEvent
 from PySide6.QtGui import QAction, QIcon, QKeySequence
 from PySide6.QtWidgets import (QApplication, QDialog, QFileDialog,
                                QMainWindow, QSlider, QStyle, QToolBar)
@@ -87,6 +87,14 @@ class MainWindow(QMainWindow):
         self._stop_action.triggered.connect(self._ensure_stopped)
         play_menu.addAction(self._stop_action)
 
+        # Fullscreen action
+        icon = QIcon.fromTheme(QIcon.ThemeIcon.ViewFullscreen, style.standardIcon(QStyle.SP_TitleBarMaxButton))
+        self._fullscreen_action = tool_bar.addAction(icon, "Fullscreen")
+        self._fullscreen_action.setCheckable(True)
+        self._fullscreen_action.setShortcut(Qt.Key_F11)
+        self._fullscreen_action.triggered.connect(self.toggle_fullscreen)
+        play_menu.addAction(self._fullscreen_action)
+
         self._volume_slider = QSlider()
         self._volume_slider.setOrientation(Qt.Orientation.Horizontal)
         self._volume_slider.setMinimum(0)
@@ -110,8 +118,37 @@ class MainWindow(QMainWindow):
         self._player.playbackStateChanged.connect(self.update_buttons)
         self._player.setVideoOutput(self._video_widget)
 
+        self._video_widget.installEventFilter(self)
+        self._is_fullscreen = False
+
         self.update_buttons(self._player.playbackState())
         self._mime_types = []
+
+    def toggle_fullscreen(self):
+        if not self._is_fullscreen:
+            self._video_widget.setFullScreen(True)
+            self._is_fullscreen = True
+            self._fullscreen_action.setChecked(True)
+            self._video_widget.setFocus()  # Ensure key events go to video widget
+        else:
+            self._video_widget.setFullScreen(False)
+            self._is_fullscreen = False
+            self._fullscreen_action.setChecked(False)
+            self.setFocus()  # Return focus to main window
+
+    def eventFilter(self, obj, event):
+        if self._is_fullscreen:
+            # Accept Escape from anywhere
+            if event.type() == QEvent.KeyPress and event.key() == Qt.Key_Escape:
+                self.toggle_fullscreen()
+                return True
+        return super().eventFilter(obj, event)
+
+    def keyPressEvent(self, event):
+        if self._is_fullscreen and event.key() == Qt.Key_Escape:
+            self.toggle_fullscreen()
+        else:
+            super().keyPressEvent(event)
 
     def closeEvent(self, event):
         self._ensure_stopped()
