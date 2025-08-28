@@ -4,10 +4,13 @@ import threading
 import json
 import time
 import logging
-from flask import Flask, request, render_template_string, redirect, url_for, send_from_directory
+from flask import Flask, request, render_template_string, redirect, url_for, send_from_directory, session, make_response
 from werkzeug.utils import secure_filename
 import requests
 from flask import jsonify
+import json as pyjson
+import pyotp
+from functools import wraps
 
 # Set the folder to sync at the top
 SYNC_FOLDER = os.path.abspath(r"C:/Users/Paul.Schoeneck.INFORMATIK/Downloads/SyncServer")  # CHANGE THIS
@@ -15,6 +18,11 @@ HOST = '0.0.0.0'
 PORT = 5001
 BUFFER_SIZE = 4096
 WEB_PORT = 64137
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+CLIENT_NAMES_FILE = os.path.join(BASE_DIR, 'client_names.json')
+VIDEOS_FOLDER = os.path.join(SYNC_FOLDER, 'videos')
+PLAYLIST_FILE = os.path.join(SYNC_FOLDER, 'playlist.txt')
 
 logging.basicConfig(level=logging.DEBUG, format='[SERVER] %(asctime)s %(message)s')
 
@@ -81,11 +89,78 @@ clients = {}
 clients_lock = threading.Lock()
 CLIENT_TIMEOUT = 60  # seconds
 
+# --- Persistent client names ---
+def load_client_names():
+    if os.path.exists(CLIENT_NAMES_FILE):
+        with open(CLIENT_NAMES_FILE, 'r', encoding='utf-8') as f:
+            return pyjson.load(f)
+    return {}
+
+def save_client_names(names):
+    with open(CLIENT_NAMES_FILE, 'w', encoding='utf-8') as f:
+        pyjson.dump(names, f)
+
+client_names = load_client_names()
+
+@app.route('/set_client_name', methods=['POST'])
+def set_client_name():
+    data = request.get_json(force=True)
+    ip = data['ip']
+    name = data['name']
+    client_names[ip] = name
+    save_client_names(client_names)
+    with clients_lock:
+        if ip in clients:
+            clients[ip]['name'] = name
+    return jsonify({'status': 'ok'})
+
+# --- Video management ---
+@app.route('/videos')
+def list_videos():
+    os.makedirs(VIDEOS_FOLDER, exist_ok=True)
+    files = [f for f in os.listdir(VIDEOS_FOLDER) if os.path.isfile(os.path.join(VIDEOS_FOLDER, f))]
+    return jsonify(files)
+
+@app.route('/delete_video', methods=['POST'])
+def delete_video():
+    data = request.get_json(force=True)
+    filename = data['filename']
+    abs_path = os.path.join(VIDEOS_FOLDER, filename)
+    if os.path.isfile(abs_path):
+        os.remove(abs_path)
+    # Remove all occurrences from playlist
+    if os.path.exists(PLAYLIST_FILE):
+        with open(PLAYLIST_FILE, 'r', encoding='utf-8') as f:
+            lines = [line.strip() for line in f if line.strip() != filename]
+        with open(PLAYLIST_FILE, 'w', encoding='utf-8') as f:
+            for line in lines:
+                f.write(line + '\n')
+    return jsonify({'status': 'ok'})
+
+# --- Playlist management ---
+@app.route('/playlist', methods=['GET', 'POST'])
+def playlist():
+    if request.method == 'GET':
+        if os.path.exists(PLAYLIST_FILE):
+            with open(PLAYLIST_FILE, 'r', encoding='utf-8') as f:
+                lines = [line.strip() for line in f if line.strip()]
+            return jsonify(lines)
+        else:
+            return jsonify([])
+    else:
+        data = request.get_json(force=True)
+        videos = data['videos']
+        with open(PLAYLIST_FILE, 'w', encoding='utf-8') as f:
+            for v in videos:
+                f.write(v + '\n')
+        return jsonify({'status': 'ok'})
+
 @app.route('/register', methods=['POST'])
 def register():
     data = request.get_json(force=True)
     ip = request.remote_addr
-    name = data.get('name', ip)
+    # Only use client-supplied name if no custom name is set
+    name = client_names.get(ip, data.get('name', ip))
     with clients_lock:
         clients[ip] = {'name': name, 'ip': ip, 'last_seen': time.time(), 'volume': data.get('volume', 100)}
     return jsonify({'status': 'ok'})
@@ -129,105 +204,104 @@ HTML = '''
 <!DOCTYPE html>
 <html>
 <head>
-<title>Sync Folder Control</title>
+<title>VideoSync Control</title>
 <style>
-body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 0; }
-.container { max-width: 600px; margin: 40px auto; background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 2px 8px #0001; }
-h2 { color: #333; }
-#drop-area {
-  border: 2px dashed #0078d7;
-  border-radius: 8px;
-  padding: 40px 20px;
-  text-align: center;
-  color: #0078d7;
-  background: #f9f9f9;
-  margin-bottom: 20px;
-  transition: background 0.2s;
+:root {
+  --bg: #181c24;
+  --panel: #232837;
+  --accent: #0078d7;
+  --accent2: #1e90ff;
+  --text: #e6e6e6;
+  --text-muted: #b0b0b0;
+  --danger: #d70022;
+  --item-bg: #23283a;
+  --item-hover: #26304a;
+  --border: #2a2f3d;
+  --shadow: 0 2px 16px #0008;
 }
-#drop-area.dragover { background: #e3f1ff; }
-#file-list { margin: 10px 0; }
-button { background: #0078d7; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 1em; }
-button:disabled { background: #aaa; }
-ul { list-style: none; padding: 0; }
-li { margin: 8px 0; }
-a { color: #d70022; text-decoration: none; margin-left: 10px; }
-a:hover { text-decoration: underline; }
-.client-list { margin-top: 30px; }
-.client-entry { margin-bottom: 10px; }
-input[type=range] { width: 120px; }
+body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; }
+.container { max-width: 900px; margin: 40px auto; background: var(--panel); padding: 30px; border-radius: 16px; box-shadow: var(--shadow); }
+h2 { color: var(--accent2); letter-spacing: 1px; }
+.client-list { margin-bottom: 30px; }
+.client-entry { margin-bottom: 14px; background: var(--item-bg); border-radius: 8px; padding: 12px 16px; display: flex; align-items: center; gap: 16px; box-shadow: 0 1px 4px #0003; transition: background 0.2s; }
+.client-entry input[type=text] { background: var(--panel); color: var(--text); border: 1px solid var(--border); border-radius: 5px; padding: 4px 8px; transition: border 0.2s; }
+.client-entry input[type=text]:focus { border: 1.5px solid var(--accent2); outline: none; }
+input[type=range] { width: 120px; accent-color: var(--accent2); }
+input[type=range]::-webkit-slider-thumb { background: var(--accent2); }
+input[type=range]::-moz-range-thumb { background: var(--accent2); }
+input[type=range]::-ms-thumb { background: var(--accent2); }
+.flex-row { display: flex; gap: 40px; }
+.flex-col { display: flex; flex-direction: column; gap: 10px; }
+#videos, #playlist { min-width: 300px; min-height: 300px; border: 1.5px solid var(--border); border-radius: 12px; padding: 14px; background: var(--item-bg); box-shadow: 0 1px 8px #0002; transition: background 0.2s, border 0.2s; }
+#videos { flex: 1; }
+#playlist { flex: 1; }
+.video-item, .playlist-item { background: var(--panel); margin: 7px 0; padding: 10px 12px; border-radius: 7px; cursor: grab; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 4px #0002; transition: background 0.18s, transform 0.15s; }
+.video-item:hover, .playlist-item:hover { background: var(--item-hover); transform: scale(1.025); }
+.video-item button, .playlist-item button { margin-left: 10px; background: var(--danger); color: #fff; border: none; border-radius: 5px; padding: 5px 14px; font-size: 1em; cursor: pointer; box-shadow: 0 1px 4px #0003; transition: background 0.18s, transform 0.12s; }
+.video-item button:hover, .playlist-item button:hover { background: #a00018; transform: scale(1.08); }
+#drop-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background:rgba(30,144,255,0.12); z-index:1000; display:none; align-items:center; justify-content:center; font-size:2em; color:var(--accent2); font-weight:600; letter-spacing:2px; animation: fadein 0.2s; }
+#upload-status { margin-top:10px; color:var(--accent2); font-weight:500; letter-spacing:1px; }
+::-webkit-scrollbar { width: 10px; background: var(--panel); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 6px; }
+@keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
 </style>
 </head>
 <body>
-<div class="container">
-<h2>Sync Folder Control</h2>
-<p>Folder: {{ folder }}</p>
-<div id="drop-area">
-  <p>Drag & Drop files here to upload</p>
-  <div id="file-list"></div>
-  <button id="upload-btn" disabled>Upload</button>
-</div>
-<h3>Files</h3>
-<ul>
-{% for file in files %}
-  <li>{{ file.name }} ({{ file.size }} bytes) <a href="/delete/{{ file.name }}">Delete</a></li>
-{% endfor %}
-</ul>
-<div class="client-list">
-  <h3>Connected Clients</h3>
-  <div id="clients"></div>
+<div id="drop-overlay">Drop files to upload</div>
+<div class="container" id="main-container">
+<h2>VideoSync Control</h2><a href="/logout" style="float:right; color:#1e90ff; text-decoration:underline; font-size:1em; margin-top:-32px;">Logout</a>
+<div class="client-list" id="clients"></div>
+<div class="flex-row">
+  <div>
+    <h3 style="color:var(--accent2);">Videos</h3>
+    <div id="videos" ondragover="event.preventDefault()"></div>
+    <div id="upload-status"></div>
+  </div>
+  <div>
+    <h3 style="color:var(--accent2);">Playlist</h3>
+    <div id="playlist" ondragover="event.preventDefault()"></div>
+  </div>
 </div>
 </div>
 <script>
-let dropArea = document.getElementById('drop-area');
-let uploadBtn = document.getElementById('upload-btn');
-let fileListDiv = document.getElementById('file-list');
-let filesToUpload = [];
-
-dropArea.addEventListener('dragover', (e) => {
-  e.preventDefault();
-  dropArea.classList.add('dragover');
+// --- Drag and Drop Upload ---
+const dropOverlay = document.getElementById('drop-overlay');
+const mainContainer = document.getElementById('main-container');
+const uploadStatus = document.getElementById('upload-status');
+['dragenter','dragover'].forEach(evt=>{
+  document.body.addEventListener(evt, e=>{
+    if(e.dataTransfer && e.dataTransfer.types.includes('Files')) {
+      dropOverlay.style.display = 'flex';
+      e.preventDefault();
+    }
+  });
 });
-dropArea.addEventListener('dragleave', (e) => {
-  e.preventDefault();
-  dropArea.classList.remove('dragover');
+['dragleave','drop'].forEach(evt=>{
+  document.body.addEventListener(evt, e=>{
+    dropOverlay.style.display = 'none';
+  });
 });
-dropArea.addEventListener('drop', (e) => {
+document.body.addEventListener('drop', function(e) {
   e.preventDefault();
-  dropArea.classList.remove('dragover');
-  filesToUpload = Array.from(e.dataTransfer.files);
-  showFileList();
-});
-
-function showFileList() {
-  fileListDiv.innerHTML = '';
-  if (filesToUpload.length > 0) {
-    filesToUpload.forEach(f => {
-      let p = document.createElement('p');
-      p.textContent = f.name + ' (' + Math.round(f.size/1024) + ' KB)';
-      fileListDiv.appendChild(p);
+  dropOverlay.style.display = 'none';
+  let files = e.dataTransfer.files;
+  if(files.length > 0) {
+    let formData = new FormData();
+    for(let i=0; i<files.length; ++i) formData.append('file', files[i]);
+    uploadStatus.textContent = 'Uploading...';
+    fetch('/upload_video', {method:'POST', body:formData}).then(()=>{
+      uploadStatus.textContent = 'Upload complete!';
+      setTimeout(()=>uploadStatus.textContent='', 2000);
+      fetchVideos();
     });
-    uploadBtn.disabled = false;
-  } else {
-    uploadBtn.disabled = true;
   }
-}
-
-uploadBtn.addEventListener('click', () => {
-  if (filesToUpload.length === 0) return;
-  let confirmUpload = confirm('Upload ' + filesToUpload.length + ' file(s)?');
-  if (!confirmUpload) return;
-  let formData = new FormData();
-  filesToUpload.forEach(f => formData.append('file', f));
-  fetch('/upload', { method: 'POST', body: formData })
-    .then(res => { if (res.redirected) window.location = res.url; else window.location.reload(); });
 });
-
-// Client list and volume control
+// --- Clients ---
 function fetchClients() {
   fetch('/clients').then(r => r.json()).then(clients => {
     let html = '';
     clients.forEach(c => {
-      html += `<div class='client-entry'><b>${c.name}</b> (${c.ip}) Volume: <input type='range' min='0' max='100' value='${c.volume}' onchange='setVolume("${c.ip}", this.value)'> <span id='volval-${c.ip}'>${c.volume}</span></div>`;
+      html += `<div class='client-entry'><b>Name:</b> <input type='text' value='${c.name||''}' id='name-${c.ip}' oninput='saveName("${c.ip}", this.value)'> <b>IP:</b> ${c.ip} <b>Volume:</b> <input type='range' min='0' max='100' value='${c.volume}' onchange='setVolume("${c.ip}", this.value)'> <span id='volval-'+c.ip}>${c.volume}</span></div>`;
     });
     document.getElementById('clients').innerHTML = html;
   });
@@ -239,28 +313,159 @@ function setVolume(ip, vol) {
       else alert('Failed to set volume: '+res.error);
     });
 }
+function saveName(ip, name) {
+  fetch('/set_client_name', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ip:ip, name:name})})
+    .then(r => r.json()).then(res => {
+      if(res.status!=='ok') alert('Failed to save name');
+    });
+}
 setInterval(fetchClients, 3000);
 fetchClients();
+// --- Videos ---
+function fetchVideos() {
+  fetch('/videos').then(r => r.json()).then(videos => {
+    let html = '';
+    videos.forEach(v => {
+      html += `<div class='video-item' draggable='true' ondragstart='dragVideo(event, "${v}")'>${v} <button onclick='deleteVideo("${v}")'>Delete</button></div>`;
+    });
+    document.getElementById('videos').innerHTML = html;
+  });
+}
+function deleteVideo(filename) {
+  if(!confirm('Delete video '+filename+'?')) return;
+  fetch('/delete_video', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({filename:filename})})
+    .then(r => r.json()).then(res => { fetchVideos(); fetchPlaylist(); });
+}
+function dragVideo(ev, filename) {
+  ev.dataTransfer.setData('video', filename);
+}
+// --- Playlist ---
+let playlistOrder = [];
+function fetchPlaylist() {
+  fetch('/playlist').then(r => r.json()).then(list => {
+    playlistOrder = list;
+    renderPlaylist();
+  });
+}
+function renderPlaylist() {
+  let html = '';
+  playlistOrder.forEach((v, idx) => {
+    html += `<div class='playlist-item' draggable='true' ondragstart='dragPlaylist(event, ${idx})'>${v} <button onclick='removeFromPlaylist(${idx})'>Remove</button></div>`;
+  });
+  document.getElementById('playlist').innerHTML = html;
+}
+function dragPlaylist(ev, idx) {
+  ev.dataTransfer.setData('playlist', idx);
+}
+document.getElementById('playlist').ondrop = function(ev) {
+  ev.preventDefault();
+  let idx = ev.dataTransfer.getData('playlist');
+  let video = ev.dataTransfer.getData('video');
+  if(video) {
+    playlistOrder.push(video);
+    savePlaylist();
+  } else if(idx !== '') {
+    let from = parseInt(idx);
+    let to = getDropIndex(ev, this);
+    if(to !== from) {
+      let item = playlistOrder.splice(from, 1)[0];
+      playlistOrder.splice(to, 0, item);
+      savePlaylist();
+    }
+  }
+  renderPlaylist();
+};
+function getDropIndex(ev, container) {
+  let y = ev.clientY;
+  let items = Array.from(container.children);
+  for(let i=0; i<items.length; ++i) {
+    let rect = items[i].getBoundingClientRect();
+    if(y < rect.top + rect.height/2) return i;
+  }
+  return items.length;
+}
+function removeFromPlaylist(idx) {
+  playlistOrder.splice(idx, 1);
+  savePlaylist();
+  renderPlaylist();
+}
+function savePlaylist() {
+  fetch('/playlist', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({videos:playlistOrder})});
+}
+document.getElementById('videos').ondrop = function(ev) {
+  ev.preventDefault();
+  // No-op: only allow drag to playlist
+};
+fetchVideos();
+fetchPlaylist();
 </script>
 </body>
 </html>
 '''
 
+app.secret_key = os.environ.get('VIDEOSYNC_SECRET_KEY', 'ThisIsAVerySecretKey')
+TOTP_SECRET = os.environ.get('VIDEOSYNC_TOTP_SECRET', 'MNS-Studio-Sync')  # Use your own secret!
+TOTP_INTERVAL = 300  # 5 minutes
+
+def require_totp(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if session.get('totp_valid_until', 0) < time.time():
+            return redirect('/login')
+        return f(*args, **kwargs)
+    return decorated
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        code = request.form.get('code', '')
+        totp = pyotp.TOTP(TOTP_SECRET)
+        if totp.verify(code):
+            session['totp_valid_until'] = int(time.time()) + TOTP_INTERVAL
+            return redirect('/')
+        else:
+            return render_template_string(LOGIN_HTML, error='Invalid code')
+    return render_template_string(LOGIN_HTML, error=None)
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect('/login')
+
+LOGIN_HTML = '''
+<!DOCTYPE html>
+<html><head><title>Login</title>
+<style>
+body { background: #181c24; color: #e6e6e6; font-family: 'Segoe UI', Arial, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; }
+.login-box { background: #232837; padding: 40px 30px; border-radius: 14px; box-shadow: 0 2px 16px #0008; min-width: 320px; }
+h2 { color: #1e90ff; margin-bottom: 18px; }
+input[type=text], input[type=password] { width: 100%; padding: 12px; border-radius: 6px; border: 1.5px solid #2a2f3d; background: #181c24; color: #e6e6e6; font-size: 1.1em; margin-bottom: 18px; box-sizing: border-box; }
+input[name=code] { width: 100%; min-width: 0; }
+button { width: 100%; background: #1e90ff; color: #fff; border: none; border-radius: 6px; padding: 12px; font-size: 1.1em; font-weight: 500; cursor: pointer; transition: background 0.18s, transform 0.12s; }
+button:hover { background: #0078d7; transform: scale(1.03); }
+.error { color: #d70022; margin-bottom: 10px; }
+.logout-link { display:block; text-align:center; margin-top:18px; color:#1e90ff; text-decoration:underline; cursor:pointer; font-size:1em; }
+.logout-link:hover { color:#0078d7; }
+</style>
+</head><body>
+<div class="login-box">
+<h2>Enter TOTP Code</h2>
+{% if error %}<div class="error">{{ error }}</div>{% endif %}
+<form method="post">
+  <input type="text" name="code" placeholder="6-digit code" autocomplete="one-time-code" autofocus required>
+  <button type="submit">Login</button>
+</form>
+<a class="logout-link" href="/logout">Logout</a>
+</div>
+</body></html>
+'''
+
+# --- Protect all main routes with TOTP ---
 @app.route("/")
+@require_totp
 def index():
     files = get_all_files()
     return render_template_string(HTML, folder=SYNC_FOLDER, files=files)
-
-@app.route("/upload", methods=['POST'])
-def upload():
-    if 'file' not in request.files:
-        return redirect(url_for('index'))
-    file = request.files['file']
-    if file.filename == '':
-        return redirect(url_for('index'))
-    filename = secure_filename(file.filename)
-    file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-    return redirect(url_for('index'))
 
 @app.route("/delete/<path:filename>")
 def delete(filename):
@@ -285,3 +490,12 @@ if __name__ == "__main__":
         while True:
             conn, addr = s.accept()
             threading.Thread(target=handle_client, args=(conn, addr), daemon=True).start()
+
+# Protect all other relevant routes:
+app.view_functions['index'] = require_totp(app.view_functions['index'])
+app.view_functions['list_videos'] = require_totp(app.view_functions['list_videos'])
+app.view_functions['playlist'] = require_totp(app.view_functions['playlist'])
+app.view_functions['delete_video'] = require_totp(app.view_functions['delete_video'])
+app.view_functions['set_client_name'] = require_totp(app.view_functions['set_client_name'])
+app.view_functions['set_volume'] = require_totp(app.view_functions['set_volume'])
+app.view_functions['get_clients'] = require_totp(app.view_functions['get_clients'])
