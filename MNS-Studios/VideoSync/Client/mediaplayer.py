@@ -5,7 +5,8 @@ from __future__ import annotations
 """PySide6 Multimedia player example"""
 
 import sys
-from PySide6.QtCore import QStandardPaths, Qt, Slot, QEvent
+import os
+from PySide6.QtCore import QStandardPaths, Qt, Slot, QEvent, QUrl
 from PySide6.QtGui import QAction, QIcon, QKeySequence
 from PySide6.QtWidgets import (QApplication, QDialog, QFileDialog,
                                QMainWindow, QSlider, QStyle, QToolBar)
@@ -28,12 +29,19 @@ def get_supported_mime_types():
     return result
 
 
+# === USER CONFIGURABLE PATH ===
+# Set the path to the directory containing playlist.txt and the video folder
+MEDIA_BASE_PATH = r"C:\Users\Paul.Schoeneck.INFORMATIK\Downloads\SyncClient"  # <-- CHANGE THIS
+PLAYLIST_FILE = os.path.join(MEDIA_BASE_PATH, "playlist.txt")
+VIDEO_FOLDER = os.path.join(MEDIA_BASE_PATH, "videos")  # Folder with .mp4 files
+
+
 class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
 
-        self._playlist = []  # FIXME 6.3: Replace by QMediaPlaylist?
+        self._playlist = []
         self._playlist_index = -1
         self._audio_output = QAudioOutput()
         self._player = QMediaPlayer()
@@ -124,6 +132,15 @@ class MainWindow(QMainWindow):
         self.update_buttons(self._player.playbackState())
         self._mime_types = []
 
+        self.load_playlist_from_file()
+        if self._playlist:
+            self._playlist_index = 0
+            self.play_current_video()
+
+        self._player.mediaStatusChanged.connect(self.handle_media_status)
+        # Automatically start in fullscreen
+        self.toggle_fullscreen()
+
     def toggle_fullscreen(self):
         if not self._is_fullscreen:
             self._video_widget.setFullScreen(True)
@@ -154,33 +171,52 @@ class MainWindow(QMainWindow):
         self._ensure_stopped()
         event.accept()
 
+    def load_playlist_from_file(self):
+        self._playlist = []
+        print(f"[Playlist Loader] Listing all files in: {VIDEO_FOLDER}")
+        if os.path.exists(VIDEO_FOLDER):
+            for f in os.listdir(VIDEO_FOLDER):
+                print(f"  Found: {f}")
+        else:
+            print(f"  [ERROR] Video folder does not exist: {VIDEO_FOLDER}")
+        print(f"[Playlist Loader] Reading playlist from: {PLAYLIST_FILE}")
+        if os.path.exists(PLAYLIST_FILE):
+            with open(PLAYLIST_FILE, 'r', encoding='utf-8') as f:
+                for line in f:
+                    video_name = line.strip()
+                    if video_name:
+                        video_path = os.path.join(VIDEO_FOLDER, video_name)
+                        if os.path.exists(video_path):
+                            video_url = QUrl.fromLocalFile(video_path)
+                            self._playlist.append(video_url)
+                            print(f"  Added to playlist: {video_path}")
+                        else:
+                            print(f"  [WARNING] Listed in playlist.txt but not found: {video_path}")
+        else:
+            print(f"  [ERROR] Playlist file does not exist: {PLAYLIST_FILE}")
+        print(f"[Playlist Loader] Final playlist order:")
+        for idx, url in enumerate(self._playlist):
+            print(f"  {idx+1}. {os.path.basename(url.toLocalFile())}")
+
+    def play_current_video(self):
+        if self._playlist:
+            video_url = self._playlist[self._playlist_index]
+            print(f"[Player] Now playing: {video_url.toLocalFile()}")
+            self._player.setSource(video_url)
+            self._player.play()
+
+    def handle_media_status(self, status):
+        if status == QMediaPlayer.EndOfMedia:
+            if self._playlist:
+                self._playlist_index += 1
+                if self._playlist_index >= len(self._playlist):
+                    self._playlist_index = 0  # Loop to start
+                self.play_current_video()
+
     @Slot()
     def open(self):
-        self._ensure_stopped()
-        file_dialog = QFileDialog(self)
-
-        is_windows = sys.platform == 'win32'
-        if not self._mime_types:
-            self._mime_types = get_supported_mime_types()
-            if (is_windows and AVI not in self._mime_types):
-                self._mime_types.append(AVI)
-            elif MP4 not in self._mime_types:
-                self._mime_types.append(MP4)
-
-        file_dialog.setMimeTypeFilters(self._mime_types)
-
-        default_mimetype = AVI if is_windows else MP4
-        if default_mimetype in self._mime_types:
-            file_dialog.selectMimeTypeFilter(default_mimetype)
-
-        movies_location = QStandardPaths.writableLocation(QStandardPaths.MoviesLocation)
-        file_dialog.setDirectory(movies_location)
-        if file_dialog.exec() == QDialog.Accepted:
-            url = file_dialog.selectedUrls()[0]
-            self._playlist.append(url)
-            self._playlist_index = len(self._playlist) - 1
-            self._player.setSource(url)
-            self._player.play()
+        # Overridden: disables manual open, as playlist is loaded from file
+        self.show_status_message("Playlist is loaded from file. To change videos, edit playlist.txt.")
 
     @Slot()
     def _ensure_stopped(self):
@@ -189,20 +225,15 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def previous_clicked(self):
-        # Go to previous track if we are within the first 5 seconds of playback
-        # Otherwise, seek to the beginning.
-        if self._player.position() <= 5000 and self._playlist_index > 0:
-            self._playlist_index -= 1
-            self._playlist.previous()
-            self._player.setSource(self._playlist[self._playlist_index])
-        else:
-            self._player.setPosition(0)
+        if self._playlist:
+            self._playlist_index = (self._playlist_index - 1) % len(self._playlist)
+            self.play_current_video()
 
     @Slot()
     def next_clicked(self):
-        if self._playlist_index < len(self._playlist) - 1:
-            self._playlist_index += 1
-            self._player.setSource(self._playlist[self._playlist_index])
+        if self._playlist:
+            self._playlist_index = (self._playlist_index + 1) % len(self._playlist)
+            self.play_current_video()
 
     @Slot("QMediaPlayer::PlaybackState")
     def update_buttons(self, state):
