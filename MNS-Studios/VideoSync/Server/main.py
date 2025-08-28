@@ -13,8 +13,8 @@ import pyotp
 from functools import wraps
 
 # Set the folder to sync at the top
-SYNC_FOLDER = os.path.abspath(r"C:/Users/Paul.Schoeneck.INFORMATIK/Downloads/SyncServer")  # CHANGE THIS
-HOST = '0.0.0.0'
+SYNC_FOLDER = os.path.abspath(r"/root/VideoSync/Files")  # CHANGE THIS
+HOST = '10.68.241.20'  # Change to '
 PORT = 5001
 BUFFER_SIZE = 4096
 WEB_PORT = 64137
@@ -404,7 +404,7 @@ fetchPlaylist();
 '''
 
 app.secret_key = os.environ.get('VIDEOSYNC_SECRET_KEY', 'ThisIsAVerySecretKey')
-TOTP_SECRET = os.environ.get('VIDEOSYNC_TOTP_SECRET', 'MNS-Studio-Sync')  # Use your own secret!
+TOTP_SECRET = os.environ.get('VIDEOSYNC_TOTP_SECRET', '4O5ZAPVGSCLFG7FL7EK7N5BRCI6KCOTY')  # Use your own secret!
 TOTP_INTERVAL = 300  # 5 minutes
 
 def require_totp(f):
@@ -477,6 +477,22 @@ def delete(filename):
 @app.route('/files/<path:filename>')
 def download(filename):
     return send_from_directory(SYNC_FOLDER, filename)
+
+@app.route('/upload_video', methods=['POST'])
+def upload_video():
+    if 'file' not in request.files:
+        return jsonify({'status': 'error', 'error': 'No file part'}), 400
+    files = request.files.getlist('file')
+    os.makedirs(VIDEOS_FOLDER, exist_ok=True)
+    saved = []
+    for file in files:
+        if file.filename == '':
+            continue
+        filename = secure_filename(file.filename)
+        save_path = os.path.join(VIDEOS_FOLDER, filename)
+        file.save(save_path)
+        saved.append(filename)
+    return jsonify({'status': 'ok', 'saved': saved})
 
 def run_web():
     app.run(host=HOST, port=WEB_PORT, debug=False, use_reloader=False)
