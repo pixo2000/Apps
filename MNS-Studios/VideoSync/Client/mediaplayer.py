@@ -6,7 +6,9 @@ from __future__ import annotations
 
 import sys
 import os
-from PySide6.QtCore import QStandardPaths, Qt, Slot, QEvent, QUrl
+import threading
+import socket
+from PySide6.QtCore import QStandardPaths, Qt, Slot, QEvent, QUrl, Signal
 from PySide6.QtGui import QAction, QIcon, QKeySequence
 from PySide6.QtWidgets import (QApplication, QDialog, QFileDialog,
                                QMainWindow, QSlider, QStyle, QToolBar)
@@ -35,8 +37,12 @@ MEDIA_BASE_PATH = r"C:\Users\Paul.Schoeneck.INFORMATIK\Downloads\SyncClient"  # 
 PLAYLIST_FILE = os.path.join(MEDIA_BASE_PATH, "playlist.txt")
 VIDEO_FOLDER = os.path.join(MEDIA_BASE_PATH, "videos")  # Folder with .mp4 files
 
+LOCAL_CONTROL_PORT = 64138  # Port for local control commands
+
 
 class MainWindow(QMainWindow):
+    reload_playlist_signal = Signal()
+    set_volume_signal = Signal(int)
 
     def __init__(self):
         super().__init__()
@@ -118,7 +124,7 @@ class MainWindow(QMainWindow):
 
         icon = QIcon.fromTheme(QIcon.ThemeIcon.HelpAbout)
         about_menu = self.menuBar().addMenu("&About")
-        about_qt_act = QAction(icon, "About &Qt", self, triggered=qApp.aboutQt)  # noqa: F821
+        about_qt_act = QAction(icon, "About &Qt", self, triggered=QApplication.instance().aboutQt)
         about_menu.addAction(about_qt_act)
 
         self._video_widget = QVideoWidget()
@@ -140,6 +146,10 @@ class MainWindow(QMainWindow):
         self._player.mediaStatusChanged.connect(self.handle_media_status)
         # Automatically start in fullscreen
         self.toggle_fullscreen()
+
+        self.reload_playlist_signal.connect(self.reload_and_restart)
+        self.set_volume_signal.connect(self.set_volume_from_command)
+        threading.Thread(target=self.control_server_thread, daemon=True).start()
 
     def toggle_fullscreen(self):
         if not self._is_fullscreen:
@@ -258,6 +268,41 @@ class MainWindow(QMainWindow):
                                                 QAudio.VolumeScale.LogarithmicVolumeScale,
                                                 QAudio.VolumeScale.LinearVolumeScale)
         self._audio_output.setVolume(self.volumeValue)
+
+    def control_server_thread(self):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            s.bind(('127.0.0.1', LOCAL_CONTROL_PORT))
+            s.listen(1)
+            while True:
+                conn, _ = s.accept()
+                with conn:
+                    data = conn.recv(1024).decode().strip()
+                    if data == 'RELOAD':
+                        self.reload_playlist_signal.emit()
+                        conn.sendall(b'OK')
+                    elif data.startswith('SETVOLUME:'):
+                        try:
+                            vol = int(data.split(':')[1])
+                            self.set_volume_signal.emit(vol)
+                            conn.sendall(b'OK')
+                        except Exception:
+                            conn.sendall(b'ERR')
+                    else:
+                        conn.sendall(b'ERR')
+
+    def reload_and_restart(self):
+        self.load_playlist_from_file()
+        if self._playlist:
+            self._playlist_index = 0
+            self.play_current_video()
+        self.show_status_message('Playlist reloaded and restarted.')
+
+    def set_volume_from_command(self, vol):
+        vol = max(0, min(100, vol))
+        self._volume_slider.setValue(vol)
+        self.setVolume()
+        self.show_status_message(f'Volume set to {vol}% (remote)')
 
 
 if __name__ == '__main__':

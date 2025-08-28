@@ -4,15 +4,62 @@ import os
 import json
 import time
 import shutil
+import socket as pysocket  # To avoid conflict with main socket import
+import threading
+import requests
+from flask import Flask, request, jsonify
 
 logging.basicConfig(level=logging.DEBUG, format='[CLIENT] %(asctime)s %(message)s')
 
 # Set the folder to sync at the top
-SYNC_FOLDER = os.path.abspath(r"/root/VideoSync")  # CHANGE THIS
-SERVER_IP = '10.68.242.114'  # Replace with your server's IP
+SYNC_FOLDER = os.path.abspath(r"C:\Users\Paul.Schoeneck.INFORMATIK\Downloads\SyncClient")  # CHANGE THIS
+SERVER_IP = 'localhost'  # Replace with your server's IP
 PORT = 5001
 BUFFER_SIZE = 4096
 SYNC_INTERVAL = 10  # seconds
+SERVER_WEB_PORT = 64137
+LOCAL_MEDIA_CONTROL_PORT = 64138
+CLIENT_HTTP_PORT = 64139
+CLIENT_NAME = os.environ.get('CLIENT_NAME', os.uname().nodename if hasattr(os, 'uname') else 'Client')
+
+# Register client with server
+
+def register_with_server(volume=100):
+    try:
+        url = f'http://{SERVER_IP}:{SERVER_WEB_PORT}/register'
+        requests.post(url, json={'name': CLIENT_NAME, 'volume': volume}, timeout=2)
+    except Exception as e:
+        logging.warning(f"Could not register with server: {e}")
+
+def heartbeat_thread():
+    while True:
+        register_with_server()
+        time.sleep(30)
+
+def start_heartbeat():
+    threading.Thread(target=heartbeat_thread, daemon=True).start()
+
+# HTTP server for volume control
+app = Flask(__name__)
+
+@app.route('/set_volume', methods=['POST'])
+def set_volume():
+    data = request.get_json(force=True)
+    vol = int(data.get('volume', 100))
+    # Forward to local media player
+    try:
+        with pysocket.socket(pysocket.AF_INET, pysocket.SOCK_STREAM) as s:
+            s.connect(('127.0.0.1', LOCAL_MEDIA_CONTROL_PORT))
+            s.sendall(f'SETVOLUME:{vol}'.encode())
+            s.recv(16)
+        logging.info(f"Set local media player volume to {vol}% via remote command.")
+        return jsonify({'status': 'ok'})
+    except Exception as e:
+        logging.warning(f"Could not set volume on media player: {e}")
+        return jsonify({'status': 'error', 'error': str(e)}), 500
+
+def start_http_server():
+    threading.Thread(target=lambda: app.run(host='0.0.0.0', port=CLIENT_HTTP_PORT, debug=False, use_reloader=False), daemon=True).start()
 
 def get_server_file_list(s):
     logging.debug("Requesting file list from server...")
@@ -75,6 +122,16 @@ def delete_local_file(rel_path):
     else:
         logging.warning(f"Tried to delete non-existent file: {rel_path}")
 
+def notify_media_player_reload():
+    try:
+        with pysocket.socket(pysocket.AF_INET, pysocket.SOCK_STREAM) as s:
+            s.connect(('127.0.0.1', 64138))
+            s.sendall(b'RELOAD')
+            s.recv(16)
+        logging.info("Notified media player to reload playlist.")
+    except Exception as e:
+        logging.warning(f"Could not notify media player: {e}")
+
 def sync_with_server():
     while True:
         try:
@@ -89,6 +146,7 @@ def sync_with_server():
                 local_sizes = {f: os.path.getsize(os.path.join(SYNC_FOLDER, f)) for f in local_files if os.path.isfile(os.path.join(SYNC_FOLDER, f))}
                 server_file_dict = {f['name']: f['size'] for f in server_files}
                 # Download new/changed files
+                playlist_changed = False
                 for rel_path, server_size in server_file_dict.items():
                     needs_download = (
                         rel_path not in local_files or
@@ -97,10 +155,16 @@ def sync_with_server():
                     if needs_download:
                         logging.info(f"File '{rel_path}' will be downloaded (missing or size mismatch)")
                         download_file(s, rel_path)
+                        if rel_path == 'playlist.txt':
+                            playlist_changed = True
                 # Delete files not on server
                 for rel_path in local_files:
                     if rel_path not in server_file_dict:
                         delete_local_file(rel_path)
+                        if rel_path == 'playlist.txt':
+                            playlist_changed = True
+            if playlist_changed:
+                notify_media_player_reload()
             logging.debug("Sync cycle complete.")
         except Exception as e:
             logging.error(f"Sync error: {e}")
@@ -121,6 +185,8 @@ def list_files_with_sizes(base_folder):
 
 if __name__ == "__main__":
     os.makedirs(SYNC_FOLDER, exist_ok=True)
+    start_heartbeat()
+    start_http_server()
     logging.info(f"Syncing to local folder: {SYNC_FOLDER}")
     # List all files and sizes on client
     print("[CLIENT] Files and sizes in sync folder:")
