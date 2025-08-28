@@ -1,0 +1,1 @@
+dont use pyqt as it does not work on raspi
