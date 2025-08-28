@@ -6,6 +6,8 @@ import time
 import logging
 from flask import Flask, request, render_template_string, redirect, url_for, send_from_directory
 from werkzeug.utils import secure_filename
+import requests
+from flask import jsonify
 
 # Set the folder to sync at the top
 SYNC_FOLDER = os.path.abspath(r"C:/Users/Paul.Schoeneck.INFORMATIK/Downloads/SyncServer")  # CHANGE THIS
@@ -75,6 +77,54 @@ def handle_client(conn, addr):
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = SYNC_FOLDER
 
+clients = {}
+clients_lock = threading.Lock()
+CLIENT_TIMEOUT = 60  # seconds
+
+@app.route('/register', methods=['POST'])
+def register():
+    data = request.get_json(force=True)
+    ip = request.remote_addr
+    name = data.get('name', ip)
+    with clients_lock:
+        clients[ip] = {'name': name, 'ip': ip, 'last_seen': time.time(), 'volume': data.get('volume', 100)}
+    return jsonify({'status': 'ok'})
+
+@app.route('/unregister', methods=['POST'])
+def unregister():
+    ip = request.remote_addr
+    with clients_lock:
+        if ip in clients:
+            del clients[ip]
+    return jsonify({'status': 'ok'})
+
+@app.route('/clients')
+def get_clients():
+    now = time.time()
+    with clients_lock:
+        # Remove stale clients
+        to_remove = [ip for ip, c in clients.items() if now - c['last_seen'] > CLIENT_TIMEOUT]
+        for ip in to_remove:
+            del clients[ip]
+        return jsonify(list(clients.values()))
+
+@app.route('/set_volume', methods=['POST'])
+def set_volume():
+    data = request.get_json(force=True)
+    ip = data['ip']
+    volume = int(data['volume'])
+    # Send volume command to client
+    try:
+        # Assume client exposes a local endpoint for volume (on same host as client)
+        url = f'http://{ip}:64139/set_volume'
+        requests.post(url, json={'volume': volume}, timeout=2)
+        with clients_lock:
+            if ip in clients:
+                clients[ip]['volume'] = volume
+        return jsonify({'status': 'ok'})
+    except Exception as e:
+        return jsonify({'status': 'error', 'error': str(e)}), 500
+
 HTML = '''
 <!DOCTYPE html>
 <html>
@@ -102,6 +152,9 @@ ul { list-style: none; padding: 0; }
 li { margin: 8px 0; }
 a { color: #d70022; text-decoration: none; margin-left: 10px; }
 a:hover { text-decoration: underline; }
+.client-list { margin-top: 30px; }
+.client-entry { margin-bottom: 10px; }
+input[type=range] { width: 120px; }
 </style>
 </head>
 <body>
@@ -119,6 +172,10 @@ a:hover { text-decoration: underline; }
   <li>{{ file.name }} ({{ file.size }} bytes) <a href="/delete/{{ file.name }}">Delete</a></li>
 {% endfor %}
 </ul>
+<div class="client-list">
+  <h3>Connected Clients</h3>
+  <div id="clients"></div>
+</div>
 </div>
 <script>
 let dropArea = document.getElementById('drop-area');
@@ -164,6 +221,26 @@ uploadBtn.addEventListener('click', () => {
   fetch('/upload', { method: 'POST', body: formData })
     .then(res => { if (res.redirected) window.location = res.url; else window.location.reload(); });
 });
+
+// Client list and volume control
+function fetchClients() {
+  fetch('/clients').then(r => r.json()).then(clients => {
+    let html = '';
+    clients.forEach(c => {
+      html += `<div class='client-entry'><b>${c.name}</b> (${c.ip}) Volume: <input type='range' min='0' max='100' value='${c.volume}' onchange='setVolume("${c.ip}", this.value)'> <span id='volval-${c.ip}'>${c.volume}</span></div>`;
+    });
+    document.getElementById('clients').innerHTML = html;
+  });
+}
+function setVolume(ip, vol) {
+  fetch('/set_volume', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ip:ip, volume:vol})})
+    .then(r => r.json()).then(res => {
+      if(res.status==='ok') document.getElementById('volval-'+ip).innerText = vol;
+      else alert('Failed to set volume: '+res.error);
+    });
+}
+setInterval(fetchClients, 3000);
+fetchClients();
 </script>
 </body>
 </html>
