@@ -23,7 +23,8 @@ def get_all_files():
         for file in files:
             abs_path = os.path.join(root, file)
             rel_path = os.path.relpath(abs_path, SYNC_FOLDER)
-            file_list.append(rel_path.replace('\\', '/'))
+            size = os.path.getsize(abs_path)
+            file_list.append({'name': rel_path.replace('\\', '/'), 'size': size})
     logging.debug(f"Current server file list: {file_list}")
     return file_list
 
@@ -115,7 +116,7 @@ a:hover { text-decoration: underline; }
 <h3>Files</h3>
 <ul>
 {% for file in files %}
-  <li>{{ file }} <a href="/delete/{{ file }}">Delete</a></li>
+  <li>{{ file.name }} ({{ file.size }} bytes) <a href="/delete/{{ file.name }}">Delete</a></li>
 {% endfor %}
 </ul>
 </div>

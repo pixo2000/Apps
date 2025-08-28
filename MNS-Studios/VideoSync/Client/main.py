@@ -8,8 +8,8 @@ import shutil
 logging.basicConfig(level=logging.DEBUG, format='[CLIENT] %(asctime)s %(message)s')
 
 # Set the folder to sync at the top
-SYNC_FOLDER = os.path.abspath(r"C:/Users/Paul.Schoeneck.INFORMATIK/Downloads/SyncClient")  # CHANGE THIS
-SERVER_IP = 'localhost'  # Replace with your server's IP
+SYNC_FOLDER = os.path.abspath(r"/root/VideoSync")  # CHANGE THIS
+SERVER_IP = '10.68.242.114'  # Replace with your server's IP
 PORT = 5001
 BUFFER_SIZE = 4096
 SYNC_INTERVAL = 10  # seconds
@@ -87,24 +87,19 @@ def sync_with_server():
                 local_files = local_file_list()
                 # Build a dict of local file sizes
                 local_sizes = {f: os.path.getsize(os.path.join(SYNC_FOLDER, f)) for f in local_files if os.path.isfile(os.path.join(SYNC_FOLDER, f))}
+                server_file_dict = {f['name']: f['size'] for f in server_files}
                 # Download new/changed files
-                for rel_path in server_files:
-                    # Get server file size
-                    try:
-                        abs_server_path = os.path.join(os.path.abspath(r"C:/Users/Paul.Schoeneck.INFORMATIK/Downloads/SyncServer"), rel_path)
-                        server_size = os.path.getsize(abs_server_path)
-                    except Exception:
-                        server_size = None
+                for rel_path, server_size in server_file_dict.items():
                     needs_download = (
                         rel_path not in local_files or
-                        (server_size is not None and rel_path in local_sizes and local_sizes[rel_path] != server_size)
+                        (rel_path in local_sizes and local_sizes[rel_path] != server_size)
                     )
                     if needs_download:
                         logging.info(f"File '{rel_path}' will be downloaded (missing or size mismatch)")
                         download_file(s, rel_path)
                 # Delete files not on server
                 for rel_path in local_files:
-                    if rel_path not in server_files:
+                    if rel_path not in server_file_dict:
                         delete_local_file(rel_path)
             logging.debug("Sync cycle complete.")
         except Exception as e:
@@ -141,13 +136,9 @@ if __name__ == "__main__":
             data = s.recv(1024*1024)
             server_files = json.loads(data.decode())
             print("[SERVER] Files and sizes in sync folder:")
-            for rel_path in server_files:
-                try:
-                    # Try to get size from local server folder if running on same machine
-                    abs_path = os.path.join(os.path.abspath(r"C:/Users/Paul.Schoeneck.INFORMATIK/Downloads/SyncServer"), rel_path)
-                    size = os.path.getsize(abs_path)
-                except Exception:
-                    size = 'unknown'
+            for fileinfo in server_files:
+                rel_path = fileinfo['name']
+                size = fileinfo['size']
                 print(f"  {rel_path}: {size} bytes")
     except Exception as e:
         print(f"[SERVER] Could not list server files: {e}")
