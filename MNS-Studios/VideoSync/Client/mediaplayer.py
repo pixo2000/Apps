@@ -33,10 +33,11 @@ def get_supported_mime_types():
 
 # === USER CONFIGURABLE PATH ===
 # Set the path to the directory containing playlist.txt and the video folder
-MEDIA_BASE_PATH = r"C:\Users\Paul.Schoeneck.INFORMATIK\Downloads\SyncClient"  # <-- CHANGE THIS
+MEDIA_BASE_PATH = r"/home/pi/Sync/Files"  # <-- CHANGE THIS
 PLAYLIST_FILE = os.path.join(MEDIA_BASE_PATH, "playlist.txt")
 VIDEO_FOLDER = os.path.join(MEDIA_BASE_PATH, "videos")  # Folder with .mp4 files
 
+HOST = '10.68.238.166'
 LOCAL_CONTROL_PORT = 64138  # Port for local control commands
 
 
@@ -272,7 +273,7 @@ class MainWindow(QMainWindow):
     def control_server_thread(self):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            s.bind(('127.0.0.1', LOCAL_CONTROL_PORT))
+            s.bind((HOST, LOCAL_CONTROL_PORT))
             s.listen(1)
             while True:
                 conn, _ = s.accept()
