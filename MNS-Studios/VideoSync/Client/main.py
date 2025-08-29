@@ -58,6 +58,78 @@ def set_volume():
         logging.warning(f"Could not set volume on media player: {e}")
         return jsonify({'status': 'error', 'error': str(e)}), 500
 
+@app.route('/control', methods=['POST'])
+def control():
+    data = request.get_json(force=True)
+    action = data.get('action')
+    # Forward to local media player
+    try:
+        with pysocket.socket(pysocket.AF_INET, pysocket.SOCK_STREAM) as s:
+            s.connect(('127.0.0.1', LOCAL_MEDIA_CONTROL_PORT))
+            if action == 'play':
+                s.sendall(b'PLAY')
+            elif action == 'pause':
+                s.sendall(b'PAUSE')
+            elif action == 'next':
+                s.sendall(b'NEXT')
+            elif action == 'prev':
+                s.sendall(b'PREV')
+            elif action == 'set_index':
+                idx = data.get('index', 0)
+                s.sendall(f'SETINDEX:{idx}'.encode())
+            else:
+                return jsonify({'status': 'error', 'error': 'Unknown action'}), 400
+            s.recv(16)
+        logging.info(f"Sent media control command: {action}")
+        return jsonify({'status': 'ok'})
+    except Exception as e:
+        logging.warning(f"Could not send control command to media player: {e}")
+        return jsonify({'status': 'error', 'error': str(e)}), 500
+
+@app.route('/playlist')
+def get_playlist():
+    # Forward to local media player
+    try:
+        with pysocket.socket(pysocket.AF_INET, pysocket.SOCK_STREAM) as s:
+            s.connect(('127.0.0.1', LOCAL_MEDIA_CONTROL_PORT))
+            s.sendall(b'GETPLAYLIST')
+            response = s.recv(4096).decode()
+        playlist_data = json.loads(response)
+        return jsonify(playlist_data)
+    except Exception as e:
+        logging.warning(f"Could not get playlist from media player: {e}")
+        return jsonify({'status': 'error', 'error': str(e)}), 500
+
+@app.route('/skip', methods=['POST'])
+def skip():
+    data = request.get_json(force=True)
+    seconds = data.get('seconds', 10)
+    # Forward to local media player
+    try:
+        with pysocket.socket(pysocket.AF_INET, pysocket.SOCK_STREAM) as s:
+            s.connect(('127.0.0.1', LOCAL_MEDIA_CONTROL_PORT))
+            s.sendall(f'SKIP:{seconds}'.encode())
+            s.recv(16)
+        logging.info(f"Sent skip command: {seconds} seconds")
+        return jsonify({'status': 'ok'})
+    except Exception as e:
+        logging.warning(f"Could not send skip command to media player: {e}")
+        return jsonify({'status': 'error', 'error': str(e)}), 500
+
+@app.route('/playing_status')
+def get_playing_status():
+    # Forward to local media player
+    try:
+        with pysocket.socket(pysocket.AF_INET, pysocket.SOCK_STREAM) as s:
+            s.connect(('127.0.0.1', LOCAL_MEDIA_CONTROL_PORT))
+            s.sendall(b'GETPLAYINGSTATUS')
+            response = s.recv(1024).decode()
+        status_data = json.loads(response)
+        return jsonify(status_data)
+    except Exception as e:
+        logging.warning(f"Could not get playing status from media player: {e}")
+        return jsonify({'status': 'error', 'error': str(e)}), 500
+
 def start_http_server():
     threading.Thread(target=lambda: app.run(host='0.0.0.0', port=CLIENT_HTTP_PORT, debug=False, use_reloader=False), daemon=True).start()
 

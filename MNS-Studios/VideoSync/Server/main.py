@@ -215,6 +215,47 @@ def set_volume():
   except Exception as e:
     return jsonify({'status': 'error', 'error': str(e)}), 500
 
+# --- Client media control routes ---
+@app.route('/client_control/<client_ip>', methods=['POST'])
+def client_control(client_ip):
+    data = request.get_json(force=True)
+    action = data.get('action')
+    try:
+        url = f'http://{client_ip}:64139/control'
+        response = requests.post(url, json=data, timeout=2)
+        return jsonify(response.json())
+    except Exception as e:
+        return jsonify({'status': 'error', 'error': str(e)}), 500
+
+@app.route('/client_playlist/<client_ip>')
+def client_playlist(client_ip):
+    try:
+        url = f'http://{client_ip}:64139/playlist'
+        response = requests.get(url, timeout=2)
+        return jsonify(response.json())
+    except Exception as e:
+        return jsonify({'status': 'error', 'error': str(e)}), 500
+
+@app.route('/client_skip/<client_ip>', methods=['POST'])
+def client_skip(client_ip):
+    data = request.get_json(force=True)
+    seconds = data.get('seconds', 10)
+    try:
+        url = f'http://{client_ip}:64139/skip'
+        response = requests.post(url, json={'seconds': seconds}, timeout=2)
+        return jsonify(response.json())
+    except Exception as e:
+        return jsonify({'status': 'error', 'error': str(e)}), 500
+
+@app.route('/client_playing_status/<client_ip>')
+def client_playing_status(client_ip):
+    try:
+        url = f'http://{client_ip}:64139/playing_status'
+        response = requests.get(url, timeout=2)
+        return jsonify(response.json())
+    except Exception as e:
+        return jsonify({'status': 'error', 'error': str(e)}), 500
+
 HTML = '''
 <!DOCTYPE html>
 <html>
@@ -241,6 +282,16 @@ h2 { color: var(--accent2); letter-spacing: 1px; }
 .client-entry { margin-bottom: 14px; background: var(--item-bg); border-radius: 8px; padding: 12px 16px; display: flex; align-items: center; gap: 16px; box-shadow: 0 1px 4px #0003; transition: background 0.2s; }
 .client-entry input[type=text] { background: var(--panel); color: var(--text); border: 1px solid var(--border); border-radius: 5px; padding: 4px 8px; transition: border 0.2s; }
 .client-entry input[type=text]:focus { border: 1.5px solid var(--accent2); outline: none; }
+.client-controls { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; }
+.client-controls button { background: var(--accent); color: #fff; border: none; border-radius: 5px; padding: 6px 12px; font-size: 0.9em; cursor: pointer; transition: background 0.18s; }
+.client-controls button:hover { background: var(--accent2); }
+.client-playlist { margin-top: 10px; max-height: 150px; overflow-y: auto; background: var(--panel); border-radius: 5px; padding: 8px; }
+.client-playlist-item { padding: 4px 8px; margin: 2px 0; background: var(--item-bg); border-radius: 3px; cursor: pointer; font-size: 0.9em; }
+.client-playlist-item.active { background: var(--accent2); color: #fff; }
+.client-playlist-item:hover { background: var(--item-hover); }
+.playing-indicator { display: inline-block; width: 12px; height: 12px; background: #00ff00; border-radius: 50%; margin-right: 8px; animation: pulse 1.5s ease-in-out infinite alternate; }
+.paused-indicator { display: inline-block; width: 12px; height: 12px; background: #ff6b6b; border-radius: 50%; margin-right: 8px; }
+@keyframes pulse { from { opacity: 0.6; } to { opacity: 1; } }
 input[type=range] { width: 120px; accent-color: var(--accent2); }
 input[type=range]::-webkit-slider-thumb { background: var(--accent2); }
 input[type=range]::-moz-range-thumb { background: var(--accent2); }
@@ -313,13 +364,80 @@ document.body.addEventListener('drop', function(e) {
 });
 // --- Clients ---
 function fetchClients() {
+  // Store current playlist visibility states before refreshing
+  const playlistStates = {};
+  document.querySelectorAll('[id^="playlist-"]').forEach(div => {
+    const ip = div.id.replace('playlist-', '');
+    playlistStates[ip] = div.style.display !== 'none';
+  });
+
   fetch('/clients').then(r => r.json()).then(clients => {
     let html = '';
     clients.forEach(c => {
-      html += `<div class='client-entry'><b>Name:</b> <input type='text' value='${c.name||''}' id='name-${c.ip}' oninput='saveName("${c.ip}", this.value)'> <b>IP:</b> ${c.ip} <b>Volume:</b> <input type='range' min='0' max='100' value='${c.volume}' onchange='setVolume("${c.ip}", this.value)'> <span id='volval-'+c.ip}>${c.volume}</span></div>`;
+      html += `
+        <div class='client-entry'>
+          <div style="flex: 1;">
+            <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 10px;">
+              <span class="playing-status" id="playing-${c.ip}">⏸️</span>
+              <b>Name:</b> <input type='text' value='${c.name||''}' id='name-${c.ip}' oninput='saveName("${c.ip}", this.value)'>
+              <b>IP:</b> ${c.ip}
+              <b>Volume:</b> <input type='range' min='0' max='100' value='${c.volume}' onchange='setVolume("${c.ip}", this.value)'>
+              <span id='volval-${c.ip}'>${c.volume}</span>
+            </div>
+            <div class="client-controls">
+              <button onclick='clientControl("${c.ip}", "play")'>▶️ Play</button>
+              <button onclick='clientControl("${c.ip}", "pause")'>⏸️ Pause</button>
+              <button onclick='clientControl("${c.ip}", "next")'>⏭️ Next</button>
+              <button onclick='clientControl("${c.ip}", "prev")'>⏮️ Prev</button>
+              <button onclick='clientSkip("${c.ip}", 10)'>+10s</button>
+              <button onclick='clientSkip("${c.ip}", 30)'>+30s</button>
+              <button onclick='clientSkip("${c.ip}", 60)'>+1m</button>
+              <button onclick='clientSkip("${c.ip}", -10)'>-10s</button>
+              <button onclick='togglePlaylist("${c.ip}")'>📋 Playlist</button>
+            </div>
+            <div class="client-playlist" id="playlist-${c.ip}" style="display: none;"></div>
+          </div>
+        </div>`;
     });
     document.getElementById('clients').innerHTML = html;
+    
+    // Restore playlist visibility states and refresh visible playlists
+    Object.keys(playlistStates).forEach(ip => {
+      const playlistDiv = document.getElementById(`playlist-${ip}`);
+      if (playlistDiv && playlistStates[ip]) {
+        playlistDiv.style.display = 'block';
+        fetchClientPlaylist(ip); // Refresh the content of visible playlists
+      }
+    });
+    
+    // Update playing status for all clients
+    clients.forEach(c => {
+      updateClientPlayingStatus(c.ip);
+    });
   });
+}
+
+function updateClientPlayingStatus(ip) {
+  fetch(`/client_playing_status/${ip}`)
+    .then(r => r.json()).then(data => {
+      const statusEl = document.getElementById(`playing-${ip}`);
+      if (statusEl) {
+        if (data.is_playing) {
+          statusEl.innerHTML = '<span class="playing-indicator"></span>▶️ Playing';
+          statusEl.style.color = '#00ff00';
+        } else {
+          statusEl.innerHTML = '<span class="paused-indicator"></span>⏸️ Paused';
+          statusEl.style.color = '#ff6b6b';
+        }
+      }
+    }).catch(() => {
+      // If can't get status, show unknown
+      const statusEl = document.getElementById(`playing-${ip}`);
+      if (statusEl) {
+        statusEl.innerHTML = '❓ Unknown';
+        statusEl.style.color = '#888';
+      }
+    });
 }
 function setVolume(ip, vol) {
   fetch('/set_volume', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ip:ip, volume:vol})})
@@ -334,6 +452,66 @@ function saveName(ip, name) {
   fetch('/set_client_name', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ip:ip, name:name})})
     .then(r => r.json()).then(res => {
       if(res.status!=='ok') alert('Failed to save name');
+    });
+}
+
+// --- Client Controls ---
+function clientControl(ip, action) {
+  fetch(`/client_control/${ip}`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({action:action})})
+    .then(r => r.json()).then(res => {
+      if(res.status!=='ok') alert(`Failed to ${action}: ${res.error || 'Unknown error'}`);
+    });
+}
+
+function clientSkip(ip, seconds) {
+  fetch(`/client_skip/${ip}`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({seconds:seconds})})
+    .then(r => r.json()).then(res => {
+      if(res.status!=='ok') alert(`Failed to skip: ${res.error || 'Unknown error'}`);
+    });
+}
+
+function togglePlaylist(ip) {
+  const playlistDiv = document.getElementById(`playlist-${ip}`);
+  if(playlistDiv.style.display === 'none') {
+    fetchClientPlaylist(ip);
+    playlistDiv.style.display = 'block';
+  } else {
+    playlistDiv.style.display = 'none';
+  }
+}
+
+function fetchClientPlaylist(ip) {
+  fetch(`/client_playlist/${ip}`)
+    .then(r => r.json()).then(data => {
+      if(data.status === 'error') {
+        alert(`Failed to fetch playlist: ${data.error}`);
+        return;
+      }
+      const playlistDiv = document.getElementById(`playlist-${ip}`);
+      let html = '';
+      data.playlist.forEach((video, idx) => {
+        const isActive = idx === data.current;
+        html += `<div class="client-playlist-item ${isActive ? 'active' : ''}" onclick="setClientVideo('${ip}', ${idx})">${video}</div>`;
+      });
+      if(html === '') html = '<div style="color: var(--text-muted); font-style: italic;">No videos in playlist</div>';
+      playlistDiv.innerHTML = html;
+    });
+}
+
+function setClientVideo(ip, index) {
+  fetch(`/client_control/${ip}`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({action:'set_index', index:index})})
+    .then(r => r.json()).then(res => {
+      if(res.status==='ok') {
+        // Refresh playlist after a short delay to show the new active video
+        setTimeout(() => {
+          const playlistDiv = document.getElementById(`playlist-${ip}`);
+          if (playlistDiv && playlistDiv.style.display !== 'none') {
+            fetchClientPlaylist(ip);
+          }
+        }, 500);
+      } else {
+        alert(`Failed to set video: ${res.error || 'Unknown error'}`);
+      }
     });
 }
 setInterval(fetchClients, 3000);
@@ -421,8 +599,9 @@ fetchPlaylist();
 '''
 
 app.secret_key = os.environ.get('VIDEOSYNC_SECRET_KEY', 'ThisIsAVerySecretKey')
+app.permanent_session_lifetime = 3600  # 1 hour
 TOTP_SECRET = os.environ.get('VIDEOSYNC_TOTP_SECRET', '4O5ZAPVGSCLFG7FL7EK7N5BRCI6KCOTY')  # Use your own secret!
-TOTP_INTERVAL = 300  # 5 minutes
+TOTP_INTERVAL = 3600  # 1 hour instead of 5 minutes
 
 def require_totp(f):
     @wraps(f)
@@ -438,6 +617,7 @@ def login():
         code = request.form.get('code', '')
         totp = pyotp.TOTP(TOTP_SECRET)
         if totp.verify(code):
+            session.permanent = True  # Make session persistent
             session['totp_valid_until'] = int(time.time()) + TOTP_INTERVAL
             return redirect('/')
         else:
@@ -532,3 +712,7 @@ app.view_functions['delete_video'] = require_totp(app.view_functions['delete_vid
 app.view_functions['set_client_name'] = require_totp(app.view_functions['set_client_name'])
 app.view_functions['set_volume'] = require_totp(app.view_functions['set_volume'])
 app.view_functions['get_clients'] = require_totp(app.view_functions['get_clients'])
+app.view_functions['client_control'] = require_totp(app.view_functions['client_control'])
+app.view_functions['client_playlist'] = require_totp(app.view_functions['client_playlist'])
+app.view_functions['client_skip'] = require_totp(app.view_functions['client_skip'])
+app.view_functions['client_playing_status'] = require_totp(app.view_functions['client_playing_status'])
