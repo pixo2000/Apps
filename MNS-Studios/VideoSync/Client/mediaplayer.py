@@ -37,7 +37,7 @@ MEDIA_BASE_PATH = r"C:\Users\Paul.Schoeneck.INFORMATIK\Downloads\SyncClient"  # 
 PLAYLIST_FILE = os.path.join(MEDIA_BASE_PATH, "playlist.txt")
 VIDEO_FOLDER = os.path.join(MEDIA_BASE_PATH, "videos")  # Folder with .mp4 files
 
-HOST = '10.68.242.114' # use ur client ip
+HOST = '127.0.0.1' # use ur client ip
 LOCAL_CONTROL_PORT = 64138  # Port for local control commands
 
 
