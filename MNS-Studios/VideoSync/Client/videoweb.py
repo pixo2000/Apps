@@ -2,6 +2,7 @@
 import os
 import threading
 import socket
+import json
 from flask import Flask, send_from_directory, jsonify, request, render_template_string
 
 # === USER CONFIGURABLE PATH ===
@@ -19,6 +20,9 @@ state = {
 		'playlist': [],
 		'playlist_index': 0,
 		'volume': 100,
+		'pending_skip': 0,  # Seconds to skip when polled
+		'pending_commands': [],  # Remote commands like play/pause
+		'is_playing': False,  # Current playing status
 }
 
 def load_playlist():
@@ -49,7 +53,8 @@ def get_playlist():
 		return jsonify({
 				'playlist': state['playlist'],
 				'current': state['playlist_index'],
-				'volume': state['volume']
+				'volume': state['volume'],
+				'is_playing': state['is_playing']
 		})
 
 @app.route('/video/<int:index>')
@@ -64,16 +69,26 @@ def control():
 		data = request.json
 		action = data.get('action')
 		if action == 'play':
-				# No-op, handled client-side
-				pass
+				# Add to pending commands for client-side execution
+				if 'pending_commands' not in state:
+						state['pending_commands'] = []
+				state['pending_commands'].append('play')
 		elif action == 'pause':
-				pass
+				if 'pending_commands' not in state:
+						state['pending_commands'] = []
+				state['pending_commands'].append('pause')
 		elif action == 'next':
 				if state['playlist']:
 						state['playlist_index'] = (state['playlist_index'] + 1) % len(state['playlist'])
+						if 'pending_commands' not in state:
+								state['pending_commands'] = []
+						state['pending_commands'].append('next')
 		elif action == 'prev':
 				if state['playlist']:
 						state['playlist_index'] = (state['playlist_index'] - 1) % len(state['playlist'])
+						if 'pending_commands' not in state:
+								state['pending_commands'] = []
+						state['pending_commands'].append('prev')
 		elif action == 'set_volume':
 				vol = int(data.get('volume', 100))
 				state['volume'] = max(0, min(100, vol))
@@ -81,7 +96,43 @@ def control():
 				idx = int(data.get('index', 0))
 				if 0 <= idx < len(state['playlist']):
 						state['playlist_index'] = idx
+						if 'pending_commands' not in state:
+								state['pending_commands'] = []
+						state['pending_commands'].append('setindex')
 		return jsonify({'status': 'ok', 'state': state})
+
+@app.route('/skip', methods=['POST'])
+def skip():
+		data = request.json
+		seconds = data.get('seconds', 10)
+		# Store the skip amount to be consumed by the client
+		state['pending_skip'] = seconds
+		return jsonify({'status': 'ok', 'skip_seconds': seconds})
+
+@app.route('/get_remote_command', methods=['GET'])
+def get_remote_command():
+		# Return and clear any pending remote commands
+		commands = state.get('pending_commands', [])
+		state['pending_commands'] = []
+		return jsonify({'commands': commands})
+
+@app.route('/get_skip', methods=['GET'])
+def get_skip():
+		# Return and clear pending skip
+		skip_amount = state['pending_skip']
+		state['pending_skip'] = 0
+		return jsonify({'skip_seconds': skip_amount})
+
+@app.route('/playing_status', methods=['GET', 'POST'])
+def playing_status():
+		if request.method == 'POST':
+				# Update playing status from client-side JavaScript
+				data = request.get_json(force=True)
+				state['is_playing'] = data.get('is_playing', False)
+				return jsonify({'status': 'ok'})
+		else:
+				# Return current playing status
+				return jsonify({'is_playing': state['is_playing']})
 
 # --- Socket server for remote commands (RELOAD, SETVOLUME) ---
 def control_server_thread():
@@ -101,6 +152,75 @@ def control_server_thread():
 												vol = int(data.split(':')[1])
 												state['volume'] = max(0, min(100, vol))
 												conn.sendall(b'OK')
+										except Exception:
+												conn.sendall(b'ERR')
+								elif data == 'PLAY':
+										# Add play command to pending commands
+										if 'pending_commands' not in state:
+												state['pending_commands'] = []
+										state['pending_commands'].append('play')
+										conn.sendall(b'OK')
+								elif data == 'PAUSE':
+										# Add pause command to pending commands
+										if 'pending_commands' not in state:
+												state['pending_commands'] = []
+										state['pending_commands'].append('pause')
+										conn.sendall(b'OK')
+								elif data == 'NEXT':
+										if state['playlist']:
+												state['playlist_index'] = (state['playlist_index'] + 1) % len(state['playlist'])
+												# Add next command to pending commands to trigger video change
+												if 'pending_commands' not in state:
+														state['pending_commands'] = []
+												state['pending_commands'].append('next')
+										conn.sendall(b'OK')
+								elif data == 'PREV':
+										if state['playlist']:
+												state['playlist_index'] = (state['playlist_index'] - 1) % len(state['playlist'])
+												# Add prev command to pending commands to trigger video change
+												if 'pending_commands' not in state:
+														state['pending_commands'] = []
+												state['pending_commands'].append('prev')
+										conn.sendall(b'OK')
+								elif data.startswith('SETINDEX:'):
+										try:
+												idx = int(data.split(':')[1])
+												if 0 <= idx < len(state['playlist']):
+														state['playlist_index'] = idx
+														# Add setindex command to pending commands to trigger video change
+														if 'pending_commands' not in state:
+																state['pending_commands'] = []
+														state['pending_commands'].append('setindex')
+												conn.sendall(b'OK')
+										except Exception:
+												conn.sendall(b'ERR')
+								elif data == 'GETPLAYLIST':
+										try:
+												playlist_data = {
+														'playlist': state['playlist'],
+														'current': state['playlist_index'],
+														'volume': state['volume'],
+														'is_playing': state['is_playing']
+												}
+												response = json.dumps(playlist_data).encode()
+												conn.sendall(response)
+										except Exception:
+												conn.sendall(b'ERR')
+								elif data.startswith('SKIP:'):
+										try:
+												seconds = int(data.split(':')[1])
+												# Set pending skip for client to consume
+												state['pending_skip'] = seconds
+												conn.sendall(b'OK')
+										except Exception:
+												conn.sendall(b'ERR')
+								elif data == 'GETPLAYINGSTATUS':
+										try:
+												status_data = {
+														'is_playing': state['is_playing']
+												}
+												response = json.dumps(status_data).encode()
+												conn.sendall(response)
 										except Exception:
 												conn.sendall(b'ERR')
 								else:
@@ -197,6 +317,8 @@ window.addEventListener('DOMContentLoaded', () => {
 let playlist = [];
 let current = 0;
 let volume = 100;
+let lastCurrent = -1; // Track last current index to detect changes
+let skipAmount = 0; // For remote skip commands
 const video = document.getElementById('video');
 const playpause = document.getElementById('playpause');
 const volslider = document.getElementById('volume');
@@ -212,11 +334,44 @@ function fetchPlaylist(updateOnly=false) {
 		volval.textContent = volume;
 		video.volume = volume/100;
 		renderPlaylist();
+		
+		// Check if current index changed (remote next/prev/setindex)
+		if (lastCurrent !== -1 && lastCurrent !== current && updateOnly) {
+			loadVideo(); // Load new video when index changes remotely
+		}
+		lastCurrent = current;
+		
 		if (!updateOnly) loadVideo();
 	});
 }
-// Poll every second for remote volume changes
-setInterval(()=>fetchPlaylist(true), 1000);
+
+// Poll every second for remote volume changes and skip commands
+setInterval(()=>{
+	fetchPlaylist(true);
+	// Check for skip commands
+	fetch('/get_skip')
+		.then(r => r.json()).then(data => {
+			if(data.skip_seconds && data.skip_seconds !== 0) {
+				video.currentTime += data.skip_seconds;
+			}
+		}).catch(() => {}); // Ignore errors for polling
+	// Check for remote commands (play/pause/next/prev/setindex)
+	fetch('/get_remote_command')
+		.then(r => r.json()).then(data => {
+			data.commands.forEach(cmd => {
+				if(cmd === 'play' && video.paused) {
+					video.play();
+					playpause.textContent = '⏸️';
+				} else if(cmd === 'pause' && !video.paused) {
+					video.pause();
+					playpause.textContent = '▶️';
+				} else if(cmd === 'next' || cmd === 'prev' || cmd === 'setindex') {
+					// These commands change the playlist index, trigger a video reload
+					loadVideo();
+				}
+			});
+		}).catch(() => {}); // Ignore errors for polling
+}, 1000);
 
 function renderPlaylist() {
 	let html = '';
@@ -239,21 +394,56 @@ function loadVideo() {
 				video.volume = volume/100;
 				firstVideoLoaded = true;
 				video.src = `/video/${current}`;
-				video.play();
+				video.play().then(() => {
+					// Update status after successful play
+					updatePlayingStatus(true);
+					playpause.textContent = '⏸️';
+				}).catch(() => {
+					// If play fails, update status accordingly
+					updatePlayingStatus(false);
+					playpause.textContent = '▶️';
+				});
 			});
 		} else {
 			video.src = `/video/${current}`;
 			video.volume = volume/100;
-			video.play();
+			video.play().then(() => {
+				// Update status after successful play
+				updatePlayingStatus(true);
+				playpause.textContent = '⏸️';
+			}).catch(() => {
+				// If play fails, update status accordingly
+				updatePlayingStatus(false);
+				playpause.textContent = '▶️';
+			});
 		}
 	} else {
 		video.src = '';
+		updatePlayingStatus(false);
 	}
 }
 
 function playPause() {
-	if (video.paused) { video.play(); playpause.textContent = '⏸️'; sendControl('play'); }
-	else { video.pause(); playpause.textContent = '▶️'; sendControl('pause'); }
+	if (video.paused) { 
+		video.play(); 
+		playpause.textContent = '⏸️'; 
+		updatePlayingStatus(true);
+		sendControl('play'); 
+	}
+	else { 
+		video.pause(); 
+		playpause.textContent = '▶️'; 
+		updatePlayingStatus(false);
+		sendControl('pause'); 
+	}
+}
+
+function updatePlayingStatus(isPlaying) {
+	fetch('/playing_status', {
+		method: 'POST', 
+		headers: {'Content-Type': 'application/json'}, 
+		body: JSON.stringify({is_playing: isPlaying})
+	});
 }
 
 function next() {
@@ -283,8 +473,25 @@ function sendControl(action, extra={}) {
 	fetch('/control', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(Object.assign({action}, extra))});
 }
 video.onended = function() { next(); };
-video.onplay = function() { playpause.textContent = '⏸️'; };
-video.onpause = function() { playpause.textContent = '▶️'; };
+video.onplay = function() { 
+	playpause.textContent = '⏸️'; 
+	updatePlayingStatus(true);
+};
+video.onpause = function() { 
+	playpause.textContent = '▶️'; 
+	updatePlayingStatus(false);
+};
+video.onloadstart = function() {
+	// Don't immediately set to paused - wait for actual play/pause events
+	playpause.textContent = '▶️';
+};
+video.oncanplay = function() {
+	// Auto-update status based on actual video state after loading
+	setTimeout(() => {
+		updatePlayingStatus(!video.paused);
+		playpause.textContent = video.paused ? '▶️' : '⏸️';
+	}, 100);
+};
 fetchPlaylist();
 // Poll every second for remote volume changes
 setInterval(()=>fetchPlaylist(true), 1000);
