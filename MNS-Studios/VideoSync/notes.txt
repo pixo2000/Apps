@@ -1,1 +1,3 @@
 dont use pyqt as it does not work on raspi
+
+blacklist: vlc, PySide6/PyQT, cv2, mpv
