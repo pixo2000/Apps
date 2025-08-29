@@ -12,8 +12,8 @@ from flask import Flask, request, jsonify
 logging.basicConfig(level=logging.DEBUG, format='[CLIENT] %(asctime)s %(message)s')
 
 # Set the folder to sync at the top
-SYNC_FOLDER = os.path.abspath(r"C:\Users\Paul.Schoeneck.INFORMATIK\Downloads\SyncClient")  # CHANGE THIS
-SERVER_IP = '10.68.241.20'  # Replace with your server's IP
+SYNC_FOLDER = os.path.abspath(r"C:\Users\pixo2000\Downloads\SyncClient")  # CHANGE THIS
+SERVER_IP = 'localhost'  # Replace with your server's IP
 PORT = 5001
 BUFFER_SIZE = 4096
 SYNC_INTERVAL = 10  # seconds
