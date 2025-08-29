@@ -228,7 +228,57 @@ def sync_with_server():
                 server_file_dict = {f['name']: f['size'] for f in server_files}
                 # Download new/changed files
                 playlist_changed = False
+                
+                # Special handling for playlist.txt - always check content
+                playlist_file = 'playlist.txt'
+                if playlist_file in server_file_dict:
+                    server_playlist_size = server_file_dict[playlist_file]
+                    local_playlist_path = os.path.join(SYNC_FOLDER, playlist_file)
+                    
+                    should_download_playlist = False
+                    if playlist_file not in local_files:
+                        should_download_playlist = True
+                        logging.info(f"Playlist file missing locally, downloading")
+                    elif local_sizes[playlist_file] != server_playlist_size:
+                        should_download_playlist = True
+                        logging.info(f"Playlist file size changed ({local_sizes[playlist_file]} -> {server_playlist_size}), downloading")
+                    else:
+                        # Same size, but let's download anyway to check for content changes
+                        should_download_playlist = True
+                        logging.debug(f"Playlist file same size, downloading to check content")
+                    
+                    if should_download_playlist:
+                        # Read current content before downloading
+                        old_content = ""
+                        if os.path.exists(local_playlist_path):
+                            try:
+                                with open(local_playlist_path, 'r', encoding='utf-8') as f:
+                                    old_content = f.read()
+                            except Exception:
+                                pass
+                        
+                        download_file(s, playlist_file)
+                        
+                        # Check if content actually changed
+                        new_content = ""
+                        if os.path.exists(local_playlist_path):
+                            try:
+                                with open(local_playlist_path, 'r', encoding='utf-8') as f:
+                                    new_content = f.read()
+                            except Exception:
+                                pass
+                        
+                        if old_content != new_content:
+                            playlist_changed = True
+                            logging.info(f"Playlist content actually changed")
+                        else:
+                            logging.debug(f"Playlist content unchanged")
+                
+                # Handle other files normally
                 for rel_path, server_size in server_file_dict.items():
+                    if rel_path == playlist_file:
+                        continue  # Already handled above
+                        
                     needs_download = (
                         rel_path not in local_files or
                         (rel_path in local_sizes and local_sizes[rel_path] != server_size)
@@ -236,14 +286,14 @@ def sync_with_server():
                     if needs_download:
                         logging.info(f"File '{rel_path}' will be downloaded (missing or size mismatch)")
                         download_file(s, rel_path)
-                        if rel_path == 'playlist.txt':
-                            playlist_changed = True
+                
                 # Delete files not on server
                 for rel_path in local_files:
                     if rel_path not in server_file_dict:
                         delete_local_file(rel_path)
-                        if rel_path == 'playlist.txt':
+                        if rel_path == playlist_file:
                             playlist_changed = True
+                            
             if playlist_changed:
                 notify_media_player_reload()
             logging.debug("Sync cycle complete.")

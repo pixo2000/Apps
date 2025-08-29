@@ -661,6 +661,8 @@ button:hover { background: #0078d7; transform: scale(1.03); }
 @app.route("/")
 @require_totp
 def index():
+    # Clear session to force TOTP on next visit
+    session.clear()
     files = get_all_files()
     return render_template_string(HTML, folder=SYNC_FOLDER, files=files)
 
