@@ -3,6 +3,7 @@ import os
 import threading
 import socket
 import json
+import logging
 from flask import Flask, send_from_directory, jsonify, request, render_template_string
 
 # === USER CONFIGURABLE PATH ===
@@ -38,8 +39,26 @@ def load_playlist():
 		return playlist
 
 def reload_playlist():
+		old_playlist = state['playlist'][:]  # Create a copy of current playlist
+		old_index = state['playlist_index']
+		
 		state['playlist'] = load_playlist()
-		state['playlist_index'] = 0
+		
+		# Check if playlist content actually changed or was reordered
+		playlist_content_changed = len(old_playlist) != len(state['playlist']) or old_playlist != state['playlist']
+		playlist_reordered = (len(old_playlist) == len(state['playlist']) and 
+		                     set(old_playlist) == set(state['playlist']) and 
+		                     old_playlist != state['playlist'])
+		
+		# Reset index if playlist changed significantly or current index is invalid
+		if playlist_content_changed or state['playlist_index'] >= len(state['playlist']):
+			state['playlist_index'] = 0
+			if playlist_reordered:
+				logging.info(f"Playlist reordered, index reset to 0")
+			else:
+				logging.info(f"Playlist content changed, index reset to 0")
+		else:
+			logging.info(f"Playlist reloaded: no content changes, keeping index {state['playlist_index']}")
 
 reload_playlist()
 
@@ -145,7 +164,23 @@ def control_server_thread():
 						with conn:
 								data = conn.recv(1024).decode().strip()
 								if data == 'RELOAD':
+										old_playlist = state['playlist'][:]
+										old_index = state['playlist_index']
 										reload_playlist()
+										# Check if content changed or was reordered
+										playlist_changed = old_playlist != state['playlist']
+										playlist_reordered = (len(old_playlist) == len(state['playlist']) and 
+										                     set(old_playlist) == set(state['playlist']) and 
+										                     old_playlist != state['playlist'])
+										
+										if playlist_changed:
+												if playlist_reordered:
+														logging.info("Playlist reordered during reload - notifying client")
+												else:
+														logging.info("Playlist content changed during reload - notifying client")
+												if 'pending_commands' not in state:
+														state['pending_commands'] = []
+												state['pending_commands'].append('playlist_changed')
 										conn.sendall(b'OK')
 								elif data.startswith('SETVOLUME:'):
 										try:
@@ -318,30 +353,82 @@ let playlist = [];
 let current = 0;
 let volume = 100;
 let lastCurrent = -1; // Track last current index to detect changes
+let lastPlaylist = []; // Track last playlist content to detect changes
 let skipAmount = 0; // For remote skip commands
 const video = document.getElementById('video');
 const playpause = document.getElementById('playpause');
 const volslider = document.getElementById('volume');
 const volval = document.getElementById('volval');
 
+function arraysEqual(a, b) {
+	if (a.length !== b.length) return false;
+	for (let i = 0; i < a.length; i++) {
+		if (a[i] !== b[i]) return false;
+	}
+	return true;
+}
+
+function playlistReordered(oldPlaylist, newPlaylist) {
+	// Check if same items but different order
+	if (oldPlaylist.length !== newPlaylist.length) return false;
+	
+	// Check if all items exist in both arrays (same content)
+	const oldSet = new Set(oldPlaylist);
+	const newSet = new Set(newPlaylist);
+	if (oldSet.size !== newSet.size) return false;
+	
+	for (let item of oldSet) {
+		if (!newSet.has(item)) return false;
+	}
+	
+	// Same content but check if order is different
+	return !arraysEqual(oldPlaylist, newPlaylist);
+}
+
 function fetchPlaylist(updateOnly=false) {
 	fetch('/playlist').then(r=>r.json()).then(data => {
-		playlist = data.playlist;
-		current = data.current;
+		const newPlaylist = data.playlist;
+		const newCurrent = data.current;
+		
 		// Always update volume from server
 		volume = data.volume;
 		volslider.value = volume;
 		volval.textContent = volume;
 		video.volume = volume/100;
+		
+		// Check different types of changes
+		const playlistContentChanged = !arraysEqual(playlist, newPlaylist);
+		const playlistWasReordered = playlistReordered(playlist, newPlaylist);
+		const currentIndexChanged = current !== newCurrent;
+		
+		// Update local state
+		playlist = newPlaylist;
+		current = newCurrent;
+		
+		// Always re-render playlist display
 		renderPlaylist();
 		
-		// Check if current index changed (remote next/prev/setindex)
-		if (lastCurrent !== -1 && lastCurrent !== current && updateOnly) {
-			loadVideo(); // Load new video when index changes remotely
+		// Only reload video if necessary
+		if (!updateOnly) {
+			// Initial load - always load video
+			loadVideo();
+		} else if (playlistWasReordered) {
+			// Playlist was reordered - restart video to maintain sync
+			console.log('Playlist was reordered, restarting video');
+			loadVideo();
+		} else if (playlistContentChanged) {
+			// Playlist content changed (new/removed items) - reload current video
+			console.log('Playlist content changed, reloading video');
+			loadVideo();
+		} else if (currentIndexChanged) {
+			// Only index changed - load new video
+			console.log('Current index changed, loading new video');
+			loadVideo();
 		}
-		lastCurrent = current;
 		
-		if (!updateOnly) loadVideo();
+		// Update tracking variables
+		lastCurrent = current;
+		lastPlaylist = [...playlist]; // Create a copy
 	});
 }
 
@@ -368,6 +455,10 @@ setInterval(()=>{
 				} else if(cmd === 'next' || cmd === 'prev' || cmd === 'setindex') {
 					// These commands change the playlist index, trigger a video reload
 					loadVideo();
+				} else if(cmd === 'playlist_changed') {
+					// Playlist content changed, force a full refresh
+					console.log('Playlist content changed via server sync, refreshing...');
+					fetchPlaylist(false); // Force full reload
 				}
 			});
 		}).catch(() => {}); // Ignore errors for polling
