@@ -33,11 +33,11 @@ def get_supported_mime_types():
 
 # === USER CONFIGURABLE PATH ===
 # Set the path to the directory containing playlist.txt and the video folder
-MEDIA_BASE_PATH = r"/home/pi/Sync/Files"  # <-- CHANGE THIS
+MEDIA_BASE_PATH = r"C:\Users\Paul.Schoeneck.INFORMATIK\Downloads\SyncClient"  # <-- CHANGE THIS
 PLAYLIST_FILE = os.path.join(MEDIA_BASE_PATH, "playlist.txt")
 VIDEO_FOLDER = os.path.join(MEDIA_BASE_PATH, "videos")  # Folder with .mp4 files
 
-HOST = '10.68.238.166'
+HOST = '10.68.242.114' # use ur client ip
 LOCAL_CONTROL_PORT = 64138  # Port for local control commands
 
 
