@@ -71,7 +71,13 @@ def get_server_file_list(s):
 def download_file(s, rel_path):
     logging.debug(f"Requesting file: {rel_path}")
     s.sendall(f'GET:{rel_path}'.encode())
-    status = s.recv(BUFFER_SIZE)
+    # Read exactly 6 bytes for status
+    status = b''
+    while len(status) < 6:
+        chunk = s.recv(6 - len(status))
+        if not chunk:
+            break
+        status += chunk
     logging.debug(f"Received status for {rel_path}: {status}")
     if status == b'EXISTS':
         # Read 16-byte file size header
@@ -87,11 +93,14 @@ def download_file(s, rel_path):
         total_bytes = 0
         with open(abs_path, 'wb') as f:
             while total_bytes < file_size:
-                data = s.recv(min(BUFFER_SIZE, file_size - total_bytes))
+                chunk_size = min(BUFFER_SIZE, file_size - total_bytes)
+                data = s.recv(chunk_size)
                 if not data:
                     break
                 f.write(data)
                 total_bytes += len(data)
+            f.flush()
+            os.fsync(f.fileno())
         logging.info(f"Downloaded: {rel_path} ({total_bytes} bytes, expected {file_size} bytes)")
         # Print file size after download
         try:
@@ -99,8 +108,8 @@ def download_file(s, rel_path):
             logging.info(f"File size on disk: {size} bytes")
         except Exception as e:
             logging.warning(f"Could not get file size: {e}")
-        if total_bytes != file_size:
-            logging.error(f"File size mismatch for {rel_path}: expected {file_size}, got {total_bytes}")
+        if total_bytes != file_size or size != file_size:
+            logging.error(f"File size mismatch for {rel_path}: expected {file_size}, got {total_bytes} (written), {size} (on disk)")
     else:
         logging.warning(f"File not found on server: {rel_path}")
 
