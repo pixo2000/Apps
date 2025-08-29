@@ -13,8 +13,8 @@ import pyotp
 from functools import wraps
 
 # Set the folder to sync at the top
-SYNC_FOLDER = os.path.abspath(r"/root/VideoSync/Files")  # CHANGE THIS
-HOST = '10.68.241.20'  # Change to '
+SYNC_FOLDER = os.path.abspath(r"C:\Users\pixo2000\Downloads\SyncServer")  # CHANGE THIS
+HOST = 'localhost'  # Change to '
 PORT = 5001
 BUFFER_SIZE = 4096
 WEB_PORT = 64137
@@ -90,29 +90,37 @@ clients_lock = threading.Lock()
 CLIENT_TIMEOUT = 60  # seconds
 
 # --- Persistent client names ---
+
+# Now stores { ip: name, ... }
 def load_client_names():
-    if os.path.exists(CLIENT_NAMES_FILE):
-        with open(CLIENT_NAMES_FILE, 'r', encoding='utf-8') as f:
-            return pyjson.load(f)
-    return {}
+  if os.path.exists(CLIENT_NAMES_FILE):
+    with open(CLIENT_NAMES_FILE, 'r', encoding='utf-8') as f:
+      data = pyjson.load(f)
+      # Migrate new format if needed
+      if data and isinstance(next(iter(data.values())), dict):
+        # New format: {ip: {name:..., volume:...}}
+        return {ip: v.get('name', ip) for ip, v in data.items()}
+      return data
+  return {}
 
 def save_client_names(names):
-    with open(CLIENT_NAMES_FILE, 'w', encoding='utf-8') as f:
-        pyjson.dump(names, f)
+  with open(CLIENT_NAMES_FILE, 'w', encoding='utf-8') as f:
+    pyjson.dump(names, f)
 
 client_names = load_client_names()
 
+
 @app.route('/set_client_name', methods=['POST'])
 def set_client_name():
-    data = request.get_json(force=True)
-    ip = data['ip']
-    name = data['name']
-    client_names[ip] = name
-    save_client_names(client_names)
-    with clients_lock:
-        if ip in clients:
-            clients[ip]['name'] = name
-    return jsonify({'status': 'ok'})
+  data = request.get_json(force=True)
+  ip = data['ip']
+  name = data['name']
+  client_names[ip] = name
+  save_client_names(client_names)
+  with clients_lock:
+    if ip in clients:
+      clients[ip]['name'] = name
+  return jsonify({'status': 'ok'})
 
 # --- Video management ---
 @app.route('/videos')
@@ -155,15 +163,21 @@ def playlist():
                 f.write(v + '\n')
         return jsonify({'status': 'ok'})
 
+
+
 @app.route('/register', methods=['POST'])
 def register():
-    data = request.get_json(force=True)
-    ip = request.remote_addr
-    # Only use client-supplied name if no custom name is set
-    name = client_names.get(ip, data.get('name', ip))
-    with clients_lock:
-        clients[ip] = {'name': name, 'ip': ip, 'last_seen': time.time(), 'volume': data.get('volume', 100)}
-    return jsonify({'status': 'ok'})
+  data = request.get_json(force=True)
+  ip = request.remote_addr
+  # Use stored name if present, else client-supplied, else IP
+  name = client_names.get(ip, data.get('name', ip))
+  # Always start with 100 if new, else keep in-memory value
+  with clients_lock:
+    if ip not in clients:
+      clients[ip] = {'name': name, 'ip': ip, 'last_seen': time.time(), 'volume': 100}
+    else:
+      clients[ip]['last_seen'] = time.time()
+  return jsonify({'status': 'ok'})
 
 @app.route('/unregister', methods=['POST'])
 def unregister():
@@ -183,22 +197,23 @@ def get_clients():
             del clients[ip]
         return jsonify(list(clients.values()))
 
+
 @app.route('/set_volume', methods=['POST'])
 def set_volume():
-    data = request.get_json(force=True)
-    ip = data['ip']
-    volume = int(data['volume'])
-    # Send volume command to client
-    try:
-        # Assume client exposes a local endpoint for volume (on same host as client)
-        url = f'http://{ip}:64139/set_volume'
-        requests.post(url, json={'volume': volume}, timeout=2)
-        with clients_lock:
-            if ip in clients:
-                clients[ip]['volume'] = volume
-        return jsonify({'status': 'ok'})
-    except Exception as e:
-        return jsonify({'status': 'error', 'error': str(e)}), 500
+  data = request.get_json(force=True)
+  ip = data['ip']
+  volume = int(data['volume'])
+  # Send volume command to client
+  try:
+    # Assume client exposes a local endpoint for volume (on same host as client)
+    url = f'http://{ip}:64139/set_volume'
+    requests.post(url, json={'volume': volume}, timeout=2)
+    with clients_lock:
+      if ip in clients:
+        clients[ip]['volume'] = volume
+    return jsonify({'status': 'ok'})
+  except Exception as e:
+    return jsonify({'status': 'error', 'error': str(e)}), 500
 
 HTML = '''
 <!DOCTYPE html>
@@ -309,8 +324,10 @@ function fetchClients() {
 function setVolume(ip, vol) {
   fetch('/set_volume', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ip:ip, volume:vol})})
     .then(r => r.json()).then(res => {
-      if(res.status==='ok') document.getElementById('volval-'+ip).innerText = vol;
-      else alert('Failed to set volume: '+res.error);
+      if(res.status==='ok') {
+        const el = document.getElementById('volval-'+ip);
+        if (el) el.innerText = vol;
+      } else alert('Failed to set volume: '+res.error);
     });
 }
 function saveName(ip, name) {

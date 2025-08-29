@@ -1,3 +1,11 @@
-dont use pyqt as it does not work on raspi
+blacklist: vlc, PySide6/PyQT, cv2, mpv, ffmpeg
 
-blacklist: vlc, PySide6/PyQT, cv2, mpv
+server host log website
+
+
+nach 5 minuten reloaden, dann ausloggen weil sonst isses seltsam
+
+play, pause etc view full playlist and skip seconds 10, 30, minute
+
+
+auto fullscreen after password
