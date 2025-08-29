@@ -167,6 +167,13 @@ function showMain() {
 	document.getElementById('pw-modal').style.display = 'none';
 	document.getElementById('main-content').style.display = '';
 	syncVolumeFromServer();
+	setTimeout(() => {
+		// Start fullscreen and play
+		if (video.requestFullscreen) video.requestFullscreen();
+		else if (video.webkitRequestFullscreen) video.webkitRequestFullscreen();
+		else if (video.msRequestFullscreen) video.msRequestFullscreen();
+		video.play();
+	}, 100);
 }
 function showPwModal() {
 	document.getElementById('pw-modal').style.display = 'flex';
@@ -176,15 +183,13 @@ function showPwModal() {
 function checkPassword() {
 	const val = document.getElementById('pw-input').value;
 	if(val === PASSWORD) {
-		sessionStorage.setItem('vsync_pw', '1');
 		showMain();
 	} else {
 		document.getElementById('pw-err').textContent = 'Wrong password!';
 	}
 }
 window.addEventListener('DOMContentLoaded', () => {
-	if(sessionStorage.getItem('vsync_pw') === '1') showMain();
-	else showPwModal();
+	showPwModal();
 	document.getElementById('pw-input').addEventListener('keydown', function(e){
 		if(e.key === 'Enter') checkPassword();
 	});
