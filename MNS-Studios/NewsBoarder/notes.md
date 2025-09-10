@@ -26,3 +26,14 @@ auto load events, better gui
     config felder mit config datei
     größeres termine feld
     multi option
+
+# vor release:
+link zum schulkalender
+anleitung
+remove save button
+komplett terminname nutzen
+. . bei termin in anzeige fixen
+
+input für eigenen link und speichern
+mehr laden
+cassian designt neues logo
