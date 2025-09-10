@@ -1,0 +1,50 @@
+
+GET Presence
+https://127.0.0.1:{port}/chat/v4/presences
+
+Get a list of online friends and their activity If the player is playing Valorant, private is a base64-encoded JSON string that contains useful information such as party and in-progress game score.
+Headers:
+
+    Authorization: Basic {base64 encoded "riot:{lockfile password}"}
+
+URL Parameters:
+
+    {port}
+
+    The port can be found from the lockfile (located at %LocalAppData%\Riot Games\Riot Client\Config\lockfile) when the game is running. The file has the format name:pid:port:password:protocol
+
+Other Variables:
+
+    lockfile password
+
+    The password can be found from the lockfile (located at %LocalAppData%\Riot Games\Riot Client\Config\lockfile) when the game is running. The file has the format name:pid:port:password:protocol
+
+Response:
+
+type PresenceResponse = {
+    presences: {
+        actor?: unknown | null;
+        basic: string;
+        details?: unknown | null;
+        game_name: string;
+        game_tag: string;
+        location?: unknown | null;
+        msg?: unknown | null;
+        name: string;
+        patchline?: unknown | null;
+        pid: string;
+        platform?: unknown | null;
+        private: string | null;
+        privateJwt?: unknown | null;
+        product: "valorant" | "league_of_legends";
+        /** Player UUID */
+        puuid: string;
+        region: string;
+        resource: string;
+        state: "mobile" | "dnd" | "away" | "chat";
+        summary: string;
+        /** Milliseconds since epoch */
+        time: number;
+    }[];
+};
+
