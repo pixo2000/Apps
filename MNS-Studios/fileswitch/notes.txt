@@ -3,3 +3,8 @@ tray ends it realy
 
 add ignore mode for admins
 synced caps lock
+
+
+hotkey for file to clip
+
+admin enbale caps but not for me
