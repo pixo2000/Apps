@@ -27,62 +27,87 @@ def get_ip_and_mode():
     else:
         return '', 'server'
 
+def get_peer_ip():
+    import socket
+    local_ip = socket.gethostbyname(socket.gethostname())
+    # fallback: get correct IP if multiple interfaces
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(('8.8.8.8', 80))
+        local_ip = s.getsockname()[0]
+        s.close()
+    except Exception:
+        pass
+    if local_ip == '10.68.242.153':
+        return '10.68.242.106'
+    elif local_ip == '10.68.242.106':
+        return '10.68.242.153'
+    else:
+        print(f'Unknown local IP: {local_ip}. Exiting.')
+        sys.exit(1)
+
 # --- Server ---
 def server_thread():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind(('', PORT))
     s.listen(1)
     print(f'Server listening on port {PORT}...')
-    conn, addr = s.accept()
-    print(f'Connected by {addr}')
     while True:
-        header = conn.recv(8)
-        if not header:
-            break
-        mode = header.decode().strip()
-        if mode == 'FILE':
-            filename_len = int.from_bytes(conn.recv(2), 'big')
-            filename = conn.recv(filename_len).decode()
-            filesize = int.from_bytes(conn.recv(8), 'big')
-            with open(filename, 'wb') as f:
-                received = 0
-                while received < filesize:
-                    data = conn.recv(min(BUFFER_SIZE, filesize - received))
-                    if not data:
-                        break
-                    f.write(data)
-                    received += len(data)
-            print(f'Received file: {filename}')
-        elif mode == 'CLIP':
-            cliptype = conn.recv(4).decode()
-            if cliptype == 'TEXT':
-                textlen = int.from_bytes(conn.recv(4), 'big')
-                text = conn.recv(textlen).decode()
-                pyperclip.copy(text)
-                print('Received clipboard text.')
-            elif cliptype == 'IMG_':
-                imgsize = int.from_bytes(conn.recv(8), 'big')
-                imgdata = b''
-                while len(imgdata) < imgsize:
-                    imgdata += conn.recv(min(BUFFER_SIZE, imgsize - len(imgdata)))
-                # Save image to temp and copy to clipboard
-                tmpfile = 'received_clipboard.png'
-                with open(tmpfile, 'wb') as f:
-                    f.write(imgdata)
-                try:
-                    import win32clipboard
-                    from PIL import Image
-                    img = Image.open(tmpfile)
-                    output = io.BytesIO()
-                    img.convert('RGB').save(output, 'BMP')
-                    data = output.getvalue()[14:]
-                    win32clipboard.OpenClipboard()
-                    win32clipboard.EmptyClipboard()
-                    win32clipboard.SetClipboardData(win32clipboard.CF_DIB, data)
-                    win32clipboard.CloseClipboard()
-                    print('Received clipboard image.')
-                except Exception as e:
-                    print('Image clipboard failed:', e)
+        conn, addr = s.accept()
+        print(f'Connected by {addr}')
+        try:
+            while True:
+                header = conn.recv(8)
+                if not header:
+                    break
+                mode = header.decode().strip()
+                if mode == 'FILE':
+                    filename_len = int.from_bytes(conn.recv(2), 'big')
+                    filename = conn.recv(filename_len).decode()
+                    filesize = int.from_bytes(conn.recv(8), 'big')
+                    with open(filename, 'wb') as f:
+                        received = 0
+                        while received < filesize:
+                            data = conn.recv(min(BUFFER_SIZE, filesize - received))
+                            if not data:
+                                break
+                            f.write(data)
+                            received += len(data)
+                    print(f'Received file: {filename}')
+                elif mode == 'CLIP':
+                    cliptype = conn.recv(4).decode()
+                    if cliptype == 'TEXT':
+                        textlen = int.from_bytes(conn.recv(4), 'big')
+                        text = conn.recv(textlen).decode()
+                        pyperclip.copy(text)
+                        print('Received clipboard text.')
+                    elif cliptype == 'IMG_':
+                        imgsize = int.from_bytes(conn.recv(8), 'big')
+                        imgdata = b''
+                        while len(imgdata) < imgsize:
+                            imgdata += conn.recv(min(BUFFER_SIZE, imgsize - len(imgdata)))
+                        # Save image to temp and copy to clipboard
+                        tmpfile = 'received_clipboard.png'
+                        with open(tmpfile, 'wb') as f:
+                            f.write(imgdata)
+                        try:
+                            import win32clipboard
+                            from PIL import Image
+                            img = Image.open(tmpfile)
+                            output = io.BytesIO()
+                            img.convert('RGB').save(output, 'BMP')
+                            data = output.getvalue()[14:]
+                            win32clipboard.OpenClipboard()
+                            win32clipboard.EmptyClipboard()
+                            win32clipboard.SetClipboardData(win32clipboard.CF_DIB, data)
+                            win32clipboard.CloseClipboard()
+                            print('Received clipboard image.')
+                        except Exception as e:
+                            print('Image clipboard failed:', e)
+        except Exception as e:
+            print(f'Server error: {e}')
+        finally:
+            conn.close()
     s.close()
 
 # --- Client ---
@@ -138,12 +163,20 @@ def send_clipboard(ip):
 
 # --- Hotkey Handlers ---
 def file_hotkey(ip):
-    root = tk.Tk()
-    root.withdraw()
-    filepath = filedialog.askopenfilename(title='Select file to send')
-    root.destroy()
-    if filepath:
-        send_file(ip, filepath)
+    print('[File Hotkey] Triggered!')
+    try:
+        root = tk.Tk()
+        root.withdraw()
+        root.attributes('-topmost', True)
+        filepath = filedialog.askopenfilename(title='Select file to send')
+        root.destroy()
+        if filepath:
+            print(f'[File Hotkey] Selected file: {filepath}')
+            send_file(ip, filepath)
+        else:
+            print('[File Hotkey] No file selected.')
+    except Exception as e:
+        print(f'[File Hotkey] Error: {e}')
 
 def clipboard_hotkey(ip):
     send_clipboard(ip)
@@ -162,17 +195,9 @@ def create_tray_icon():
 
 # --- Main ---
 if __name__ == '__main__':
-    # Ask for peer IP (other PC)
-    root = tk.Tk()
-    root.withdraw()
-    peer_ip = simpledialog.askstring('Connect', 'Enter IP of other PC:')
-    root.destroy()
-    if not peer_ip:
-        print('No peer IP entered. Exiting.')
-        sys.exit(0)
-    # Start server in background
+    peer_ip = get_peer_ip()
+    print(f'Local IP detected. Will connect to peer: {peer_ip}')
     threading.Thread(target=server_thread, daemon=True).start()
-    # Register hotkeys for sending to peer
     print(f'Hotkeys: {FILE_HOTKEY} (file), {CLIPBOARD_HOTKEY} (clipboard)')
     keyboard.add_hotkey(FILE_HOTKEY, lambda: file_hotkey(peer_ip))
     keyboard.add_hotkey(CLIPBOARD_HOTKEY, lambda: clipboard_hotkey(peer_ip))
