@@ -1,12 +1,5 @@
-share files and text etc between 2 pc's
-
-admin moe for 1c
-
-
-fix file transfer
-hardcoded ip
 tray ends it realy
 
 
-yay clipboard works
-maybe add acception
+add ignore mode for admins
+synced caps lock
