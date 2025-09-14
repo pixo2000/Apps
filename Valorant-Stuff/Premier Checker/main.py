@@ -186,12 +186,25 @@ def send_webhook(carba_players, match_result, points_info, match_data):
     # Get map name
     map_name = match_data.get('data', {}).get('metadata', {}).get('map', 'Unknown')
     
-    # Format player list
-    player_list = "\n".join([f"• **{p['name']}** ({p['agent']}) - {p['kda']}" for p in carba_players])
-    
+    # Sort players by kills, then deaths if kills are equal
+    def kda_sort_key(p):
+        try:
+            kills, deaths, _ = map(int, p['kda'].split('/'))
+            return (-kills, deaths)
+        except Exception:
+            return (0, 0)
+
+    carba_players_sorted = sorted(carba_players, key=kda_sort_key)
+    player_list = "\n".join([f"• **{p['name']}** ({p['agent']}) - {p['kda']}" for p in carba_players_sorted])
+
+    # Score field: Old score -> new score (+X)
+    score_change = points_info['points_gained']
+    score_field_name = f"💰 Score (+{score_change})"
+    score_field_value = f"**{points_info['points_before']} -> {points_info['points_after']}**"
+
     # Create embed
     embed = {
-        "title": "🎮 New Carings Baes Match Result!",
+        "title": "New Match Result",
         "color": 0x00ff00 if match_result['won'] else 0xff0000,
         "fields": [
             {
@@ -215,14 +228,14 @@ def send_webhook(carba_players, match_result, points_info, match_data):
                 "inline": False
             },
             {
-                "name": "💰 New Score",
-                "value": f"**{points_info['points_after']} (+{points_info['points_gained']})**",
+                "name": score_field_name,
+                "value": score_field_value,
                 "inline": True
             }
         ],
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "footer": {
-            "text": "Premier League Monitor"
+            "text": "Made with ❤️ for Carings Baes"
         }
     }
     
