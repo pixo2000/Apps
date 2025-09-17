@@ -48,17 +48,12 @@ def get_peer_ip():
         print(f'Unknown local IP: {local_ip}. Exiting.')
         sys.exit(1)
 
-sync_enabled = True
-
-def send_disable_sync(ip):
-    try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect((ip, PORT))
-        s.send(b'DISSYNC ')
-        s.close()
-        print('Sent disable sync command to peer.')
-    except Exception as e:
-        print(f'Disable sync error: {e}')
+def set_capslock(state: bool):
+    VK_CAPITAL = 0x14
+    caps_state = ctypes.WinDLL("User32.dll").GetKeyState(VK_CAPITAL) & 1
+    if bool(caps_state) != state:
+        ctypes.WinDLL("User32.dll").keybd_event(VK_CAPITAL, 0, 0, 0)
+        ctypes.WinDLL("User32.dll").keybd_event(VK_CAPITAL, 0, 2, 0)
 
 # --- Server ---
 def handle_connection(conn, addr, peer_ip):
@@ -120,18 +115,16 @@ def handle_connection(conn, addr, peer_ip):
                         print('Image clipboard failed:', e)
             elif mode == 'CAPSLOCK':
                 state = conn.recv(1)
-                VK_CAPITAL = 0x14
-                # Set caps lock state
-                caps_state = ctypes.windll.user32.GetKeyState(VK_CAPITAL) & 1
-                if state == b'1' and not caps_state:
-                    ctypes.windll.user32.keybd_event(VK_CAPITAL, 0, 0, 0)
-                elif state == b'0' and caps_state:
-                    ctypes.windll.user32.keybd_event(VK_CAPITAL, 0, 0, 0)
+                set_capslock(state == b'1')
                 print(f"Caps Lock set to: {'ON' if state == b'1' else 'OFF'}")
+            elif mode == 'ENABLESYNC':
+                global capslock_sync_enabled
+                capslock_sync_enabled = True
+                print('Received: Caps Lock sync ENABLED by peer.')
             elif mode == 'DISSYNC':
-                global sync_enabled
-                sync_enabled = False
-                print('Caps Lock sync disabled by peer.')
+                global capslock_sync_enabled
+                capslock_sync_enabled = False
+                print('Received: Caps Lock sync DISABLED by peer.')
     except Exception as e:
         print(f'Server error: {e}')
     finally:
@@ -209,6 +202,26 @@ def send_capslock(ip, state):
     except Exception as e:
         print(f"Caps Lock sync error: {e}")
 
+def send_enable_sync(ip):
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((ip, PORT))
+        s.send(b'ENABLESYNC')
+        s.close()
+        print('Sent enable sync command to peer.')
+    except Exception as e:
+        print(f'Enable sync error: {e}')
+
+def send_disable_sync(ip):
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((ip, PORT))
+        s.send(b'DISSYNC ')
+        s.close()
+        print('Sent disable sync command to peer.')
+    except Exception as e:
+        print(f'Disable sync error: {e}')
+
 # --- Hotkey Handlers ---
 def file_hotkey(ip):
     print('[File Hotkey] Triggered!')
@@ -230,22 +243,21 @@ def clipboard_hotkey(ip):
     threading.Thread(target=send_clipboard, args=(ip,), daemon=True).start()
 
 # --- Caps Lock Sync ---
+capslock_sync_enabled = False
+
 def capslock_listener(ip):
-    global sync_enabled
+    global capslock_sync_enabled
     def on_capslock(e):
-        if sync_enabled:
+        if capslock_sync_enabled:
             state = keyboard.is_pressed('caps lock')
-            for _ in range(3):
-                try:
-                    send_capslock(ip, state)
-                    break
-                except Exception:
-                    time.sleep(1)
-    def on_ctrl_capslock(e):
-        global sync_enabled
-        sync_enabled = not sync_enabled
-        print(f'Caps Lock sync enabled: {sync_enabled}')
-        if not sync_enabled:
+            send_capslock(ip, state)
+    def on_ctrl_capslock(e=None):
+        global capslock_sync_enabled
+        capslock_sync_enabled = not capslock_sync_enabled
+        print(f'Caps Lock sync enabled: {capslock_sync_enabled}')
+        if capslock_sync_enabled:
+            send_enable_sync(ip)
+        else:
             send_disable_sync(ip)
     keyboard.on_press_key('caps lock', on_capslock)
     keyboard.add_hotkey('ctrl+caps lock', on_ctrl_capslock)
