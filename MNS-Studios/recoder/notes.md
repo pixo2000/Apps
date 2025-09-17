@@ -1,1 +1,5 @@
-im windows datei rechtsclick mit nem programm einfach so xmedia recode template for mov adden
+fix open folder
+
+maybe context menu
+compile
+maybe studio app with copy and chat
