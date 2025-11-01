@@ -1,0 +1,79 @@
+====================================================================================================
+📊 ZUSAMMENFASSUNG DER KURSZUTEILUNG - METHODENTAG
+====================================================================================================
+
+✅ ERFOLGREICHE ZUTEILUNG
+----------------------------------------------------------------------------------------------------
+• 155 Schüler wurden auf 16 verschiedene Kurse verteilt
+• Jeder Kurs findet in 3 Zeitfenstern statt
+• Jeder Schüler belegt 3 Kurse (einen pro Zeitfenster)
+
+📈 WUNSCHERFÜLLUNG
+----------------------------------------------------------------------------------------------------
+• Erfüllungsrate: 77.1% (414 von 537 Wünschen)
+• 1. Wunsch: 154 erfüllt (99.4%)
+• 2. Wunsch: 128 erfüllt (82.6%)
+• 3. Wunsch: 106 erfüllt (68.4%)
+• 4. Wunsch: 26 erfüllt (16.8%)
+
+📊 VERTEILUNG ERFÜLLTER WÜNSCHE PRO SCHÜLER
+----------------------------------------------------------------------------------------------------
+• 3 Schüler haben 1 Wunsch erfüllt bekommen (1.9%)
+• 45 Schüler haben 2 Wünsche erfüllt bekommen (29.0%)
+• 107 Schüler haben 3 Wünsche erfüllt bekommen (69.0%)
+
+
+✓ Alle Schüler haben mindestens einen Wunsch erfüllt bekommen!
+
+👥 KURSGRÖSSENVERPEILUNG
+----------------------------------------------------------------------------------------------------
+• Durchschnittliche Kursgröße: 29.1 Schüler
+• Die Kurse sind gut verteilt und haben ähnliche Größen
+
+Beliebteste Kurse (Top 5):
+  1. "Debattieren – wie überzeuge ich am besten? (Referent: Hr. Fringes)"
+     → 35 Schüler gesamt (12/11/12 pro Zeitfenster)
+  2. "Deliver quality! – Professionell wissenschaftliche Präsentationen gest..."
+     → 35 Schüler gesamt (12/13/10 pro Zeitfenster)
+  3. "Klausurenphase - Verflixt, wie bekomme ich das mit den Aufgabenstellun..."
+     → 35 Schüler gesamt (12/11/12 pro Zeitfenster)
+  4. "Künstliche Intelligenz als Hilfsmittel in eurem Schulalltag – Lern-Cha..."
+     → 35 Schüler gesamt (13/12/10 pro Zeitfenster)
+  5. "Language/Langue/Lengua: Vom Wort zum Text und wieder zurück (Referent:..."
+     → 35 Schüler gesamt (12/11/12 pro Zeitfenster)
+
+📋 VOLLSTÄNDIGE KURSÜBERSICHT
+----------------------------------------------------------------------------------------------------
+
+Nr   Kursname                                                                 Gesamt  Zeit1  Zeit2  Zeit3
+----------------------------------------------------------------------------------------------------
+1    Debattieren – wie überzeuge ich am besten? (Referent: Hr. Fringes...         35     12     11     12
+2    Deliver quality! – Professionell wissenschaftliche Präsentationen...         35     12     13     10
+3    Klausurenphase - Verflixt, wie bekomme ich das mit den Aufgabenst...         35     12     11     12
+4    Künstliche Intelligenz als Hilfsmittel in eurem Schulalltag – Ler...         35     13     12     10
+5    Language/Langue/Lengua: Vom Wort zum Text und wieder zurück (Refe...         35     12     11     12
+6    Lust statt Frust: Prüfungen stark und gelassen meistern! - ein Mi...         35     12     12     11
+7    Runter mit dem Fehlerindex! (Referent: Hr. Joneleit)                         35     12     11     12
+8    Wie kommt der Stoff ins Gehirn? Oder: how to                                 35     12     12     11
+9    Wie verstehe ich Mathe? (Referent: Hr. Müller)                               35     10     13     12
+10   Analyse von Karikaturen und Statistiken im gesellschaftswissensch...         33     12      9     12
+11   „Erörtern/Diskutieren/Beurteilen“ – Der Umgang mit Aufgabenstellu...         22      6      6     10
+12   Naturwissenschaftliche Experimente planen, durchführen und auswer...         20      8      6      6
+13   Sicher Ergebnisse sichern - Grundlage Layout (Referentin: Fr. Kru...         19      3      6     10
+14   Spiel dich frei! Act it out! (Galli-Akademie)                                19      5      9      5
+15   Vortrag? Inhaltlich ist das ja ganz gut, aber... Wie man mit eine...         19      7      8      4
+16   Richtig zitieren – aber wie? (Referentin: Fr. Betz)                          18      7      5      6
+
+📁 ERSTELLTE DATEIEN
+----------------------------------------------------------------------------------------------------
+• zuteilung_schueler.csv - Liste aller Schüler mit ihren 3 zugeteilten Kursen
+• zuteilung_kurse.csv - Übersicht aller Kurse mit Schülerlisten pro Zeitfenster
+• zusammenfassung.txt - Diese Zusammenfassung
+
+====================================================================================================
+Die Zuteilung berücksichtigt alle Constraints:
+✓ Jeder Schüler hat 3 verschiedene Kurse
+✓ Kein Kurs wird von einem Schüler doppelt belegt
+✓ Kein Schüler hat 2 Kurse im gleichen Zeitfenster
+✓ Kurse sind gleichmäßig auf die Zeitfenster verteilt
+====================================================================================================
