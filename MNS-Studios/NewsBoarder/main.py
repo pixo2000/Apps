@@ -92,9 +92,9 @@ class NewsBoardGenerator:
         button_frame = ctk.CTkFrame(self.root)
         button_frame.pack(fill="x", padx=20, pady=20)
         
-        generate_button = ctk.CTkButton(button_frame, text="News Board generieren", 
-                                      command=self.generate_newsboard)
-        generate_button.pack(side="left", padx=10)
+        copy_button = ctk.CTkButton(button_frame, text="In Zwischenablage kopieren", 
+                                   command=self.copy_to_clipboard)
+        copy_button.pack(side="left", padx=10)
         
         clear_button = ctk.CTkButton(button_frame, text="Auswahl zurücksetzen", 
                                    command=self.clear_selection)
@@ -435,8 +435,8 @@ class NewsBoardGenerator:
         self.update_edit_table()
         self.display_events()
     
-    def generate_newsboard(self):
-        """Generiert das News Board"""
+    def copy_to_clipboard(self):
+        """Kopiert das News Board in die Zwischenablage"""
         # Hole aktuelle Werte aus den Entry-Feldern
         current_dates = [entry.get().strip() for entry in self.date_entries]
         current_events = [entry.get().strip() for entry in self.event_entries]
@@ -463,21 +463,15 @@ class NewsBoardGenerator:
             modified_content = self.fill_template_with_current_values(
                 template_content, month_name, current_dates, current_events)
             
-            # Speichern
-            output_path = filedialog.asksaveasfilename(
-                defaultextension=".setting",
-                filetypes=[("DaVinci Resolve Settings", "*.setting"), ("All files", "*.*")],
-                title="News Board speichern"
-            )
+            # In Zwischenablage kopieren
+            self.root.clipboard_clear()
+            self.root.clipboard_append(modified_content)
+            self.root.update()  # Wichtig für die Zwischenablage
             
-            if output_path:
-                with open(output_path, 'w', encoding='utf-8') as f:
-                    f.write(modified_content)
-                
-                messagebox.showinfo("Erfolg", f"News Board wurde gespeichert:\n{output_path}")
+            messagebox.showinfo("Erfolg", "News Board wurde in die Zwischenablage kopiert!")
             
         except Exception as e:
-            messagebox.showerror("Fehler", f"Fehler beim Generieren:\n{str(e)}")
+            messagebox.showerror("Fehler", f"Fehler beim Kopieren:\n{str(e)}")
     
     def fill_template_with_current_values(self, template: str, month_name: str, 
                                         dates: List[str], events: List[str]) -> str:
@@ -496,10 +490,6 @@ class NewsBoardGenerator:
         for i in range(4):
             date_str = dates[i] if i < len(dates) and dates[i] else ""
             event_str = events[i] if i < len(events) and events[i] else ""
-            
-            # Kürze Event-Name falls zu lang
-            if len(event_str) > 30:
-                event_str = event_str[:27] + "..."
             
             # Ersetze Template-Werte
             if i < len(template_replacements):
