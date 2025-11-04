@@ -42,7 +42,7 @@ class NewsBoardGenerator:
         
         self.root = ctk.CTk()
         self.root.title("News Board Generator")
-        self.root.geometry("1200x800")
+        self.root.state('zoomed')  # Maximiert starten
         
         self.setup_gui()
         

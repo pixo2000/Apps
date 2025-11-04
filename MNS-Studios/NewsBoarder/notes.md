@@ -37,3 +37,13 @@ komplett terminname nutzen
 input für eigenen link und speichern
 mehr laden
 cassian designt neues logo
+
+
+# new
+
+namen net kürzen
+eigener link
+only copy
+fullscreen start
+mehr events laden
+events filtern
