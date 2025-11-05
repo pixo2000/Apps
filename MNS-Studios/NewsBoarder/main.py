@@ -35,8 +35,9 @@ class NewsBoardGenerator:
         self.config_dir = os.path.join(os.path.expanduser("~"), ".newsboarder")
         self.config_file = os.path.join(self.config_dir, "config.json")
         
-        # Kalender-URL laden oder abfragen
+        # Kalender-URL und Filter laden
         self.calendar_url = self.load_or_request_calendar_url()
+        self.filter_words = self.load_filter_words()
         
         # Wenn keine URL (Benutzer hat abgebrochen), Programm beenden
         if not self.calendar_url:
@@ -72,11 +73,20 @@ class NewsBoardGenerator:
                                  font=ctk.CTkFont(size=24, weight="bold"))
         title_label.pack(pady=20)
         
+        # Button Frame für Header-Buttons
+        header_button_frame = ctk.CTkFrame(header_frame)
+        header_button_frame.pack(pady=10)
+        
         # Mehr Events laden Button
-        self.load_more_button = ctk.CTkButton(header_frame, text="Mehr Events laden", 
+        self.load_more_button = ctk.CTkButton(header_button_frame, text="Mehr Events laden", 
                                             command=self.load_more_events,
                                             state="disabled")
-        self.load_more_button.pack(pady=10)
+        self.load_more_button.pack(side="left", padx=5)
+        
+        # Filter verwalten Button
+        filter_button = ctk.CTkButton(header_button_frame, text="Filter verwalten", 
+                                     command=self.open_filter_manager)
+        filter_button.pack(side="left", padx=5)
         
         # Main Content Frame
         main_frame = ctk.CTkFrame(self.root)
@@ -390,7 +400,11 @@ class NewsBoardGenerator:
         
         # Sortiere nach Datum
         events.sort(key=lambda x: x.start_date)
-        return events  # Gebe alle Events zurück
+        
+        # Filtere Events basierend auf Filterwörtern
+        events = self.apply_filters(events)
+        
+        return events  # Gebe alle gefilterten Events zurück
     
     def load_calendar(self):
         """Lädt Kalender von der URL"""
@@ -426,6 +440,26 @@ class NewsBoardGenerator:
         except Exception as e:
             print(f"Fehler beim Laden: {e}")
             messagebox.showerror("Fehler", f"Kalender konnte nicht geladen werden:\n{str(e)}")
+    
+    def apply_filters(self, events: List[CalendarEvent]) -> List[CalendarEvent]:
+        """Filtert Events basierend auf den Filterwörtern"""
+        if not self.filter_words:
+            return events
+        
+        filtered_events = []
+        for event in events:
+            # Prüfe ob ein Filterwort im Event-Namen vorkommt (case-insensitive)
+            summary_lower = event.summary.lower()
+            contains_filter = any(word.lower() in summary_lower for word in self.filter_words)
+            
+            # Event nur hinzufügen wenn KEIN Filterwort gefunden wurde
+            if not contains_filter:
+                filtered_events.append(event)
+        
+        print(f"Filter angewendet: {len(events)} Events -> {len(filtered_events)} Events nach Filterung")
+        print(f"Aktive Filter: {', '.join(self.filter_words) if self.filter_words else 'Keine'}")
+        
+        return filtered_events
     
     def load_more_events(self):
         """Lädt weitere Events (jeweils 20 mehr)"""
@@ -577,6 +611,131 @@ class NewsBoardGenerator:
         # Config existiert nicht oder ist fehlerhaft - Benutzer fragen
         return self.request_calendar_url()
     
+    def load_filter_words(self) -> List[str]:
+        """Lädt die Filterwörter aus der Config"""
+        if os.path.exists(self.config_file):
+            try:
+                with open(self.config_file, 'r', encoding='utf-8') as f:
+                    config = json.load(f)
+                    return config.get('filter_words', [])
+            except Exception as e:
+                print(f"Fehler beim Laden der Filter: {e}")
+        return []
+    
+    def save_filter_words(self):
+        """Speichert die Filterwörter in der Config"""
+        try:
+            # Lade existierende Config
+            config = {}
+            if os.path.exists(self.config_file):
+                with open(self.config_file, 'r', encoding='utf-8') as f:
+                    config = json.load(f)
+            
+            # Aktualisiere Filter
+            config['filter_words'] = self.filter_words
+            
+            # Speichere Config
+            os.makedirs(self.config_dir, exist_ok=True)
+            with open(self.config_file, 'w', encoding='utf-8') as f:
+                json.dump(config, f, indent=2)
+            
+            print(f"Filter gespeichert: {self.filter_words}")
+        except Exception as e:
+            print(f"Fehler beim Speichern der Filter: {e}")
+            messagebox.showerror("Fehler", f"Filter konnten nicht gespeichert werden:\n{str(e)}")
+    
+    def open_filter_manager(self):
+        """Öffnet ein Fenster zum Verwalten der Filterwörter"""
+        # Erstelle neues Fenster
+        filter_window = ctk.CTkToplevel(self.root)
+        filter_window.title("Filter verwalten")
+        filter_window.geometry("500x400")
+        filter_window.transient(self.root)
+        filter_window.grab_set()
+        
+        # Titel
+        title_label = ctk.CTkLabel(filter_window, text="Event-Filter verwalten", 
+                                   font=ctk.CTkFont(size=18, weight="bold"))
+        title_label.pack(pady=20)
+        
+        # Beschreibung
+        desc_label = ctk.CTkLabel(filter_window, 
+                                 text="Events, die eines dieser Wörter enthalten, werden ausgeblendet:",
+                                 wraplength=450)
+        desc_label.pack(pady=10)
+        
+        # Frame für Filter-Liste
+        list_frame = ctk.CTkFrame(filter_window)
+        list_frame.pack(fill="both", expand=True, padx=20, pady=10)
+        
+        # Scrollable Frame für Filter
+        filter_scroll = ctk.CTkScrollableFrame(list_frame, height=200)
+        filter_scroll.pack(fill="both", expand=True, padx=10, pady=10)
+        
+        def refresh_filter_list():
+            """Aktualisiert die Anzeige der Filterwörter"""
+            for widget in filter_scroll.winfo_children():
+                widget.destroy()
+            
+            if not self.filter_words:
+                empty_label = ctk.CTkLabel(filter_scroll, text="Keine Filter aktiv", 
+                                          text_color="gray")
+                empty_label.pack(pady=20)
+            else:
+                for i, word in enumerate(self.filter_words):
+                    filter_frame = ctk.CTkFrame(filter_scroll)
+                    filter_frame.pack(fill="x", pady=2)
+                    
+                    word_label = ctk.CTkLabel(filter_frame, text=word, anchor="w")
+                    word_label.pack(side="left", fill="x", expand=True, padx=10, pady=5)
+                    
+                    remove_btn = ctk.CTkButton(filter_frame, text="Entfernen", width=80,
+                                             command=lambda w=word: remove_filter(w))
+                    remove_btn.pack(side="right", padx=5, pady=5)
+        
+        def add_filter():
+            """Fügt ein neues Filterwort hinzu"""
+            word = simpledialog.askstring("Filter hinzufügen", 
+                                         "Geben Sie ein Wort ein, das gefiltert werden soll:",
+                                         parent=filter_window)
+            if word and word.strip():
+                word = word.strip()
+                if word not in self.filter_words:
+                    self.filter_words.append(word)
+                    self.save_filter_words()
+                    refresh_filter_list()
+                    messagebox.showinfo("Erfolg", f"Filter '{word}' hinzugefügt!", parent=filter_window)
+                else:
+                    messagebox.showwarning("Warnung", f"Filter '{word}' existiert bereits!", parent=filter_window)
+        
+        def remove_filter(word: str):
+            """Entfernt ein Filterwort"""
+            if word in self.filter_words:
+                self.filter_words.remove(word)
+                self.save_filter_words()
+                refresh_filter_list()
+        
+        def close_and_reload():
+            """Schließt das Fenster und lädt den Kalender neu"""
+            filter_window.destroy()
+            # Kalender neu laden um Filter anzuwenden
+            self.load_calendar()
+        
+        # Initiale Anzeige
+        refresh_filter_list()
+        
+        # Button Frame
+        button_frame = ctk.CTkFrame(filter_window)
+        button_frame.pack(fill="x", padx=20, pady=10)
+        
+        add_button = ctk.CTkButton(button_frame, text="Filter hinzufügen", 
+                                  command=add_filter)
+        add_button.pack(side="left", padx=5)
+        
+        close_button = ctk.CTkButton(button_frame, text="Schließen & Neu laden", 
+                                    command=close_and_reload)
+        close_button.pack(side="right", padx=5)
+    
     def request_calendar_url(self) -> str:
         """Fragt den Benutzer nach der Kalender-URL"""
         # Temporäres Fenster für die Abfrage
@@ -605,8 +764,16 @@ class NewsBoardGenerator:
             # Erstelle Config-Verzeichnis falls nicht vorhanden
             os.makedirs(self.config_dir, exist_ok=True)
             
+            # Lade existierende Config (um Filter zu behalten)
+            config = {}
+            if os.path.exists(self.config_file):
+                with open(self.config_file, 'r', encoding='utf-8') as f:
+                    config = json.load(f)
+            
+            # Aktualisiere URL
+            config['calendar_url'] = url
+            
             # Speichere Config
-            config = {'calendar_url': url}
             with open(self.config_file, 'w', encoding='utf-8') as f:
                 json.dump(config, f, indent=2)
             

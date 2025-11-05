@@ -5,7 +5,8 @@ eigener link        check
 only copy           check
 fullscreen start    error
 mehr events laden   check
-events filtern -> config system
+events filtern -> config system     works
+suchleiste
 
 ## notes
 
