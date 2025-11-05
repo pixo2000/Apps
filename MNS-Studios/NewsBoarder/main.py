@@ -101,6 +101,24 @@ class NewsBoardGenerator:
                                   font=ctk.CTkFont(size=16, weight="bold"))
         self.events_label.pack(anchor="w", padx=20, pady=(20, 10))
         
+        # Suchleiste Frame
+        search_frame = ctk.CTkFrame(left_frame)
+        search_frame.pack(fill="x", padx=20, pady=(0, 10))
+        
+        search_label = ctk.CTkLabel(search_frame, text="Suche:", width=60)
+        search_label.pack(side="left", padx=(0, 10))
+        
+        self.search_var = ctk.StringVar()
+        self.search_var.trace_add("write", lambda *args: self.on_search_changed())
+        
+        self.search_entry = ctk.CTkEntry(search_frame, textvariable=self.search_var, 
+                                        placeholder_text="Events durchsuchen...")
+        self.search_entry.pack(side="left", fill="x", expand=True, padx=(0, 10))
+        
+        clear_search_btn = ctk.CTkButton(search_frame, text="✕", width=30,
+                                        command=self.clear_search)
+        clear_search_btn.pack(side="left")
+        
         # Scrollable Frame für Events
         self.events_scroll = ctk.CTkScrollableFrame(left_frame, height=400)
         self.events_scroll.pack(fill="both", expand=True, padx=20, pady=10)
@@ -497,6 +515,12 @@ class NewsBoardGenerator:
             
         # Filtere ausgewählte Events heraus
         available_events = [event for event in self.events if event not in self.selected_events]
+        
+        # Filtere basierend auf Suchtext
+        search_text = self.search_var.get().strip().lower() if hasattr(self, 'search_var') else ""
+        if search_text:
+            available_events = [event for event in available_events 
+                              if search_text in event.summary.lower()]
             
         for i, event in enumerate(available_events):
             event_frame = ctk.CTkFrame(self.events_scroll)
@@ -516,6 +540,14 @@ class NewsBoardGenerator:
             
             event_label = ctk.CTkLabel(event_frame, text=info_text, anchor="w")
             event_label.pack(side="left", fill="x", expand=True, padx=10, pady=5)
+    
+    def on_search_changed(self):
+        """Wird aufgerufen wenn sich der Suchtext ändert"""
+        self.display_events()
+    
+    def clear_search(self):
+        """Löscht den Suchtext"""
+        self.search_var.set("")
     
     def select_event(self, event: CalendarEvent):
         """Wählt ein Event aus"""
