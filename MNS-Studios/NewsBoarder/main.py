@@ -4,9 +4,10 @@ from datetime import datetime, timedelta
 import re
 from typing import List, Dict
 import os
-from tkinter import filedialog, messagebox
+from tkinter import filedialog, messagebox, simpledialog
 import calendar
 import locale
+import json
 
 class CalendarEvent:
     def __init__(self, summary: str, start_date: datetime, end_date: datetime = None):
@@ -27,7 +28,17 @@ class NewsBoardGenerator:
     def __init__(self):
         self.events: List[CalendarEvent] = []
         self.selected_events: List[CalendarEvent] = []
-        self.calendar_url = "https://start.schulportal.hessen.de/kalender.php?a=ical&i=5214&export=ical&t=47398d6bf42ddcd5ef343c4ea5b11d43b6e8da0521c802b72a5c5a9d789ec66050290985756de16055299d2b38e37ea0d38d1fe7ffdda667287a46110829c439"
+        
+        # Config-Dateipfad im User-Ordner
+        self.config_dir = os.path.join(os.path.expanduser("~"), ".newsboarder")
+        self.config_file = os.path.join(self.config_dir, "config.json")
+        
+        # Kalender-URL laden oder abfragen
+        self.calendar_url = self.load_or_request_calendar_url()
+        
+        # Wenn keine URL (Benutzer hat abgebrochen), Programm beenden
+        if not self.calendar_url:
+            return
         
         # Deutsche Monatsnamen
         self.german_months = {
@@ -100,6 +111,12 @@ class NewsBoardGenerator:
                                    command=self.clear_selection)
         clear_button.pack(side="left", padx=10)
         
+        # Config löschen Button
+        reset_button = ctk.CTkButton(button_frame, text="Kalender-URL zurücksetzen & Beenden", 
+                                    command=self.reset_config_and_exit,
+                                    fg_color="red", hover_color="darkred")
+        reset_button.pack(side="right", padx=10)
+    
     def create_edit_table(self, parent):
         """Erstellt die Bearbeitungstabelle für ausgewählte Events"""
         # Header
@@ -502,10 +519,85 @@ class NewsBoardGenerator:
         
         return template
 
+    def load_or_request_calendar_url(self) -> str:
+        """Lädt die Kalender-URL aus der Config oder fragt den Benutzer"""
+        # Prüfe ob Config existiert
+        if os.path.exists(self.config_file):
+            try:
+                with open(self.config_file, 'r', encoding='utf-8') as f:
+                    config = json.load(f)
+                    return config.get('calendar_url', '')
+            except Exception as e:
+                print(f"Fehler beim Laden der Config: {e}")
+        
+        # Config existiert nicht oder ist fehlerhaft - Benutzer fragen
+        return self.request_calendar_url()
+    
+    def request_calendar_url(self) -> str:
+        """Fragt den Benutzer nach der Kalender-URL"""
+        # Temporäres Fenster für die Abfrage
+        root = ctk.CTk()
+        root.withdraw()  # Verstecke Hauptfenster
+        
+        url = simpledialog.askstring(
+            "Kalender-URL",
+            "Bitte geben Sie die iCal-URL Ihres Kalenders ein:",
+            parent=root
+        )
+        
+        root.destroy()
+        
+        if url and url.strip():
+            url = url.strip()
+            # Speichere URL in Config
+            self.save_calendar_url(url)
+            return url
+        
+        return ""
+    
+    def save_calendar_url(self, url: str):
+        """Speichert die Kalender-URL in der Config-Datei"""
+        try:
+            # Erstelle Config-Verzeichnis falls nicht vorhanden
+            os.makedirs(self.config_dir, exist_ok=True)
+            
+            # Speichere Config
+            config = {'calendar_url': url}
+            with open(self.config_file, 'w', encoding='utf-8') as f:
+                json.dump(config, f, indent=2)
+            
+            print(f"Kalender-URL gespeichert in: {self.config_file}")
+        except Exception as e:
+            print(f"Fehler beim Speichern der Config: {e}")
+            messagebox.showerror("Fehler", f"Kalender-URL konnte nicht gespeichert werden:\n{str(e)}")
+    
+    def reset_config_and_exit(self):
+        """Löscht die Config-Datei und beendet das Programm"""
+        result = messagebox.askyesno(
+            "Bestätigung",
+            "Möchten Sie wirklich die Kalender-URL zurücksetzen?\n\n"
+            "Die gespeicherte URL wird gelöscht und das Programm beendet.\n"
+            "Beim nächsten Start werden Sie nach einer neuen URL gefragt."
+        )
+        
+        if result:
+            try:
+                if os.path.exists(self.config_file):
+                    os.remove(self.config_file)
+                    print(f"Config-Datei gelöscht: {self.config_file}")
+                
+                messagebox.showinfo("Erfolg", "Kalender-URL wurde zurückgesetzt.\nDas Programm wird jetzt beendet.")
+                self.root.quit()
+                self.root.destroy()
+            except Exception as e:
+                messagebox.showerror("Fehler", f"Config konnte nicht gelöscht werden:\n{str(e)}")
+    
     def run(self):
         """Startet die Anwendung"""
-        self.root.mainloop()
+        if hasattr(self, 'root'):
+            self.root.mainloop()
 
 if __name__ == "__main__":
     app = NewsBoardGenerator()
-    app.run()
+    if hasattr(app, 'root'):
+        app.run()
