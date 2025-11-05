@@ -1,10 +1,10 @@
 # new
 
-namen net kürzen
-eigener link
-only copy
-fullscreen start
-mehr events laden
+namen net kürzen    check
+eigener link        check
+only copy           check
+fullscreen start    error
+mehr events laden   check
 events filtern -> config system
 
 ## notes
