@@ -59,6 +59,9 @@ class NewsBoardGenerator:
         
         self.setup_gui()
         
+        # Kalender automatisch beim Start laden
+        self.root.after(100, self.load_calendar)
+        
     def setup_gui(self):
         """Erstellt die GUI"""
         # Header
@@ -69,20 +72,11 @@ class NewsBoardGenerator:
                                  font=ctk.CTkFont(size=24, weight="bold"))
         title_label.pack(pady=20)
         
-        # Button Frame für Kalender-Buttons
-        calendar_button_frame = ctk.CTkFrame(header_frame)
-        calendar_button_frame.pack(pady=10)
-        
-        # Kalender laden Button
-        load_button = ctk.CTkButton(calendar_button_frame, text="Kalender laden", 
-                                  command=self.load_calendar)
-        load_button.pack(side="left", padx=5)
-        
         # Mehr Events laden Button
-        self.load_more_button = ctk.CTkButton(calendar_button_frame, text="Mehr Events laden", 
+        self.load_more_button = ctk.CTkButton(header_frame, text="Mehr Events laden", 
                                             command=self.load_more_events,
                                             state="disabled")
-        self.load_more_button.pack(side="left", padx=5)
+        self.load_more_button.pack(pady=10)
         
         # Main Content Frame
         main_frame = ctk.CTkFrame(self.root)
