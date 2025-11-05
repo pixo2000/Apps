@@ -28,6 +28,8 @@ class NewsBoardGenerator:
     def __init__(self):
         self.events: List[CalendarEvent] = []
         self.selected_events: List[CalendarEvent] = []
+        self.all_events: List[CalendarEvent] = []  # Alle geparsten Events
+        self.current_limit = 20  # Aktuelles Anzeigelimit
         
         # Config-Dateipfad im User-Ordner
         self.config_dir = os.path.join(os.path.expanduser("~"), ".newsboarder")
@@ -67,10 +69,20 @@ class NewsBoardGenerator:
                                  font=ctk.CTkFont(size=24, weight="bold"))
         title_label.pack(pady=20)
         
+        # Button Frame für Kalender-Buttons
+        calendar_button_frame = ctk.CTkFrame(header_frame)
+        calendar_button_frame.pack(pady=10)
+        
         # Kalender laden Button
-        load_button = ctk.CTkButton(header_frame, text="Kalender laden", 
+        load_button = ctk.CTkButton(calendar_button_frame, text="Kalender laden", 
                                   command=self.load_calendar)
-        load_button.pack(pady=10)
+        load_button.pack(side="left", padx=5)
+        
+        # Mehr Events laden Button
+        self.load_more_button = ctk.CTkButton(calendar_button_frame, text="Mehr Events laden", 
+                                            command=self.load_more_events,
+                                            state="disabled")
+        self.load_more_button.pack(side="left", padx=5)
         
         # Main Content Frame
         main_frame = ctk.CTkFrame(self.root)
@@ -80,9 +92,10 @@ class NewsBoardGenerator:
         left_frame = ctk.CTkFrame(main_frame)
         left_frame.pack(side="left", fill="both", expand=True, padx=(0, 10))
         
-        events_label = ctk.CTkLabel(left_frame, text="Verfügbare Termine:", 
+        # Label mit Event-Zähler
+        self.events_label = ctk.CTkLabel(left_frame, text="Verfügbare Termine:", 
                                   font=ctk.CTkFont(size=16, weight="bold"))
-        events_label.pack(anchor="w", padx=20, pady=(20, 10))
+        self.events_label.pack(anchor="w", padx=20, pady=(20, 10))
         
         # Scrollable Frame für Events
         self.events_scroll = ctk.CTkScrollableFrame(left_frame, height=400)
@@ -383,7 +396,7 @@ class NewsBoardGenerator:
         
         # Sortiere nach Datum
         events.sort(key=lambda x: x.start_date)
-        return events[:20]  # Begrenzt auf 20 Events
+        return events  # Gebe alle Events zurück
     
     def load_calendar(self):
         """Lädt Kalender von der URL"""
@@ -402,14 +415,51 @@ class NewsBoardGenerator:
                 f.write(response.text)
             print(f"Roher iCal Content gespeichert in: {debug_file}")
             
-            self.events = self.parse_ical(response.text)
+            self.all_events = self.parse_ical(response.text)
+            self.current_limit = 20  # Setze Limit zurück
+            self.events = self.all_events[:self.current_limit]  # Zeige erste 20
+            self.update_events_label()
             self.display_events()
             
-            messagebox.showinfo("Erfolg", f"{len(self.events)} Termine geladen!")
+            # Aktiviere "Mehr laden" Button wenn mehr Events verfügbar
+            if len(self.all_events) > self.current_limit:
+                self.load_more_button.configure(state="normal")
+            else:
+                self.load_more_button.configure(state="disabled")
+            
+            messagebox.showinfo("Erfolg", f"{len(self.events)} von {len(self.all_events)} Terminen geladen!")
             
         except Exception as e:
             print(f"Fehler beim Laden: {e}")
             messagebox.showerror("Fehler", f"Kalender konnte nicht geladen werden:\n{str(e)}")
+    
+    def load_more_events(self):
+        """Lädt weitere Events (jeweils 20 mehr)"""
+        if len(self.all_events) > self.current_limit:
+            # Erhöhe Limit um 20
+            self.current_limit += 20
+            
+            # Aktualisiere angezeigte Events
+            self.events = self.all_events[:self.current_limit]
+            self.update_events_label()
+            self.display_events()
+            
+            # Deaktiviere Button wenn alle Events geladen
+            if len(self.all_events) <= self.current_limit:
+                self.load_more_button.configure(state="disabled")
+                messagebox.showinfo("Info", f"Alle {len(self.all_events)} Termine wurden geladen!")
+            else:
+                messagebox.showinfo("Erfolg", f"{len(self.events)} von {len(self.all_events)} Terminen geladen!")
+    
+    def update_events_label(self):
+        """Aktualisiert das Label mit der Event-Anzahl"""
+        total = len(self.all_events)
+        shown = len(self.events)
+        
+        if total > shown:
+            self.events_label.configure(text=f"Verfügbare Termine ({shown} von {total} geladen):")
+        else:
+            self.events_label.configure(text=f"Verfügbare Termine ({total} Termine):")
     
     def display_events(self):
         """Zeigt Events in der GUI an (nur nicht ausgewählte)"""
