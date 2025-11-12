@@ -75,15 +75,26 @@ def print_course_table(courses):
         print(f"{i:2d}. {course_name}")
     print()
 
-def assign_students_to_courses(students: List[Student], courses: Dict[str, Course], max_students_per_timeslot=None, equal_distribution=False):
+def assign_students_to_courses(students: List[Student], courses: Dict[str, Course], max_students_per_timeslot=None, equal_distribution=False, course_limits=None):
     """
     Verteilt Schüler auf Kurse unter Berücksichtigung der Wünsche und Constraints
     Verwendet einen iterativen Ansatz: Erst alle 1. Wünsche, dann alle 2. Wünsche, etc.
+    
+    Args:
+        students: Liste der Schüler
+        courses: Dictionary der Kurse
+        max_students_per_timeslot: Globales Limit für alle Kurse
+        equal_distribution: Gleichmäßige Verteilung erzwingen
+        course_limits: Dict mit individuellen Limits pro Kurs {kursname: limit}
     """
     # Statistiken
     total_wishes = 0
     fulfilled_wishes = defaultdict(int)  # wish_priority -> count
     unfulfilled_students = []  # (student, unfulfilled_wishes)
+    
+    # course_limits falls None
+    if course_limits is None:
+        course_limits = {}
     
     # Berechne Zielgröße für jeden Kurs (bei gleichmäßiger Verteilung)
     target_students_per_course = None
@@ -136,8 +147,9 @@ def assign_students_to_courses(students: List[Student], courses: Dict[str, Cours
                 
                 num_students = courses[wish].get_students_in_timeslot(timeslot)
                 
-                # Prüfe maximale Kursgröße
-                if max_students_per_timeslot and num_students >= max_students_per_timeslot:
+                # Prüfe maximale Kursgröße (individuell oder global)
+                effective_limit = course_limits.get(wish, max_students_per_timeslot)
+                if effective_limit and num_students >= effective_limit:
                     continue  # Kurs ist voll
                 
                 if num_students < min_students:
@@ -179,8 +191,9 @@ def assign_students_to_courses(students: List[Student], courses: Dict[str, Cours
                 if timeslot not in assigned_timeslots:
                     num_students = courses[course_name].get_students_in_timeslot(timeslot)
                     
-                    # Prüfe maximale Kursgröße
-                    if max_students_per_timeslot and num_students >= max_students_per_timeslot:
+                    # Prüfe maximale Kursgröße (individuell oder global)
+                    effective_limit = course_limits.get(course_name, max_students_per_timeslot)
+                    if effective_limit and num_students >= effective_limit:
                         continue
                     
                     courses[course_name].timeslots[timeslot].append(student)
