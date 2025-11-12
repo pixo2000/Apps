@@ -1,7 +1,21 @@
-max/kurs
+schnelleres öffnen
+export as excel datei -> falsche anzeige von csv in excel
+dynamic port mapping
+fix images
+alle kurse nicht nur top 10 anzeigen
+webseite als png speichern
+nachnamen in dateien speichern
+spalte für kurs, referent, zeitfenster
+excel hatte probleme mit ü in csv
 
-feedback wie viele wünsche/schüler
-webwrapper
-bescheid wenn einer keinen wunsch hat
 
-menschliche zuteilung hat vorteile schülerbeziehung, klassen etc
+prio 1: nachnamen in export dateien, export anzeigen fixen(indem excel format angeboten is)
+prio 2: webseite als png, die nutella sachen fixen, auf der webseite mehr als top 10 zeigen
+prio 3: dynamischer port, besseres öffnen auf mac(als application)
+
+
+nachnamen check
+nutella check
+excel check
+bild check
+mehr als 10 check

@@ -5,21 +5,35 @@ import csv
 from main import Student, Course, assign_students_to_courses, export_results, export_summary_txt
 import io
 from collections import Counter
+from datetime import datetime
+import pandas as pd
+import random
+import socket
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Globale Variable für aktuelle Daten (nur im RAM)
+# Verzeichnis für persistente Datenspeicherung (nicht über Web zugänglich)
+DATA_DIR = os.path.join(SCRIPT_DIR, 'data')
+UPLOADS_DIR = os.path.join(DATA_DIR, 'uploads')
+RESULTS_DIR = os.path.join(DATA_DIR, 'results')
+
+# Erstelle Verzeichnisse falls sie nicht existieren
+os.makedirs(UPLOADS_DIR, exist_ok=True)
+os.makedirs(RESULTS_DIR, exist_ok=True)
+
+# Globale Variable für aktuelle Daten (im RAM für schnellen Zugriff)
 current_data = {
     'students': None,
     'courses': None,
-    'filename': None
+    'filename': None,
+    'upload_path': None  # Pfad zur gespeicherten Upload-Datei
 }
 
 def load_data_from_csv_content(file_content):
-    """Lädt CSV-Daten direkt aus dem Speicher (ohne Disk I/O)"""
+    """Lädt CSV-Daten direkt aus dem Speicher"""
     students = []
     all_courses = set()
     
@@ -29,22 +43,34 @@ def load_data_from_csv_content(file_content):
     
     # Verwende StringIO für In-Memory CSV-Parsing
     csv_file = io.StringIO(file_content)
-    reader = csv.DictReader(csv_file)
+    reader = csv.reader(csv_file)
+    
+    # Überspringe die Kopfzeile
+    next(reader, None)
     
     for row in reader:
-        wishes = []
-        for i in range(1, 5):
-            wish_col = f'Wahlangebote Methodentag E-Phase - {i}. Wunsch'
-            if wish_col in row and row[wish_col]:
-                wishes.append(row[wish_col])
-                all_courses.add(row[wish_col])
+        # Stelle sicher, dass die Zeile genug Spalten hat
+        if len(row) < 7:
+            continue
         
-        student = Student(
-            row['Nachname'],
-            row['Vorname'],
-            row['Klasse'],
-            wishes
-        )
+        # Spalten: 0=Nachname, 1=Vorname, 2=Klasse, 3-6=Wünsche 1-4
+        lastname = row[0].strip()
+        firstname = row[1].strip()
+        klasse = row[2].strip()
+        
+        # Ignoriere Zeilen mit "unbekannt" oder "unknown" als Klasse (case-insensitive)
+        if klasse.lower() in ['unbekannt', 'unknown']:
+            continue
+        
+        # Sammle die Wünsche aus Spalten 3-6
+        wishes = []
+        for i in range(3, 7):
+            if row[i] and row[i].strip():
+                wish = row[i].strip()
+                wishes.append(wish)
+                all_courses.add(wish)
+        
+        student = Student(lastname, firstname, klasse, wishes)
         students.append(student)
     
     # Erstelle Course-Objekte
@@ -64,16 +90,29 @@ def index():
 
 @app.route('/api/upload', methods=['POST'])
 def upload_file():
-    """Lädt eine CSV-Datei hoch und speichert sie temporär im RAM"""
+    """Lädt eine CSV-Datei hoch und speichert sie persistent im data/uploads Verzeichnis"""
+    print("=" * 60)
+    print("📤 UPLOAD REQUEST empfangen")
+    print(f"Request files: {request.files}")
+    print(f"Request form: {request.form}")
+    print(f"Request method: {request.method}")
+    print(f"Content-Type: {request.content_type}")
+    
     if 'file' not in request.files:
+        error_msg = 'Keine Datei im Request gefunden (key "file" fehlt)'
+        print(f"❌ ERROR: {error_msg}")
+        print(f"Verfügbare Keys: {list(request.files.keys())}")
         return jsonify({
             'success': False,
-            'error': 'Keine Datei ausgewählt'
+            'error': error_msg
         }), 400
     
     file = request.files['file']
+    print(f"📁 Datei gefunden: {file.filename}")
     
     if file.filename == '':
+        error_msg = 'Dateiname ist leer'
+        print(f"❌ ERROR: {error_msg}")
         return jsonify({
             'success': False,
             'error': 'Keine Datei ausgewählt'
@@ -81,22 +120,43 @@ def upload_file():
     
     # Prüfe Dateiendung
     if not file.filename.lower().endswith('.csv'):
+        error_msg = f'Ungültiger Dateityp: {file.filename}'
+        print(f"❌ ERROR: {error_msg}")
         return jsonify({
             'success': False,
             'error': 'Ungültiger Dateityp. Nur CSV-Dateien sind erlaubt.'
         }), 400
     
     try:
-        # Lese Datei direkt in den Speicher (keine Disk I/O)
+        # Lese Datei direkt in den Speicher
+        print("📖 Lese Dateiinhalt...")
         file_content = file.read()
+        print(f"✓ Datei gelesen: {len(file_content)} Bytes")
+        
+        # Erstelle Zeitstempel für eindeutigen Dateinamen
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        safe_filename = f"{timestamp}_{file.filename}"
+        upload_path = os.path.join(UPLOADS_DIR, safe_filename)
+        
+        # Speichere Datei persistent
+        print(f"💾 Speichere Datei nach: {upload_path}")
+        with open(upload_path, 'wb') as f:
+            f.write(file_content)
+        print(f"✓ Datei gespeichert")
         
         # Versuche die Daten zu laden und zu validieren
+        print("🔄 Parse CSV-Daten...")
         students, courses = load_data_from_csv_content(file_content)
+        print(f"✓ CSV geparst: {len(students)} Schüler, {len(courses)} Kurse")
         
-        # Speichere in globaler Variable (nur RAM, nicht auf Disk!)
+        # Speichere in globaler Variable für schnellen Zugriff
         current_data['students'] = students
         current_data['courses'] = courses
         current_data['filename'] = file.filename
+        current_data['upload_path'] = upload_path
+        
+        print("✅ Upload erfolgreich!")
+        print("=" * 60)
         
         return jsonify({
             'success': True,
@@ -105,9 +165,15 @@ def upload_file():
             'courseCount': len(courses)
         })
     except Exception as e:
+        error_msg = f'Fehler beim Laden der Datei: {str(e)}'
+        print(f"❌ EXCEPTION: {error_msg}")
+        print(f"Exception type: {type(e).__name__}")
+        import traceback
+        print(traceback.format_exc())
+        print("=" * 60)
         return jsonify({
             'success': False,
-            'error': f'Fehler beim Laden der Datei: {str(e)}'
+            'error': error_msg
         }), 400
 
 @app.route('/api/analyze', methods=['POST'])
@@ -205,9 +271,22 @@ def assign():
             students, courses, max_students, equal_distribution, course_limits
         )
         
-        # Exportiere Ergebnisse
-        export_results(students, courses)
-        export_summary_txt(students, courses, fulfilled_wishes, unfulfilled_students, total_wishes, max_students)
+        # Erstelle Zeitstempel für eindeutige Dateinamen
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        result_subdir = os.path.join(RESULTS_DIR, timestamp)
+        os.makedirs(result_subdir, exist_ok=True)
+        
+        # Exportiere Ergebnisse in das results Verzeichnis
+        print(f"💾 Speichere Ergebnisse nach: {result_subdir}")
+        export_results(students, courses, output_dir=result_subdir)
+        export_summary_txt(students, courses, fulfilled_wishes, unfulfilled_students, total_wishes, max_students, output_dir=result_subdir)
+        
+        # Kopiere die Dateien auch ins Hauptverzeichnis für die Download-API
+        import shutil
+        for filename in ['zuteilung_schueler.csv', 'zuteilung_kurse.csv', 'zusammenfassung.txt']:
+            src = os.path.join(result_subdir, filename)
+            dst = os.path.join(SCRIPT_DIR, filename)
+            shutil.copy2(src, dst)
         
         # Berechne Statistiken
         total_fulfilled = sum(fulfilled_wishes.values())
@@ -250,7 +329,7 @@ def assign():
                 'wishesPerStudent': {str(k): v for k, v in wishes_per_student.items()},
                 'studentsWithoutWishes': len(students_without_wishes),
                 'averageCourseSize': round(avg_students, 1),
-                'courseStats': course_stats[:10]  # Top 10 Kurse
+                'courseStats': course_stats  # Alle Kurse anzeigen
             }
         })
     except Exception as e:
@@ -261,12 +340,59 @@ def assign():
 
 @app.route('/api/download/<filename>')
 def download(filename):
-    """Download generierter Dateien"""
-    allowed_files = ['zuteilung_schueler.csv', 'zuteilung_kurse.csv', 'zusammenfassung.txt']
+    """Download generierter Dateien (CSV oder Excel)"""
+    allowed_files = [
+        'zuteilung_schueler.csv', 'zuteilung_kurse.csv', 
+        'zuteilung_schueler.xlsx', 'zuteilung_kurse.xlsx',
+        'zusammenfassung.txt'
+    ]
     
     if filename not in allowed_files:
         return jsonify({'error': 'File not found'}), 404
     
+    # Wenn Excel angefragt wird, konvertiere CSV zu Excel
+    if filename.endswith('.xlsx'):
+        csv_filename = filename.replace('.xlsx', '.csv')
+        csv_path = os.path.join(SCRIPT_DIR, csv_filename)
+        
+        if not os.path.exists(csv_path):
+            return jsonify({'error': 'File not generated yet'}), 404
+        
+        try:
+            # Konvertiere CSV zu Excel
+            df = pd.read_csv(csv_path, encoding='utf-8')
+            
+            # Erstelle Excel-Datei im Speicher
+            excel_buffer = io.BytesIO()
+            with pd.ExcelWriter(excel_buffer, engine='openpyxl') as writer:
+                df.to_excel(writer, index=False, sheet_name='Zuteilung')
+                
+                # Auto-size columns für bessere Lesbarkeit
+                worksheet = writer.sheets['Zuteilung']
+                for column in worksheet.columns:
+                    max_length = 0
+                    column_letter = column[0].column_letter
+                    for cell in column:
+                        try:
+                            if len(str(cell.value)) > max_length:
+                                max_length = len(str(cell.value))
+                        except:
+                            pass
+                    adjusted_width = min(max_length + 2, 50)  # Max 50 Zeichen
+                    worksheet.column_dimensions[column_letter].width = adjusted_width
+            
+            excel_buffer.seek(0)
+            
+            return send_file(
+                excel_buffer,
+                mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                as_attachment=True,
+                download_name=filename
+            )
+        except Exception as e:
+            return jsonify({'error': f'Excel conversion failed: {str(e)}'}), 500
+    
+    # Standard CSV/TXT Download
     file_path = os.path.join(SCRIPT_DIR, filename)
     
     if not os.path.exists(file_path):
@@ -276,22 +402,72 @@ def download(filename):
 
 @app.route('/api/clear', methods=['POST'])
 def clear_data():
-    """Löscht die temporären Daten aus dem RAM"""
+    """Löscht die temporären Daten aus dem RAM (nicht die persistenten Dateien)"""
     current_data['students'] = None
     current_data['courses'] = None
     current_data['filename'] = None
+    current_data['upload_path'] = None
     
     return jsonify({
         'success': True,
-        'message': 'Daten wurden aus dem Speicher gelöscht'
+        'message': 'Daten wurden aus dem Speicher gelöscht (persistente Dateien bleiben erhalten)'
     })
+
+def is_port_available(port):
+    """Prüft ob ein Port verfügbar ist"""
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.settimeout(1)
+    try:
+        sock.bind(('0.0.0.0', port))
+        sock.close()
+        return True
+    except (socket.error, OSError):
+        return False
+
+def find_available_port(min_port=5000, max_port=5999, max_attempts=50):
+    """Findet einen verfügbaren zufälligen Port im angegebenen Bereich"""
+    attempts = 0
+    tried_ports = set()
+    
+    while attempts < max_attempts:
+        port = random.randint(min_port, max_port)
+        
+        # Überspringe bereits getestete Ports
+        if port in tried_ports:
+            continue
+        
+        tried_ports.add(port)
+        attempts += 1
+        
+        if is_port_available(port):
+            return port
+    
+    # Fallback: Durchsuche alle Ports sequentiell
+    for port in range(min_port, max_port + 1):
+        if port not in tried_ports and is_port_available(port):
+            return port
+    
+    # Wenn kein Port gefunden wurde, verwende einen vom System zugewiesenen Port
+    return None
 
 if __name__ == '__main__':
     print("="*80)
     print("🚀 Methodentag Kurszuteilung - Web Interface")
     print("="*80)
-    print("\n📊 Datenverarbeitung: Alle hochgeladenen Daten werden NUR im RAM gespeichert")
-    print("🔒 Sicherheit: Keine persistente Speicherung auf der Festplatte")
-    print("🌐 Server läuft auf: http://localhost:5000")
+    print(f"\n💾 Datenspeicherung:")
+    print(f"   • Uploads: {UPLOADS_DIR}")
+    print(f"   • Ergebnisse: {RESULTS_DIR}")
+    print(f"   • Nicht über Web-Interface zugänglich")
+    
+    # Finde verfügbaren Port
+    port = find_available_port()
+    
+    if port is None:
+        print("\n⚠️  Warnung: Kein freier Port im Bereich 5000-5999 gefunden!")
+        print("   Verwende Port 0 (System wählt automatisch)")
+        port = 0
+    
+    print(f"\n🌐 Server läuft auf: http://localhost:{port}")
     print("\n" + "="*80 + "\n")
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    
+    app.run(debug=True, host='0.0.0.0', port=port)

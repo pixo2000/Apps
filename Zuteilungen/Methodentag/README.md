@@ -48,6 +48,17 @@ python main.py
 - `zuteilung_kurse.csv` - Übersicht pro Kurs
 - `zusammenfassung.txt` - Detaillierte Statistiken
 
+## Datenspeicherung
+
+Alle Daten werden persistent im `data/` Verzeichnis gespeichert:
+
+- `data/uploads/` - Hochgeladene CSV-Dateien mit Zeitstempel
+- `data/results/` - Generierte Ergebnisdateien mit Zeitstempel
+
+Diese Verzeichnisse sind **nicht über das Web-Interface zugänglich** und dienen der langfristigen Datensicherung. Die Dateien werden mit Zeitstempeln versehen, um verschiedene Durchläufe zu unterscheiden.
+
+**Hinweis:** Das `data/` Verzeichnis ist in `.gitignore` eingetragen und wird nicht in Git versioniert.
+
 ## Technologie
 
 - Backend: Flask (Python)

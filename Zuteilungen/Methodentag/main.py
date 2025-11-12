@@ -41,21 +41,34 @@ def load_data():
     all_courses = set()
     
     with open(CSV_FILE, 'r', encoding='utf-8') as f:
-        reader = csv.DictReader(f)
+        reader = csv.reader(f)
+        
+        # Überspringe die Kopfzeile
+        next(reader, None)
+        
         for row in reader:
-            wishes = []
-            for i in range(1, 5):
-                wish_col = f'Wahlangebote Methodentag E-Phase - {i}. Wunsch'
-                if wish_col in row and row[wish_col]:
-                    wishes.append(row[wish_col])
-                    all_courses.add(row[wish_col])
+            # Stelle sicher, dass die Zeile genug Spalten hat
+            if len(row) < 7:
+                continue
             
-            student = Student(
-                row['Nachname'],
-                row['Vorname'],
-                row['Klasse'],
-                wishes
-            )
+            # Spalten: 0=Nachname, 1=Vorname, 2=Klasse, 3-6=Wünsche 1-4
+            lastname = row[0].strip()
+            firstname = row[1].strip()
+            klasse = row[2].strip()
+            
+            # Ignoriere Zeilen mit "unbekannt" oder "unknown" als Klasse (case-insensitive)
+            if klasse.lower() in ['unbekannt', 'unknown']:
+                continue
+            
+            # Sammle die Wünsche aus Spalten 3-6
+            wishes = []
+            for i in range(3, 7):
+                if row[i] and row[i].strip():
+                    wish = row[i].strip()
+                    wishes.append(wish)
+                    all_courses.add(wish)
+            
+            student = Student(lastname, firstname, klasse, wishes)
             students.append(student)
     
     # Erstelle Course-Objekte
@@ -369,11 +382,15 @@ def print_statistics(students, courses, fulfilled_wishes, unfulfilled_students, 
     else:
         print("\nAlle Schüler haben mindestens einen Wunsch erfüllt bekommen!")
 
-def export_results(students, courses):
+def export_results(students, courses, output_dir=None):
     """Exportiert die Ergebnisse in CSV-Dateien"""
     
+    # Verwende output_dir falls angegeben, sonst SCRIPT_DIR
+    if output_dir is None:
+        output_dir = SCRIPT_DIR
+    
     # Export 1: Schüler-Zuteilung
-    output_file = os.path.join(SCRIPT_DIR, 'zuteilung_schueler.csv')
+    output_file = os.path.join(output_dir, 'zuteilung_schueler.csv')
     with open(output_file, 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
         writer.writerow(['Nachname', 'Vorname', 'Klasse', 'Zeitfenster 1', 'Zeitfenster 2', 'Zeitfenster 3', 'Erfüllte Wünsche'])
@@ -399,7 +416,7 @@ def export_results(students, courses):
     print("\n✓ Datei 'zuteilung_schueler.csv' wurde erstellt")
     
     # Export 2: Kurs-Übersicht
-    output_file = os.path.join(SCRIPT_DIR, 'zuteilung_kurse.csv')
+    output_file = os.path.join(output_dir, 'zuteilung_kurse.csv')
     with open(output_file, 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
         writer.writerow(['Kurs', 'Zeitfenster', 'Anzahl Schüler', 'Schüler'])
@@ -421,10 +438,14 @@ def export_results(students, courses):
     
     print("✓ Datei 'zuteilung_kurse.csv' wurde erstellt")
 
-def export_summary_txt(students, courses, fulfilled_wishes, unfulfilled_students, total_wishes, max_students):
+def export_summary_txt(students, courses, fulfilled_wishes, unfulfilled_students, total_wishes, max_students, output_dir=None):
     """Exportiert eine Zusammenfassung als TXT-Datei"""
     
-    output_file = os.path.join(SCRIPT_DIR, 'zusammenfassung.txt')
+    # Verwende output_dir falls angegeben, sonst SCRIPT_DIR
+    if output_dir is None:
+        output_dir = SCRIPT_DIR
+    
+    output_file = os.path.join(output_dir, 'zusammenfassung.txt')
     with open(output_file, 'w', encoding='utf-8') as f:
         f.write("="*100 + "\n")
         f.write("📊 ZUSAMMENFASSUNG DER KURSZUTEILUNG - METHODENTAG\n")

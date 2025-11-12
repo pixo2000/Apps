@@ -12,6 +12,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
     
+    <!-- html2canvas für PNG Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
     <style>
         /* Light Mode Colors */
         :root[data-theme="light"] {
@@ -642,72 +645,103 @@
                 Ergebnisse
             </h2>
             
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-value" id="fulfillmentRate">-</div>
-                    <div class="stat-label">Erfüllungsrate</div>
+            <!-- Statistik-Container für PNG-Export -->
+            <div id="resultsSummary">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="fulfillmentRate">-</div>
+                        <div class="stat-label">Erfüllungsrate</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="avgCourseSize">-</div>
+                        <div class="stat-label">Ø Kursgröße</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="studentsWithoutWishes">-</div>
+                        <div class="stat-label">Ohne Wunscherfüllung</div>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="avgCourseSize">-</div>
-                    <div class="stat-label">Ø Kursgröße</div>
+                
+                <h3 style="margin-top: 24px; margin-bottom: 12px; font-size: 16px; font-weight: 500;">
+                    Erfüllte Wünsche nach Priorität
+                </h3>
+                <div id="wishPriorities" class="stats-grid">
+                    <!-- Wird dynamisch gefüllt -->
                 </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="studentsWithoutWishes">-</div>
-                    <div class="stat-label">Ohne Wunscherfüllung</div>
+                
+                <h3 style="margin-top: 24px; margin-bottom: 12px; font-size: 16px; font-weight: 500;">
+                    Kursstatistiken
+                </h3>
+                <div class="table-container">
+                    <table id="courseStatsTable">
+                        <thead>
+                            <tr>
+                                <th>Kurs</th>
+                                <th>Gesamt</th>
+                                <th>Zeit 1</th>
+                                <th>Zeit 2</th>
+                                <th>Zeit 3</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Wird dynamisch gefüllt -->
+                        </tbody>
+                    </table>
                 </div>
-            </div>
-            
-            <h3 style="margin-top: 24px; margin-bottom: 12px; font-size: 16px; font-weight: 500;">
-                Erfüllte Wünsche nach Priorität
-            </h3>
-            <div id="wishPriorities" class="stats-grid">
-                <!-- Wird dynamisch gefüllt -->
-            </div>
-            
-            <h3 style="margin-top: 24px; margin-bottom: 12px; font-size: 16px; font-weight: 500;">
-                Top 10 beliebteste Kurse
-            </h3>
-            <div class="table-container">
-                <table id="courseStatsTable">
-                    <thead>
-                        <tr>
-                            <th>Kurs</th>
-                            <th>Gesamt</th>
-                            <th>Zeit 1</th>
-                            <th>Zeit 2</th>
-                            <th>Zeit 3</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Wird dynamisch gefüllt -->
-                    </tbody>
-                </table>
             </div>
             
             <h3 style="margin-top: 24px; margin-bottom: 12px; font-size: 16px; font-weight: 500;">
                 Download
             </h3>
+            
+            <!-- Export Format Toggle -->
+            <div style="margin-bottom: 16px;">
+                <div class="switch-container">
+                    <label class="switch">
+                        <input type="checkbox" id="exportAsExcel" onchange="updateDownloadLinks()">
+                        <span class="slider"></span>
+                    </label>
+                    <span style="color: var(--md-sys-color-on-surface-variant);">
+                        Als Excel (.xlsx) exportieren
+                    </span>
+                </div>
+                <small style="color: var(--md-sys-color-on-surface-variant); display: block; margin-top: 4px; margin-left: 52px;">
+                    CSV empfohlen für bessere Kompatibilität
+                </small>
+            </div>
+            
             <div class="btn-group">
-                <a href="/api/download/zuteilung_schueler.csv" class="btn btn-secondary" download>
+                <a id="downloadStudents" href="/api/download/zuteilung_schueler.csv" class="btn btn-secondary" download>
                     <span class="material-symbols-outlined">download</span>
-                    Schüler-Zuteilung (CSV)
+                    <span id="downloadStudentsText">Schüler-Zuteilung (CSV)</span>
                 </a>
-                <a href="/api/download/zuteilung_kurse.csv" class="btn btn-secondary" download>
+                <a id="downloadCourses" href="/api/download/zuteilung_kurse.csv" class="btn btn-secondary" download>
                     <span class="material-symbols-outlined">download</span>
-                    Kurs-Übersicht (CSV)
+                    <span id="downloadCoursesText">Kurs-Übersicht (CSV)</span>
                 </a>
                 <a href="/api/download/zusammenfassung.txt" class="btn btn-secondary" download>
                     <span class="material-symbols-outlined">download</span>
                     Zusammenfassung (TXT)
                 </a>
-                <a href="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%2Fid%2FOIP.FR6MSp51ImOIPp6MNgJVqAHaEK%3Fpid%3DApi&f=1&ipt=d7d2a924993178b9f343b9a655e37f76458d4ea7323d81cee51ca33d1da29813&ipo=images" 
-                   class="btn btn-secondary" 
-                   download="nutella.jpg"
-                   target="_blank"
-                   style="background-color: #ff6b00; color: white; position: relative; overflow: hidden;">
+                <button class="btn btn-secondary" onclick="downloadResultsAsPNG()">
                     <span class="material-symbols-outlined">image</span>
-                    Nutella 🍫
-                </a>
+                    Zusammenfassung (PNG)
+                </button>
+            </div>
+            
+            <!-- Nutellabrot Nachricht -->
+            <div style="margin-top: 24px; padding: 20px; background: linear-gradient(135deg, var(--md-sys-color-primary-container) 0%, var(--md-sys-color-secondary-container) 100%); border-radius: 16px; display: flex; align-items: center; gap: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse4.mm.bing.net%2Fth%2Fid%2FOIP.dD3eeH3_wDUAkaO6wzNXxQHaE8%3Fcb%3Ducfimgc2%26pid%3DApi&f=1&ipt=74f1a33736e741eeef0bc64807851b199a7a1c6a7090fbcbcc87ef6f35f2055d&ipo=images" 
+                     alt="Nutellabrot" 
+                     style="width: 120px; height: 120px; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+                <div style="flex: 1;">
+                    <h3 style="margin: 0 0 8px 0; color: var(--md-sys-color-on-primary-container); font-size: 20px; font-weight: 500;">
+                        🎉 Mach dir doch in der gesparten Zeit ein Nutellabrot! 🍫
+                    </h3>
+                    <p style="margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: 14px;">
+                        Die Zuteilung ist fertig – Zeit für eine wohlverdiente Pause! 😋
+                    </p>
+                </div>
             </div>
         </div>
     </div>
@@ -743,6 +777,63 @@
         
         // Init theme on page load
         initTheme();
+        
+        // Download Links Management
+        function updateDownloadLinks() {
+            const exportAsExcel = document.getElementById('exportAsExcel').checked;
+            const downloadStudents = document.getElementById('downloadStudents');
+            const downloadCourses = document.getElementById('downloadCourses');
+            const downloadStudentsText = document.getElementById('downloadStudentsText');
+            const downloadCoursesText = document.getElementById('downloadCoursesText');
+            
+            if (exportAsExcel) {
+                downloadStudents.href = '/api/download/zuteilung_schueler.xlsx';
+                downloadCourses.href = '/api/download/zuteilung_kurse.xlsx';
+                downloadStudentsText.textContent = 'Schüler-Zuteilung (Excel)';
+                downloadCoursesText.textContent = 'Kurs-Übersicht (Excel)';
+            } else {
+                downloadStudents.href = '/api/download/zuteilung_schueler.csv';
+                downloadCourses.href = '/api/download/zuteilung_kurse.csv';
+                downloadStudentsText.textContent = 'Schüler-Zuteilung (CSV)';
+                downloadCoursesText.textContent = 'Kurs-Übersicht (CSV)';
+            }
+        }
+        
+        // PNG Download Funktion
+        async function downloadResultsAsPNG() {
+            const resultsSummary = document.getElementById('resultsSummary');
+            const resultsCard = document.getElementById('resultsCard');
+            
+            if (!resultsCard || resultsCard.classList.contains('hidden') || !resultsSummary) {
+                alert('Keine Ergebnisse zum Exportieren verfügbar');
+                return;
+            }
+            
+            try {
+                // Erstelle Screenshot nur der Statistik-Zusammenfassung (ohne Download-Buttons)
+                const canvas = await html2canvas(resultsSummary, {
+                    backgroundColor: getComputedStyle(document.documentElement)
+                        .getPropertyValue('--md-sys-color-surface').trim(),
+                    scale: 2, // Höhere Auflösung für bessere Qualität
+                    logging: false,
+                    useCORS: true
+                });
+                
+                // Konvertiere zu Blob und starte Download
+                canvas.toBlob(function(blob) {
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+                    link.download = `zuteilung_zusammenfassung_${timestamp}.png`;
+                    link.href = url;
+                    link.click();
+                    URL.revokeObjectURL(url);
+                });
+            } catch (error) {
+                console.error('Fehler beim PNG-Export:', error);
+                alert('Fehler beim Erstellen der PNG-Datei: ' + error.message);
+            }
+        }
         
         async function uploadFile() {
             const fileInput = document.getElementById('csvFile');
@@ -1006,16 +1097,15 @@
             <div style="font-size:14px; color:var(--md-sys-color-on-surface);">
                 © <span id="currentYear"></span> Paul Schoeneck
             </div>
-            <div style="display: flex; align-items: center; gap: 16px;">
-                <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Logo_Nutella.svg/500px-Logo_Nutella.svg.png" 
-                         alt="Nutella Logo" 
-                         style="height: 48px; border-radius: 8px; opacity: 0.9; transition: opacity 0.3s ease, transform 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.15);"
-                         onmouseover="this.style.opacity='1'; this.style.transform='scale(1.15) rotate(5deg)';"
-                         onmouseout="this.style.opacity='0.9'; this.style.transform='scale(1) rotate(0deg)';"
-                         title="Powered by Nutella 🍫">
-                    <span style="font-size: 11px; color: var(--md-sys-color-on-surface-variant); font-weight: 500;">Powered by Nutella</span>
-                </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="font-size:14px; color:var(--md-sys-color-on-surface);">Powered by</span>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Logo_Nutella.svg/250px-Logo_Nutella.svg.png" 
+                     alt="Nutella" 
+                     style="height: 32px; opacity: 0.85; transition: opacity 0.3s ease, transform 0.3s ease;"
+                     onmouseover="this.style.opacity='1'; this.style.transform='scale(1.1)';"
+                     onmouseout="this.style.opacity='0.85'; this.style.transform='scale(1)';"
+                     title="Powered by Nutella">
+                <span style="font-size: 20px;">🍫</span>
             </div>
             <div style="font-size:14px; color:var(--md-sys-color-on-surface);">
                 Support:
