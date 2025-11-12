@@ -26,6 +26,12 @@ jobs:
       run: |
         pip install -r requirements.txt
     
+    - name: Prepare Build
+      working-directory: Zuteilungen/Methodentag
+      run: |
+        # Erstelle data Ordner falls nicht vorhanden (wird von .gitignore ignoriert)
+        mkdir -p data/uploads data/results
+    
     - name: Build macOS App
       working-directory: Zuteilungen/Methodentag
       run: |

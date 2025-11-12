@@ -8,7 +8,6 @@ a = Analysis(
     binaries=[],
     datas=[
         ('templates', 'templates'),
-        ('data', 'data'),
         ('daten.csv', '.'),
     ],
     hiddenimports=[
