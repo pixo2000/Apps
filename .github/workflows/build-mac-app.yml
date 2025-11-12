@@ -1,0 +1,44 @@
+name: Build macOS App
+
+on:
+  workflow_dispatch:  # Manuell starten über GitHub UI
+  push:
+    branches:
+      - master
+    paths:
+      - 'Zuteilungen/Methodentag/**'
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+    
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install Dependencies
+      working-directory: Zuteilungen/Methodentag
+      run: |
+        pip install -r requirements.txt
+    
+    - name: Build macOS App
+      working-directory: Zuteilungen/Methodentag
+      run: |
+        pyinstaller build_mac.spec
+    
+    - name: Create ZIP
+      working-directory: Zuteilungen/Methodentag/dist
+      run: |
+        zip -r "Methodentag-Zuteilung-macOS.zip" "Methodentag Zuteilung.app"
+    
+    - name: Upload App
+      uses: actions/upload-artifact@v4
+      with:
+        name: Methodentag-macOS-App
+        path: Zuteilungen/Methodentag/dist/Methodentag-Zuteilung-macOS.zip
+        retention-days: 30
