@@ -19,3 +19,8 @@ nutella check
 excel check
 bild check
 mehr als 10 check
+
+
+new:
+hinweis auf exportart in lanis
+hinweis die die net gweählt haben manuell hinzufügen

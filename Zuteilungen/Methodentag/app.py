@@ -43,7 +43,7 @@ def load_data_from_csv_content(file_content):
     
     # Verwende StringIO für In-Memory CSV-Parsing
     csv_file = io.StringIO(file_content)
-    reader = csv.reader(csv_file)
+    reader = csv.reader(csv_file, delimiter=';')
     
     # Überspringe die Kopfzeile
     next(reader, None)

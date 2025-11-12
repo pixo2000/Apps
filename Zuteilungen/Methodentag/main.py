@@ -41,7 +41,7 @@ def load_data():
     all_courses = set()
     
     with open(CSV_FILE, 'r', encoding='utf-8') as f:
-        reader = csv.reader(f)
+        reader = csv.reader(f, delimiter=';')
         
         # Überspringe die Kopfzeile
         next(reader, None)
