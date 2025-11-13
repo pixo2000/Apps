@@ -486,18 +486,6 @@
     
     <!-- Main Container -->
     <div class="container">
-        <!-- Info Box -->
-        <div class="info-box">
-            <span class="material-symbols-outlined">info</span>
-            <div>
-                <strong>Willkommen zur Kurszuteilung!</strong><br>
-                Dieses Tool verteilt Schüler automatisch auf Kurse unter Berücksichtigung ihrer Wünsche.
-                Jeder Schüler erhält 3 Kurse (einen pro Zeitfenster).
-                <br><br>
-                🔒 <strong>Datenschutz:</strong> Alle hochgeladenen Daten werden nur temporär im RAM gespeichert und niemals auf der Festplatte abgelegt.
-            </div>
-        </div>
-        
         <!-- Upload Card -->
         <div class="card">
             <h2>
@@ -694,6 +682,15 @@
                 Download
             </h3>
             
+            <!-- Countdown Warning (nur im RAM-Only Modus) -->
+            <div id="countdownWarning" class="hidden" style="margin-bottom: 16px; padding: 12px; background-color: var(--md-sys-color-error-container); color: var(--md-sys-color-on-error-container); border-radius: 8px; display: flex; align-items: center; gap: 12px;">
+                <span class="material-symbols-outlined" style="color: var(--md-sys-color-error);">schedule</span>
+                <div>
+                    <strong>⏰ Automatisches Löschen</strong><br>
+                    <span id="countdownText">Die Dateien werden in <span id="countdownTime" style="font-weight: 500;">--:--</span> automatisch gelöscht!</span>
+                </div>
+            </div>
+            
             <!-- Export Format Toggle -->
             <div style="margin-bottom: 16px;">
                 <div class="switch-container">
@@ -748,6 +745,8 @@
     
     <script>
         let coursesList = [];
+        let countdownInterval = null;
+        let deleteTimestamp = null;
         
         // Theme Management
         function initTheme() {
@@ -777,6 +776,79 @@
         
         // Init theme on page load
         initTheme();
+        
+        // Countdown Management
+        async function fetchDeleteTimestamp() {
+            try {
+                const response = await fetch('/api/delete-timestamp');
+                const data = await response.json();
+                
+                if (data.ramOnlyMode && data.deleteTimestamp) {
+                    deleteTimestamp = data.deleteTimestamp;
+                    startCountdown();
+                }
+            } catch (error) {
+                console.error('Fehler beim Abrufen des Delete-Timestamps:', error);
+            }
+        }
+        
+        function startCountdown() {
+            const countdownWarning = document.getElementById('countdownWarning');
+            const countdownTime = document.getElementById('countdownTime');
+            
+            if (!deleteTimestamp) {
+                countdownWarning.classList.add('hidden');
+                if (countdownInterval) {
+                    clearInterval(countdownInterval);
+                    countdownInterval = null;
+                }
+                return;
+            }
+            
+            countdownWarning.classList.remove('hidden');
+            
+            function updateCountdown() {
+                const now = Date.now() / 1000;
+                const remaining = deleteTimestamp - now;
+                
+                if (remaining <= 0) {
+                    countdownTime.textContent = '00:00';
+                    countdownWarning.style.backgroundColor = 'var(--md-sys-color-error)';
+                    countdownWarning.style.color = 'var(--md-sys-color-on-error)';
+                    document.getElementById('countdownText').innerHTML = '<strong>⚠️ Dateien wurden gelöscht!</strong> Bitte führen Sie die Zuteilung erneut durch.';
+                    clearInterval(countdownInterval);
+                    countdownInterval = null;
+                    return;
+                }
+                
+                const minutes = Math.floor(remaining / 60);
+                const seconds = Math.floor(remaining % 60);
+                countdownTime.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                // Warnung intensivieren wenn weniger als 2 Minuten
+                if (remaining < 120) {
+                    countdownWarning.style.backgroundColor = 'var(--md-sys-color-error)';
+                    countdownWarning.style.color = 'var(--md-sys-color-on-error)';
+                }
+            }
+            
+            updateCountdown();
+            
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+            }
+            countdownInterval = setInterval(updateCountdown, 1000);
+        }
+        
+        function stopCountdown() {
+            deleteTimestamp = null;
+            const countdownWarning = document.getElementById('countdownWarning');
+            countdownWarning.classList.add('hidden');
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+            }
+        }
         
         // Download Links Management
         function updateDownloadLinks() {
@@ -915,6 +987,9 @@
                     document.getElementById('analyzeBtn').disabled = true;
                     document.getElementById('assignBtn').disabled = true;
                     
+                    // Stoppe Countdown
+                    stopCountdown();
+                    
                     alert('✓ Daten wurden aus dem Speicher gelöscht');
                 }
             } catch (error) {
@@ -1050,6 +1125,9 @@
                     displayResults(data.stats);
                     resultsCard.classList.remove('hidden');
                     resultsCard.scrollIntoView({ behavior: 'smooth' });
+                    
+                    // Starte Countdown für Auto-Delete
+                    setTimeout(fetchDeleteTimestamp, 500);
                 } else {
                     alert('Fehler: ' + data.error);
                 }

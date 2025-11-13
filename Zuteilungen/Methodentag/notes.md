@@ -30,4 +30,4 @@ auto open
 hinweis bei keine wünsche bekommen ob der schüler wünsche hatte
 analyse erst nach upload        check
 
-macos hat keinen data folder
+macos hat keinen data folder        check
