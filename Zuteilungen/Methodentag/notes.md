@@ -24,3 +24,10 @@ mehr als 10 check
 new:
 hinweis auf exportart in lanis
 hinweis die die net gweählt haben manuell hinzufügen
+
+auto open
+
+hinweis bei keine wünsche bekommen ob der schüler wünsche hatte
+analyse erst nach upload        check
+
+macos hat keinen data folder

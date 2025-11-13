@@ -180,20 +180,12 @@ def upload_file():
 def analyze():
     """Analysiert die Daten ohne Zuteilung durchzuführen"""
     try:
-        # Nutze hochgeladene Daten oder fallback auf daten.csv
+        # Prüfe ob Daten hochgeladen wurden
         if current_data['students'] is None or current_data['courses'] is None:
-            # Fallback: Versuche daten.csv zu laden
-            default_file = os.path.join(SCRIPT_DIR, 'daten.csv')
-            if os.path.exists(default_file):
-                students, courses = load_data_from_file(default_file)
-                current_data['students'] = students
-                current_data['courses'] = courses
-                current_data['filename'] = 'daten.csv'
-            else:
-                return jsonify({
-                    'success': False,
-                    'error': 'Bitte laden Sie zuerst eine CSV-Datei hoch.'
-                }), 400
+            return jsonify({
+                'success': False,
+                'error': 'Bitte laden Sie zuerst eine CSV-Datei hoch.'
+            }), 400
         
         students = current_data['students']
         courses = current_data['courses']
@@ -243,20 +235,12 @@ def assign():
         else:
             max_students = None
         
-        # Nutze hochgeladene Daten oder fallback auf daten.csv
+        # Prüfe ob Daten hochgeladen wurden
         if current_data['students'] is None or current_data['courses'] is None:
-            # Fallback: Versuche daten.csv zu laden
-            default_file = os.path.join(SCRIPT_DIR, 'daten.csv')
-            if os.path.exists(default_file):
-                students, courses = load_data_from_file(default_file)
-                current_data['students'] = students
-                current_data['courses'] = courses
-                current_data['filename'] = 'daten.csv'
-            else:
-                return jsonify({
-                    'success': False,
-                    'error': 'Bitte laden Sie zuerst eine CSV-Datei hoch.'
-                }), 400
+            return jsonify({
+                'success': False,
+                'error': 'Bitte laden Sie zuerst eine CSV-Datei hoch.'
+            }), 400
         
         # Erstelle neue Course-Objekte für die Zuteilung (Deep Copy)
         students = current_data['students']

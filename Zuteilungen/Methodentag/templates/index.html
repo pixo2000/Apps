@@ -550,7 +550,7 @@
             <p style="margin-bottom: 16px; color: var(--md-sys-color-on-surface-variant);">
                 Laden Sie die CSV-Datei und analysieren Sie die Daten.
             </p>
-            <button class="btn btn-primary" onclick="analyzeData()">
+            <button class="btn btn-primary" id="analyzeBtn" onclick="analyzeData()" disabled>
                 <span class="material-symbols-outlined">query_stats</span>
                 Daten analysieren
             </button>
@@ -631,7 +631,7 @@
             <p style="margin-bottom: 16px; color: var(--md-sys-color-on-surface-variant);">
                 Starten Sie den Zuteilungsalgorithmus mit den gewählten Einstellungen.
             </p>
-            <button class="btn btn-primary" onclick="runAssignment()">
+            <button class="btn btn-primary" id="assignBtn" onclick="runAssignment()" disabled>
                 <span class="material-symbols-outlined">play_arrow</span>
                 Zuteilung starten
             </button>
@@ -870,6 +870,10 @@
                     uploadSuccess.style.display = 'flex';
                     document.getElementById('clearBtn').style.display = 'inline-flex';
                     
+                    // Aktiviere die Buttons
+                    document.getElementById('analyzeBtn').disabled = false;
+                    document.getElementById('assignBtn').disabled = false;
+                    
                     // Auto-analyze nach Upload
                     setTimeout(() => analyzeData(), 500);
                 } else {
@@ -906,6 +910,10 @@
                     document.getElementById('resultsCard').classList.add('hidden');
                     document.getElementById('clearBtn').style.display = 'none';
                     document.getElementById('csvFile').value = '';
+                    
+                    // Deaktiviere die Buttons
+                    document.getElementById('analyzeBtn').disabled = true;
+                    document.getElementById('assignBtn').disabled = true;
                     
                     alert('✓ Daten wurden aus dem Speicher gelöscht');
                 }
