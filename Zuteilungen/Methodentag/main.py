@@ -375,7 +375,8 @@ def print_statistics(students, courses, fulfilled_wishes, unfulfilled_students, 
         print(f"\n{len(students_without_wishes)} Schüler haben KEINEN ihrer Wünsche bekommen:\n")
         
         for student in students_without_wishes[:20]:  # Zeige erste 20
-            print(f"  - {student}")
+            wishes_info = f" (hatte {len(student.wishes)} Wünsche)" if student.wishes else " (hatte KEINE Wünsche angegeben)"
+            print(f"  - {student}{wishes_info}")
         
         if len(students_without_wishes) > 20:
             print(f"  ... und {len(students_without_wishes) - 20} weitere Schüler\n")
@@ -500,7 +501,8 @@ def export_summary_txt(students, courses, fulfilled_wishes, unfulfilled_students
         if students_without_wishes:
             f.write(f"\n⚠️  {len(students_without_wishes)} Schüler haben KEINEN ihrer Wünsche bekommen:\n")
             for student in students_without_wishes:
-                f.write(f"   - {student.firstname} {student.lastname} ({student.klasse})\n")
+                wishes_info = f" (hatte {len(student.wishes)} Wünsche)" if student.wishes else " (hatte KEINE Wünsche angegeben)"
+                f.write(f"   - {student.firstname} {student.lastname} ({student.klasse}){wishes_info}\n")
         else:
             f.write("\n✓ Alle Schüler haben mindestens einen Wunsch erfüllt bekommen!\n")
         

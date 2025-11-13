@@ -25,9 +25,12 @@ new:
 hinweis auf exportart in lanis
 hinweis die die net gweählt haben manuell hinzufügen
 
-auto open
+auto open       check
 
 hinweis bei keine wünsche bekommen ob der schüler wünsche hatte
 analyse erst nach upload        check
 
 macos hat keinen data folder        check
+
+
+name des buttons auf lanis und hinweis auf hinzufügen von fehlenden schülern und das ungültige entfernt werden

@@ -658,6 +658,13 @@
                 </div>
                 
                 <h3 style="margin-top: 24px; margin-bottom: 12px; font-size: 16px; font-weight: 500;">
+                    Verteilung erfüllter Wünsche pro Schüler
+                </h3>
+                <div id="wishesPerStudent" class="stats-grid">
+                    <!-- Wird dynamisch gefüllt -->
+                </div>
+                
+                <h3 style="margin-top: 24px; margin-bottom: 12px; font-size: 16px; font-weight: 500;">
                     Kursstatistiken
                 </h3>
                 <div class="table-container">
@@ -1158,6 +1165,33 @@
                 `;
                 wishPriorities.appendChild(div);
             }
+            
+            // Verteilung Wünsche pro Schüler
+            const wishesPerStudent = document.getElementById('wishesPerStudent');
+            wishesPerStudent.innerHTML = '';
+            
+            // Sortiere nach Anzahl der Wünsche
+            const wishesPerStudentData = Object.entries(stats.wishesPerStudent || {})
+                .map(([wishes, count]) => ({ wishes: parseInt(wishes), count: count }))
+                .sort((a, b) => a.wishes - b.wishes);
+            
+            const totalStudents = stats.studentCount;
+            
+            wishesPerStudentData.forEach(({ wishes, count }) => {
+                const percentage = totalStudents > 0 ? (count / totalStudents * 100).toFixed(1) : 0;
+                const div = document.createElement('div');
+                div.className = 'stat-card';
+                
+                const label = wishes === 0 ? '0 Wünsche' : 
+                             wishes === 1 ? '1 Wunsch' : 
+                             `${wishes} Wünsche`;
+                
+                div.innerHTML = `
+                    <div class="stat-value">${count}</div>
+                    <div class="stat-label">${label} (${percentage}%)</div>
+                `;
+                wishesPerStudent.appendChild(div);
+            });
             
             // Kurstabelle
             const tbody = document.getElementById('courseStatsTable').querySelector('tbody');
