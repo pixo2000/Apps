@@ -34,3 +34,4 @@ macos hat keinen data folder        check
 
 
 name des buttons auf lanis und hinweis auf hinzufügen von fehlenden schülern und das ungültige entfernt werden
+compilation error
