@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Streamer - Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+        }
+        
+        body.dragging-over::after {
+            content: '📁 Drop videos here to upload';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(102, 126, 234, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: white;
+            font-weight: bold;
+            z-index: 9999;
+            pointer-events: none;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .btn-logout {
+            padding: 10px 20px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-logout:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+        
+        .upload-section {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .volume-control {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 200px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .volume-label {
+            font-weight: bold;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .volume-icon {
+            font-size: 20px;
+        }
+        
+        .volume-slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .volume-slider::-webkit-slider-thumb:hover {
+            background: #5568d3;
+            transform: scale(1.2);
+        }
+        
+        .volume-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s;
+        }
+        
+        .volume-slider::-moz-range-thumb:hover {
+            background: #5568d3;
+            transform: scale(1.2);
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+        
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+        
+        .file-input-label {
+            display: block;
+            padding: 15px 25px;
+            background: #667eea;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .file-input-label:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .file-input-label.drag-over {
+            background: #4a55c4;
+            border: 3px dashed white;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: white;
+        }
+        
+        .btn-restart {
+            background: #f093fb;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .btn-restart:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4);
+        }
+        
+
+        .playlist {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            min-height: 200px;
+        }
+        
+        .playlist-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .playlist-header h2 {
+            color: #333;
+        }
+        
+        .playlist-count {
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        
+        .playlist-items {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .playlist-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            cursor: move;
+        }
+        
+        .playlist-item:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transform: translateY(-2px);
+        }
+        
+        .playlist-item.dragging {
+            opacity: 0.5;
+        }
+        
+        .drag-handle {
+            font-size: 24px;
+            color: #999;
+            cursor: grab;
+        }
+        
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+        
+        .video-info {
+            flex: 1;
+        }
+        
+        .video-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 1.1em;
+        }
+        
+        .video-filename {
+            color: #999;
+            font-size: 0.9em;
+        }
+        
+        .item-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-small {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .btn-edit {
+            background: #4ecdc4;
+            color: white;
+        }
+        
+        .btn-edit:hover {
+            background: #45b8b0;
+        }
+        
+        .btn-delete {
+            background: #ff6b6b;
+            color: white;
+        }
+        
+        .btn-delete:hover {
+            background: #ee5a5a;
+        }
+        
+        .btn-play {
+            background: #51cf66;
+            color: white;
+        }
+        
+        .btn-play:hover {
+            background: #47b85c;
+        }
+        
+        .empty-playlist {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        
+        .empty-playlist-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+        
+        .status-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .status-success {
+            background: #51cf66;
+        }
+        
+        .status-error {
+            background: #ff6b6b;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .player-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 24px;
+            background: #764ba2;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .player-link:hover {
+            background: #653a8c;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(118, 75, 162, 0.4);
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .upload-progress {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .upload-progress.show {
+            display: block;
+        }
+
+        .progress-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+        }
+
+        .progress-bar {
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header-section">
+            <h1>Video Streamer</h1>
+            <a href="/logout" class="btn-logout">Logout</a>
+        </div>
+        <p class="subtitle">Manage your video playlist for Raspberry Pi playback</p>
+        
+        <div class="controls">
+            <div class="upload-section">
+                <div class="file-input-wrapper">
+                    <input type="file" id="fileInput" accept="video/*" multiple>
+                    <label for="fileInput" class="file-input-label" id="dropZone">
+                        Choose Video Files or Drag & Drop Here
+                    </label>
+                </div>
+                <div class="upload-progress" id="uploadProgress"></div>
+            </div>
+            
+            <div class="volume-control">
+                <div class="volume-label">
+                    <span id="volumeIcon" class="volume-icon">♪</span>
+                    <span>Volume: <span id="volumeValue">100</span>%</span>
+                </div>
+                <input type="range" min="0" max="100" value="100" class="volume-slider" id="volumeSlider">
+            </div>
+        </div>
+        
+        <div class="playlist">
+            <div class="playlist-header">
+                <h2>Playlist</h2>
+                <span class="playlist-count" id="playlistCount">0 videos</span>
+            </div>
+            <div class="playlist-items" id="playlistItems">
+                <div class="empty-playlist">
+                    <div class="empty-playlist-icon">▶</div>
+                    <p>No videos yet. Upload some videos to get started!</p>
+                </div>
+            </div>
+        </div>
+        
+        <a href="/player" target="_blank" class="player-link">
+            Open Player View (for Raspberry Pi)
+        </a>
+    </div>
+    
+    <script>
+        let playlist = [];
+        let draggedElement = null;
+        let dragCounter = 0; // To track nested drag events
+        
+        // Load playlist on page load
+        loadPlaylist();
+        
+        // Volume control
+        const volumeSlider = document.getElementById('volumeSlider');
+        const volumeValue = document.getElementById('volumeValue');
+        const volumeIcon = document.getElementById('volumeIcon');
+        
+        volumeSlider.addEventListener('input', (e) => {
+            const volume = e.target.value;
+            volumeValue.textContent = volume;
+            updateVolumeIcon(volume);
+        });
+        
+        volumeSlider.addEventListener('change', async (e) => {
+            const volume = e.target.value;
+            await setVolume(volume);
+        });
+        
+        function updateVolumeIcon(volume) {
+            if (volume == 0) {
+                volumeIcon.textContent = '♪';
+                volumeIcon.style.opacity = '0.3';
+            } else if (volume < 33) {
+                volumeIcon.textContent = '♪';
+                volumeIcon.style.opacity = '0.5';
+            } else if (volume < 66) {
+                volumeIcon.textContent = '♪';
+                volumeIcon.style.opacity = '0.7';
+            } else {
+                volumeIcon.textContent = '♪';
+                volumeIcon.style.opacity = '1';
+            }
+        }
+        
+        async function setVolume(level) {
+            try {
+                const response = await fetch(`/api/volume/${level}`, {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    showStatus(`Volume set to ${level}%`, 'success');
+                } else {
+                    showStatus('Failed to set volume', 'error');
+                }
+            } catch (error) {
+                showStatus('Error: ' + error.message, 'error');
+            }
+        }
+        
+        async function restartPlayback() {
+            try {
+                const response = await fetch('/api/restart', {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    showStatus('Playback restarting from beginning', 'success');
+                } else {
+                    showStatus('Failed to send restart signal', 'error');
+                }
+            } catch (error) {
+                showStatus('Error: ' + error.message, 'error');
+            }
+        }
+        
+        // File upload handling
+        const fileInput = document.getElementById('fileInput');
+        const dropZone = document.getElementById('dropZone');
+        const uploadProgress = document.getElementById('uploadProgress');
+        
+        fileInput.addEventListener('change', handleFileSelect);
+        
+        // Global drag and drop handlers (for entire page)
+        document.addEventListener('dragenter', handleGlobalDragEnter);
+        document.addEventListener('dragover', handleGlobalDragOver);
+        document.addEventListener('dragleave', handleGlobalDragLeave);
+        document.addEventListener('drop', handleGlobalDrop);
+        
+        function handleGlobalDragEnter(e) {
+            // Only handle file drags, not playlist item drags
+            if (e.dataTransfer.types.includes('Files')) {
+                e.preventDefault();
+                e.stopPropagation();
+                dragCounter++;
+                if (dragCounter === 1) {
+                    document.body.classList.add('dragging-over');
+                }
+            }
+        }
+        
+        function handleGlobalDragOver(e) {
+            if (e.dataTransfer.types.includes('Files')) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.dataTransfer.dropEffect = 'copy';
+            }
+        }
+        
+        function handleGlobalDragLeave(e) {
+            if (e.dataTransfer.types.includes('Files')) {
+                e.preventDefault();
+                e.stopPropagation();
+                dragCounter--;
+                if (dragCounter === 0) {
+                    document.body.classList.remove('dragging-over');
+                }
+            }
+        }
+        
+        function handleGlobalDrop(e) {
+            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                dragCounter = 0;
+                document.body.classList.remove('dragging-over');
+                dropZone.classList.remove('drag-over');
+                
+                const files = e.dataTransfer.files;
+                console.log('Files dropped:', files.length);
+                uploadFiles(files);
+            }
+        }
+        
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            if (files.length > 0) {
+                console.log('Files selected:', files.length);
+                uploadFiles(files);
+            }
+        }
+        
+        async function uploadFiles(files) {
+            console.log('uploadFiles called with', files.length, 'files');
+            uploadProgress.innerHTML = '';
+            uploadProgress.classList.add('show');
+            
+            const videoFiles = Array.from(files).filter(file => {
+                const validTypes = ['video/mp4', 'video/avi', 'video/x-msvideo', 'video/x-matroska', 
+                                  'video/quicktime', 'video/webm', 'video/x-flv', 'video/x-ms-wmv'];
+                const isValid = validTypes.includes(file.type) || file.name.match(/\.(mp4|avi|mkv|mov|webm|flv|wmv)$/i);
+                console.log('File:', file.name, 'Type:', file.type, 'Valid:', isValid);
+                return isValid;
+            });
+            
+            console.log('Valid video files:', videoFiles.length);
+            
+            if (videoFiles.length === 0) {
+                showStatus('❌ No valid video files selected', 'error');
+                uploadProgress.classList.remove('show');
+                return;
+            }
+            
+            let successCount = 0;
+            let failCount = 0;
+            
+            for (let i = 0; i < videoFiles.length; i++) {
+                const file = videoFiles[i];
+                const progressId = `progress-${i}`;
+                
+                // Create progress item
+                const progressItem = document.createElement('div');
+                progressItem.className = 'progress-item';
+                progressItem.id = progressId;
+                progressItem.innerHTML = `
+                    <div>${file.name} (${formatFileSize(file.size)})</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 0%">0%</div>
+                    </div>
+                `;
+                uploadProgress.appendChild(progressItem);
+                
+                try {
+                    await uploadFile(file, progressId);
+                    successCount++;
+                    console.log('Upload successful for:', file.name);
+                } catch (error) {
+                    failCount++;
+                    console.error('Upload failed for:', file.name, error);
+                    const progressFill = document.querySelector(`#${progressId} .progress-fill`);
+                    if (progressFill) {
+                        progressFill.style.background = '#ff6b6b';
+                        progressFill.textContent = 'Failed';
+                    }
+                }
+            }
+            
+            // Clear file input
+            fileInput.value = '';
+            
+            // Show summary
+            if (successCount > 0) {
+                showStatus(`✅ Uploaded ${successCount} video(s)`, 'success');
+            }
+            if (failCount > 0) {
+                showStatus(`❌ Failed to upload ${failCount} video(s)`, 'error');
+            }
+            
+            // Reload playlist and hide progress after delay
+            setTimeout(() => {
+                loadPlaylist();
+                uploadProgress.classList.remove('show');
+            }, 2000);
+        }
+        
+        function uploadFile(file, progressId) {
+            return new Promise((resolve, reject) => {
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                const xhr = new XMLHttpRequest();
+                
+                // Progress tracking
+                xhr.upload.addEventListener('progress', (e) => {
+                    if (e.lengthComputable) {
+                        const percentComplete = Math.round((e.loaded / e.total) * 100);
+                        const progressFill = document.querySelector(`#${progressId} .progress-fill`);
+                        if (progressFill) {
+                            progressFill.style.width = percentComplete + '%';
+                            progressFill.textContent = percentComplete + '%';
+                        }
+                    }
+                });
+                
+                xhr.addEventListener('load', () => {
+                    if (xhr.status === 200) {
+                        try {
+                            const response = JSON.parse(xhr.responseText);
+                            console.log('Upload response:', response);
+                            const progressFill = document.querySelector(`#${progressId} .progress-fill`);
+                            if (progressFill) {
+                                progressFill.style.width = '100%';
+                                progressFill.textContent = '✓ Complete';
+                            }
+                            resolve();
+                        } catch (e) {
+                            console.error('Failed to parse response:', e);
+                            reject(new Error('Invalid response'));
+                        }
+                    } else {
+                        console.error('Upload failed with status:', xhr.status, xhr.responseText);
+                        reject(new Error(`Upload failed: ${xhr.status}`));
+                    }
+                });
+                
+                xhr.addEventListener('error', () => {
+                    reject(new Error('Upload failed'));
+                });
+                
+                xhr.open('POST', '/api/upload');
+                xhr.send(formData);
+            });
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+            return (bytes / (1024 * 1024 * 1024)).toFixed(1) + ' GB';
+        }
+        
+        async function handleFileUpload(event) {
+            const files = event.target.files;
+            if (files.length === 0) return;
+            
+            for (let file of files) {
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                try {
+                    const response = await fetch('/api/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const result = await response.json();
+                    if (result.success) {
+                        showStatus('✅ Uploaded: ' + file.name, 'success');
+                    } else {
+                        showStatus('❌ Error: ' + result.error, 'error');
+                    }
+                } catch (error) {
+                    showStatus('❌ Upload failed: ' + error.message, 'error');
+                }
+            }
+            
+            // Clear file input and reload playlist
+            event.target.value = '';
+            setTimeout(loadPlaylist, 500);
+        }
+        
+        async function loadPlaylist() {
+            try {
+                const response = await fetch('/api/playlist');
+                playlist = await response.json();
+                renderPlaylist();
+            } catch (error) {
+                showStatus('❌ Failed to load playlist', 'error');
+            }
+        }
+        
+        function renderPlaylist() {
+            const container = document.getElementById('playlistItems');
+            const countEl = document.getElementById('playlistCount');
+            
+            countEl.textContent = playlist.length + (playlist.length === 1 ? ' video' : ' videos');
+            
+            if (playlist.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-playlist">
+                        <div class="empty-playlist-icon">🎥</div>
+                        <p>No videos yet. Upload some videos to get started!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = playlist.map((item, index) => `
+                <div class="playlist-item" draggable="true" data-index="${index}">
+                    <span class="drag-handle">☰</span>
+                    <div class="video-info">
+                        <div class="video-title">${escapeHtml(item.title)}</div>
+                        <div class="video-filename">${escapeHtml(item.filename)}</div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="btn-small btn-play" onclick="playVideo(${index})">▶ Play</button>
+                        <button class="btn-small btn-edit" onclick="editTitle(${index})">Rename</button>
+                        <button class="btn-small btn-delete" onclick="deleteVideo(${index})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Add drag and drop listeners
+            const items = container.querySelectorAll('.playlist-item');
+            items.forEach(item => {
+                item.addEventListener('dragstart', handleDragStart);
+                item.addEventListener('dragover', handleDragOver);
+                item.addEventListener('drop', handleDrop);
+                item.addEventListener('dragend', handleDragEnd);
+            });
+        }
+        
+        function handleDragStart(e) {
+            draggedElement = this;
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', this.innerHTML);
+        }
+        
+        function handleDragOver(e) {
+            // Only handle playlist reordering, not file drops
+            if (!e.dataTransfer.types.includes('Files')) {
+                if (e.preventDefault) {
+                    e.preventDefault();
+                }
+                e.dataTransfer.dropEffect = 'move';
+            }
+            return false;
+        }
+        
+        function handleDrop(e) {
+            // Only handle playlist reordering, not file drops
+            if (!e.dataTransfer.types.includes('Files')) {
+                if (e.stopPropagation) {
+                    e.stopPropagation();
+                }
+                
+                if (draggedElement !== this) {
+                    const fromIndex = parseInt(draggedElement.dataset.index);
+                    const toIndex = parseInt(this.dataset.index);
+                    
+                    // Reorder playlist
+                    const item = playlist.splice(fromIndex, 1)[0];
+                    playlist.splice(toIndex, 0, item);
+                    
+                    savePlaylist();
+                }
+            }
+            
+            return false;
+        }
+        
+        function handleDragEnd(e) {
+            this.classList.remove('dragging');
+        }
+        
+        async function savePlaylist() {
+            try {
+                const response = await fetch('/api/playlist', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(playlist)
+                });
+                
+                if (response.ok) {
+                    renderPlaylist();
+                    showStatus('✅ Playlist updated', 'success');
+                }
+            } catch (error) {
+                showStatus('❌ Failed to save playlist', 'error');
+            }
+        }
+        
+        async function deleteVideo(index) {
+            if (!confirm('Are you sure you want to delete this video?')) {
+                return;
+            }
+            
+            const video = playlist[index];
+            try {
+                const response = await fetch(`/api/delete/${encodeURIComponent(video.filename)}`, {
+                    method: 'DELETE'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    if (result.file_deleted === false) {
+                        // File is locked, but removed from playlist
+                        showStatus((result.message || 'Video removed from playlist'), 'success');
+                    } else {
+                        showStatus('Video deleted', 'success');
+                    }
+                    loadPlaylist();
+                } else {
+                    showStatus('Failed to delete video', 'error');
+                }
+            } catch (error) {
+                showStatus('Error: ' + error.message, 'error');
+            }
+        }
+        
+        async function editTitle(index) {
+            const video = playlist[index];
+            const newTitle = prompt('Enter new title:', video.title);
+            
+            if (newTitle && newTitle !== video.title) {
+                try {
+                    const response = await fetch(`/api/rename/${encodeURIComponent(video.filename)}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ title: newTitle })
+                    });
+                    
+                    if (response.ok) {
+                        showStatus('✅ Title updated', 'success');
+                        loadPlaylist();
+                    } else {
+                        showStatus('❌ Failed to update title', 'error');
+                    }
+                } catch (error) {
+                    showStatus('❌ Error: ' + error.message, 'error');
+                }
+            }
+        }
+        
+        async function restartPlayback() {
+            try {
+                const response = await fetch('/api/restart', {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    showStatus('✅ Playback restarting from beginning', 'success');
+                } else {
+                    showStatus('❌ Failed to send restart signal', 'error');
+                }
+            } catch (error) {
+                showStatus('❌ Error: ' + error.message, 'error');
+            }
+        }
+        
+        async function playVideo(index) {
+            try {
+                const response = await fetch(`/api/play/${index}`, {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    showStatus(`Playing video ${index + 1}: ${playlist[index].title}`, 'success');
+                } else {
+                    showStatus('Failed to send play signal', 'error');
+                }
+            } catch (error) {
+                showStatus('Error: ' + error.message, 'error');
+            }
+        }
+        
+        function showStatus(message, type) {
+            const statusDiv = document.createElement('div');
+            statusDiv.className = `status-message status-${type}`;
+            statusDiv.textContent = message;
+            document.body.appendChild(statusDiv);
+            
+            setTimeout(() => {
+                statusDiv.style.animation = 'slideIn 0.3s ease reverse';
+                setTimeout(() => statusDiv.remove(), 300);
+            }, 3000);
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

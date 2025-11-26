@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Player</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #000;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        
+        video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            object-fit: contain;
+            background: #000;
+            z-index: 1;
+        }
+        
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: white;
+            z-index: 10;
+        }
+        
+        .loading-spinner {
+            width: 80px;
+            height: 80px;
+            border: 8px solid rgba(255,255,255,0.2);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .info {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            color: white;
+            background: rgba(0,0,0,0.7);
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 18px;
+            z-index: 5;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .info.show {
+            opacity: 1;
+        }
+        
+        .error-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 0, 0, 0.9);
+            color: white;
+            padding: 30px 50px;
+            border-radius: 15px;
+            text-align: center;
+            z-index: 20;
+            max-width: 80%;
+        }
+        
+        .error-message h2 {
+            margin-bottom: 10px;
+        }
+        
+        .click-to-start {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+        
+        .click-to-start.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .start-content {
+            text-align: center;
+            color: white;
+        }
+        
+        .start-icon {
+            font-size: 120px;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        
+        .start-content h2 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .start-content p {
+            font-size: 18px;
+            color: #aaa;
+        }
+        
+        .volume-indicator {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #667eea;
+            color: white;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 32px;
+            font-weight: bold;
+            z-index: 50;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .volume-indicator.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading" id="loading">
+        <div class="loading-spinner"></div>
+        <div>Loading playlist...</div>
+    </div>
+    
+    <video id="videoPlayer" autoplay muted></video>
+    
+    <div class="info" id="info">
+        <span id="currentVideo"></span>
+    </div>
+    
+    <div class="click-to-start" id="clickToStart">
+        <div class="start-content">
+            <div class="start-icon">▶</div>
+            <h2>Click anywhere to start playback</h2>
+            <p>Videos will play automatically after this</p>
+        </div>
+    </div>
+    
+    <div class="volume-indicator" id="volumeIndicator">
+        <span id="volumeText">♪ 100%</span>
+    </div>
+    
+    <script>
+        let playlist = [];
+        let currentIndex = 0;
+        let videoPlayer = document.getElementById('videoPlayer');
+        let loadingDiv = document.getElementById('loading');
+        let infoDiv = document.getElementById('info');
+        let currentVideoSpan = document.getElementById('currentVideo');
+        let clickToStart = document.getElementById('clickToStart');
+        let userInteracted = false;
+        let volumeIndicator = document.getElementById('volumeIndicator');
+        let volumeText = document.getElementById('volumeText');
+        let volumeHideTimeout;
+        
+        // Configuration
+        const PLAYLIST_POLL_INTERVAL = 10000; // Check for playlist updates every 10 seconds
+        const RESTART_CHECK_INTERVAL = 5000;  // Check for restart signal every 5 seconds
+        
+        // Load playlist and start playback
+        async function loadPlaylist() {
+            try {
+                console.log('Fetching playlist...');
+                const response = await fetch('/api/playlist');
+                const newPlaylist = await response.json();
+                
+                console.log('Playlist loaded:', newPlaylist.length, 'videos');
+                
+                if (newPlaylist.length === 0) {
+                    showError('Playlist is empty', 'Please upload videos from the management interface');
+                    return;
+                }
+                
+                // Check if playlist changed
+                const playlistChanged = JSON.stringify(newPlaylist) !== JSON.stringify(playlist);
+                playlist = newPlaylist;
+                
+                if (playlistChanged || currentIndex >= playlist.length) {
+                    console.log('Playlist updated, restarting from beginning');
+                    currentIndex = 0;
+                }
+                
+                loadingDiv.style.display = 'none';
+                
+                // Always show click-to-start on first load
+                if (!userInteracted) {
+                    console.log('Waiting for user interaction to start playback');
+                    clickToStart.classList.remove('hidden');
+                } else if (videoPlayer.paused || videoPlayer.ended) {
+                    playCurrentVideo();
+                }
+                
+            } catch (error) {
+                console.error('Error loading playlist:', error);
+                showError('Failed to load playlist', error.message);
+            }
+        }
+        
+        function playCurrentVideo() {
+            if (currentIndex >= playlist.length) {
+                currentIndex = 0; // Loop back to start
+            }
+            
+            const video = playlist[currentIndex];
+            console.log(`Playing video ${currentIndex + 1}/${playlist.length}: ${video.title}`);
+            console.log('Video URL:', video.url);
+            
+            // Force reload the video element
+            videoPlayer.load();
+            videoPlayer.src = video.url;
+            
+            // Log video metadata when loaded
+            videoPlayer.onloadedmetadata = function() {
+                console.log('Video metadata loaded:');
+                console.log('- Duration:', videoPlayer.duration);
+                console.log('- Video width:', videoPlayer.videoWidth);
+                console.log('- Video height:', videoPlayer.videoHeight);
+                console.log('- Ready state:', videoPlayer.readyState);
+            };
+            
+            // Log when video data starts loading
+            videoPlayer.onloadeddata = function() {
+                console.log('Video data loaded, ready to play');
+            };
+            
+            // Log when video actually starts playing
+            videoPlayer.onplay = function() {
+                console.log('Video play event fired');
+            };
+            
+            videoPlayer.onplaying = function() {
+                console.log('Video is now playing');
+            };
+            
+            // Unmute after first user interaction
+            if (userInteracted) {
+                videoPlayer.muted = false;
+            }
+            
+            videoPlayer.play().catch(error => {
+                console.error('Playback error:', error);
+                
+                // If it's an autoplay error and user hasn't interacted yet
+                if (!userInteracted && error.name === 'NotAllowedError') {
+                    console.log('Waiting for user interaction to start playback...');
+                    return;
+                }
+                
+                // Try next video on other errors
+                setTimeout(() => {
+                    currentIndex++;
+                    playCurrentVideo();
+                }, 2000);
+            });
+            
+            // Show video info
+            currentVideoSpan.textContent = `${currentIndex + 1}/${playlist.length}: ${video.title}`;
+            infoDiv.classList.add('show');
+            setTimeout(() => infoDiv.classList.remove('show'), 5000);
+        }
+        
+        // When video ends, play next
+        videoPlayer.addEventListener('ended', () => {
+            currentIndex++;
+            playCurrentVideo();
+        });
+        
+        // Handle video errors
+        videoPlayer.addEventListener('error', (e) => {
+            console.error('Video error:', e);
+            
+            // If video was deleted or can't be loaded, skip to next
+            if (videoPlayer.error) {
+                const errorCode = videoPlayer.error.code;
+                console.error('Video error code:', errorCode);
+                
+                if (errorCode === 4) { // MEDIA_ERR_SRC_NOT_SUPPORTED (likely deleted)
+                    console.log('Video file not found or unsupported, skipping to next...');
+                } else {
+                    showError('Video playback error', 'Skipping to next video...');
+                }
+                
+                setTimeout(() => {
+                    hideError();
+                    currentIndex++;
+                    if (currentIndex >= playlist.length) {
+                        currentIndex = 0;
+                    }
+                    playCurrentVideo();
+                }, 1000);
+            }
+        });
+        
+        // When video starts playing successfully
+        videoPlayer.addEventListener('playing', () => {
+            hideError();
+        });
+        
+        // Check for restart signal
+        async function checkRestart() {
+            try {
+                const response = await fetch('/api/check_restart');
+                const result = await response.json();
+                
+                if (result.restart) {
+                    console.log('Restart signal received, reloading playlist');
+                    currentIndex = 0;
+                    await loadPlaylist();
+                    playCurrentVideo();
+                }
+            } catch (error) {
+                console.error('Error checking restart signal:', error);
+            }
+        }
+        
+        // Check for play specific video signal
+        async function checkPlayIndex() {
+            try {
+                const response = await fetch('/api/check_play_index');
+                const result = await response.json();
+                
+                if (result.play && result.index !== undefined) {
+                    console.log('Play signal received for video index:', result.index);
+                    currentIndex = result.index;
+                    playCurrentVideo();
+                }
+            } catch (error) {
+                console.error('Error checking play index signal:', error);
+            }
+        }
+        
+        // Check for skip signal (e.g., after video deletion)
+        async function checkSkip() {
+            try {
+                const response = await fetch('/api/check_skip');
+                const result = await response.json();
+                
+                if (result.skip) {
+                    console.log('Skip signal received, moving to next video');
+                    await loadPlaylist(); // Reload playlist first
+                    // Don't increment index, just play current index (which is now a different video)
+                    if (playlist.length > 0) {
+                        if (currentIndex >= playlist.length) {
+                            currentIndex = 0;
+                        }
+                        playCurrentVideo();
+                    } else {
+                        showError('Playlist is empty', 'Please add videos from the management interface');
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking skip signal:', error);
+            }
+        }
+        
+        // Check for volume change signal
+        async function checkVolume() {
+            try {
+                const response = await fetch('/api/check_volume');
+                const result = await response.json();
+                
+                if (result.change) {
+                    console.log('Volume change signal received:', result.level);
+                    setVideoVolume(result.level);
+                }
+            } catch (error) {
+                console.error('Error checking volume signal:', error);
+            }
+        }
+        
+        function setVideoVolume(level) {
+            const volume = level / 100;
+            videoPlayer.volume = volume;
+            
+            // Update indicator
+            let icon = '♪';
+            
+            volumeText.textContent = `${icon} ${level}%`;
+            volumeIndicator.classList.add('show');
+            
+            // Hide after 2 seconds
+            clearTimeout(volumeHideTimeout);
+            volumeHideTimeout = setTimeout(() => {
+                volumeIndicator.classList.remove('show');
+            }, 2000);
+        }
+        
+        function showError(title, message) {
+            const existingError = document.querySelector('.error-message');
+            if (existingError) existingError.remove();
+            
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.innerHTML = `<h2>${title}</h2><p>${message}</p>`;
+            document.body.appendChild(errorDiv);
+        }
+        
+        function hideError() {
+            const errorDiv = document.querySelector('.error-message');
+            if (errorDiv) errorDiv.remove();
+        }
+        
+        // Request fullscreen on first interaction (for browsers that require it)
+        document.addEventListener('click', () => {
+            if (!userInteracted) {
+                console.log('User interaction detected, starting playback');
+                userInteracted = true;
+                clickToStart.classList.add('hidden');
+                
+                // Unmute and start playing
+                videoPlayer.muted = false;
+                if (playlist.length > 0) {
+                    console.log('Starting first video');
+                    playCurrentVideo();
+                } else {
+                    console.error('No videos in playlist');
+                    showError('Playlist is empty', 'Please upload videos from the management interface');
+                }
+                
+                // Request fullscreen
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(err => {
+                        console.log('Fullscreen request failed:', err);
+                    });
+                }
+            }
+        });
+        
+        // Prevent context menu
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case 'ArrowRight':
+                case 'n':
+                    // Next video
+                    currentIndex++;
+                    playCurrentVideo();
+                    break;
+                case 'ArrowLeft':
+                case 'p':
+                    // Previous video
+                    currentIndex = Math.max(0, currentIndex - 1);
+                    playCurrentVideo();
+                    break;
+                case 'r':
+                    // Restart current video
+                    videoPlayer.currentTime = 0;
+                    videoPlayer.play();
+                    break;
+                case ' ':
+                    // Pause/Play
+                    if (videoPlayer.paused) {
+                        videoPlayer.play();
+                    } else {
+                        videoPlayer.pause();
+                    }
+                    e.preventDefault();
+                    break;
+                case 'ArrowUp':
+                    // Volume up
+                    e.preventDefault();
+                    changeVolume(10);
+                    break;
+                case 'ArrowDown':
+                    // Volume down
+                    e.preventDefault();
+                    changeVolume(-10);
+                    break;
+                case 'm':
+                case 'M':
+                    // Mute/Unmute
+                    videoPlayer.muted = !videoPlayer.muted;
+                    const muteLevel = videoPlayer.muted ? 0 : Math.round(videoPlayer.volume * 100);
+                    volumeText.textContent = videoPlayer.muted ? 'Muted' : `♪ ${muteLevel}%`;
+                    volumeIndicator.classList.add('show');
+                    clearTimeout(volumeHideTimeout);
+                    volumeHideTimeout = setTimeout(() => {
+                        volumeIndicator.classList.remove('show');
+                    }, 2000);
+                    break;
+            }
+        });
+        
+        function changeVolume(delta) {
+            let currentVolume = Math.round(videoPlayer.volume * 100);
+            let newVolume = Math.max(0, Math.min(100, currentVolume + delta));
+            setVideoVolume(newVolume);
+        }
+        
+        // Initialize
+        loadPlaylist();
+        
+        // Poll for playlist updates
+        setInterval(loadPlaylist, PLAYLIST_POLL_INTERVAL);
+        
+        // Check for restart signal
+        setInterval(checkRestart, RESTART_CHECK_INTERVAL);
+        
+        // Check for play index signal
+        setInterval(checkPlayIndex, RESTART_CHECK_INTERVAL);
+        
+        // Check for skip signal
+        setInterval(checkSkip, RESTART_CHECK_INTERVAL);
+        
+        // Check for volume changes
+        setInterval(checkVolume, RESTART_CHECK_INTERVAL);
+        
+        // Log when page is loaded
+        console.log('Video Player initialized');
+        console.log('Browser:', navigator.userAgent);
+        console.log('Video element:', videoPlayer);
+        console.log('Keyboard shortcuts:');
+        console.log('  Arrow keys: <- -> (prev/next), ^ v (volume up/down)');
+        console.log('  Space: pause/play');
+        console.log('  R: restart current video');
+        console.log('  M: mute/unmute');
+        
+        // Test video element visibility
+        setInterval(() => {
+            if (videoPlayer.src && !videoPlayer.paused) {
+                console.log('Video status:');
+                console.log('- Current time:', videoPlayer.currentTime);
+                console.log('- Duration:', videoPlayer.duration);
+                console.log('- Paused:', videoPlayer.paused);
+                console.log('- Ended:', videoPlayer.ended);
+                console.log('- Network state:', videoPlayer.networkState);
+                console.log('- Ready state:', videoPlayer.readyState);
+                console.log('- Video dimensions:', videoPlayer.videoWidth, 'x', videoPlayer.videoHeight);
+                console.log('- Element dimensions:', videoPlayer.offsetWidth, 'x', videoPlayer.offsetHeight);
+            }
+        }, 5000);
+    </script>
+</body>
+</html>
