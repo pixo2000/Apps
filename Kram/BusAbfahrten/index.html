@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bus Abfahrten</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚌 Bus Abfahrten</h1>
+            <p>Finde Abfahrten für deine Bushaltestelle</p>
+        </header>
+
+        <div class="search-section">
+            <div class="search-container">
+                <input type="text" id="stopSearch" placeholder="Bushaltestelle eingeben..." autocomplete="off">
+                <button id="searchBtn">Suchen</button>
+            </div>
+            <div id="suggestions" class="suggestions-container"></div>
+            <div id="selectedStop" class="selected-stop"></div>
+        </div>
+
+        <div class="departures-wrapper">
+            <div class="departure-area" id="area1">
+                <h2>⬅️ Richtung 1</h2>
+                <div class="departure-list" id="departures1">
+                    <p class="placeholder">Wähle eine Haltestelle aus...</p>
+                </div>
+            </div>
+
+            <div class="departure-area" id="area2">
+                <h2>➡️ Richtung 2</h2>
+                <div class="departure-list" id="departures2">
+                    <p class="placeholder">Wähle eine Haltestelle aus...</p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Daten von der Deutschen Bahn API (transport.rest)</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
