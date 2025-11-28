@@ -1,306 +1,114 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-    min-height: 100vh;
-    color: #fff;
+    background-color: #f0f2f5;
+    margin: 0;
+    padding: 20px;
+    color: #333;
 }
 
 .container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-header {
-    text-align: center;
-    padding: 30px 0;
-}
-
-header h1 {
-    font-size: 2.5rem;
-    margin-bottom: 10px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-header p {
-    font-size: 1.1rem;
-    opacity: 0.8;
-}
-
-.search-section {
     max-width: 600px;
-    margin: 0 auto 30px;
-    position: relative;
+    margin: 0 auto;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
-.search-container {
+h1 {
+    text-align: center;
+    color: #db0000; /* DB Red-ish */
+}
+
+.search-box {
     display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #db0000;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #b30000;
+}
+
+.results-list, .departures-list {
+    display: flex;
+    flex-direction: column;
     gap: 10px;
 }
 
-#stopSearch {
-    flex: 1;
-    padding: 15px 20px;
-    font-size: 1.1rem;
-    border: none;
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.95);
-    color: #333;
-    outline: none;
-    transition: box-shadow 0.3s ease;
-}
-
-#stopSearch:focus {
-    box-shadow: 0 0 0 3px rgba(100, 200, 255, 0.5);
-}
-
-#searchBtn {
-    padding: 15px 30px;
-    font-size: 1.1rem;
-    border: none;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #00b4db 0%, #0083b0 100%);
-    color: white;
-    cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-#searchBtn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 20px rgba(0, 180, 219, 0.4);
-}
-
-#searchBtn:active {
-    transform: translateY(0);
-}
-
-.suggestions-container {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: rgba(255, 255, 255, 0.98);
-    border-radius: 10px;
-    margin-top: 5px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-    max-height: 300px;
-    overflow-y: auto;
-    z-index: 100;
-    display: none;
-}
-
-.suggestions-container.active {
-    display: block;
-}
-
-.suggestion-item {
-    padding: 15px 20px;
-    color: #333;
-    cursor: pointer;
-    border-bottom: 1px solid #eee;
-    transition: background 0.2s ease;
-}
-
-.suggestion-item:last-child {
-    border-bottom: none;
-}
-
-.suggestion-item:hover {
-    background: #f0f7ff;
-}
-
-.suggestion-item .stop-name {
-    font-weight: 600;
-    margin-bottom: 3px;
-}
-
-.suggestion-item .stop-location {
-    font-size: 0.85rem;
-    color: #666;
-}
-
-.selected-stop {
-    text-align: center;
+.station-item, .departure-item {
     padding: 15px;
-    margin-top: 15px;
-    background: rgba(0, 200, 150, 0.2);
-    border-radius: 10px;
-    border: 2px solid rgba(0, 200, 150, 0.5);
-    display: none;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
 }
 
-.selected-stop.active {
-    display: block;
-}
-
-.selected-stop h3 {
-    font-size: 1.2rem;
-    color: #00d4aa;
-}
-
-.departures-wrapper {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 30px;
-    margin-top: 20px;
-}
-
-@media (max-width: 900px) {
-    .departures-wrapper {
-        grid-template-columns: 1fr;
-    }
-}
-
-.departure-area {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border-radius: 15px;
-    padding: 25px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.departure-area h2 {
-    font-size: 1.4rem;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
-    text-align: center;
-}
-
-.departure-list {
-    min-height: 300px;
-}
-
-.departure-list .placeholder {
-    text-align: center;
-    opacity: 0.6;
-    padding: 50px 20px;
-    font-style: italic;
+.station-item:hover {
+    background-color: #f9f9f9;
 }
 
 .departure-item {
+    cursor: default;
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    padding: 15px;
-    margin-bottom: 10px;
-    background: rgba(255, 255, 255, 0.08);
-    border-radius: 10px;
-    transition: transform 0.2s ease, background 0.2s ease;
 }
 
-.departure-item:hover {
-    transform: translateX(5px);
-    background: rgba(255, 255, 255, 0.12);
-}
-
-.departure-line {
-    min-width: 60px;
-    padding: 8px 12px;
-    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
-    border-radius: 8px;
+.line-badge {
+    background-color: #333;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
     font-weight: bold;
+    margin-right: 10px;
+    min-width: 40px;
     text-align: center;
-    margin-right: 15px;
-    font-size: 0.95rem;
+    display: inline-block;
 }
 
-.departure-line.bus {
-    background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%);
-}
-
-.departure-line.tram {
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-}
-
-.departure-line.subway {
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-}
-
-.departure-info {
+.direction {
     flex: 1;
 }
 
-.departure-direction {
-    font-weight: 600;
-    margin-bottom: 3px;
-    font-size: 1rem;
-}
-
-.departure-platform {
-    font-size: 0.85rem;
-    opacity: 0.7;
-}
-
-.departure-time {
-    text-align: right;
-}
-
-.departure-time .time {
-    font-size: 1.3rem;
+.time {
     font-weight: bold;
-    color: #00d4aa;
+    color: #db0000;
 }
 
-.departure-time .delay {
-    font-size: 0.85rem;
-    color: #ff6b6b;
+.back-btn {
+    background-color: #666;
+    margin-bottom: 15px;
+    font-size: 14px;
+    padding: 5px 10px;
 }
 
-.departure-time .minutes {
-    font-size: 0.9rem;
-    opacity: 0.8;
-    margin-top: 3px;
+.delay {
+    color: #db0000;
+    font-size: 0.9em;
+    margin-left: 5px;
 }
 
-.loading {
-    text-align: center;
-    padding: 50px 20px;
-}
-
-.loading::after {
-    content: '';
-    display: inline-block;
-    width: 30px;
-    height: 30px;
-    border: 3px solid rgba(255, 255, 255, 0.3);
-    border-top-color: #00d4aa;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-top: 15px;
-}
-
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-.error {
-    text-align: center;
-    padding: 30px 20px;
-    background: rgba(255, 107, 107, 0.2);
-    border-radius: 10px;
-    border: 1px solid rgba(255, 107, 107, 0.3);
-}
-
-.no-departures {
-    text-align: center;
-    padding: 30px 20px;
-    opacity: 0.7;
-    font-style: italic;
-}
-
-footer {
-    text-align: center;
-    padding: 30px 0;
-    margin-top: 40px;
-    opacity: 0.6;
-    font-size: 0.9rem;
+.on-time {
+    color: #2ecc71;
+    font-size: 0.9em;
+    margin-left: 5px;
 }
