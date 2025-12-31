@@ -1,1 +1,0 @@
-beim raspi auto transfer folder

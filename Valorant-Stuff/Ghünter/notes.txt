@@ -1,8 +1,0 @@
-status embed and website
-
-logger channel for extensive debugging
-
-status auto update
-fix status uptime again?!?!?
-
-emojis in latest gone?!?!?!?!?!!?
